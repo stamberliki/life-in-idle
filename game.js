@@ -3,7 +3,8 @@ import {getActiveButtonStats} from './getActiveButtonStats.js';
 import {nextStageData} from './nextStageData.js';
 import {buffList} from './buffList.js';
 import {buyMenuItems} from './buyMenuItems.js';
-// import {buyMenuItemsData} from './buyMenuItemsData.js';
+import {buyMenuItemsData} from './buyMenuItemsData.js';
+import {popupEvent} from './popupEvent.js';
 
 var config = {
     type: Phaser.AUTO,
@@ -28,8 +29,6 @@ var characterIdle = ['baby_idle','baby2_idle','toddler_idle',
                     'earlyChild_idle','childhood_idle','teenager1_idle',
                     'teenager2_idle','adulthood_idle'];
 var graphics;
-var bed;
-var crib;
 var player;
 var nextStage;
 var money;
@@ -111,28 +110,33 @@ function preload (){
     this.load.spritesheet('teenager2','assets/characters/teenager2.png',{ frameWidth: 32, frameHeight: 64 });
     this.load.spritesheet('adulthood','assets/characters/adulthood.png',{ frameWidth: 32, frameHeight: 64 });
     this.load.spritesheet('button','assets/ui/button.png',{ frameWidth: 64, frameHeight: 14 });
+    this.load.spritesheet('button32','assets/ui/button32.png',{ frameWidth: 32, frameHeight: 14 });
     this.load.spritesheet('activeButton','assets/ui/active_button.png',{ frameWidth: 64, frameHeight: 18 });
     this.load.spritesheet('lockedButton','assets/ui/locked_button.png',{ frameWidth: 64, frameHeight: 19 });
     this.load.spritesheet('buyMenuIcons','assets/props/icons/buy_menu_icons.png',{ frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet('crib','assets/props/crib.png',{ frameWidth: 96, frameHeight: 64 });
     this.load.spritesheet('smallBed','assets/props/small_bed.png',{ frameWidth: 64, frameHeight: 96 });
+    this.load.spritesheet('desk','assets/props/desk.png',{ frameWidth: 96, frameHeight: 64 });
     this.load.spritesheet('home','assets/props/background_home.png',{ frameWidth: 400, frameHeight: 300 });
     this.load.spritesheet('props','assets/ui/props.png',{ frameWidth: 64, frameHeight: 16 });
     this.load.spritesheet('buyIcon','assets/ui/buy_icon.png',{ frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet('closeButton','assets/ui/close_button.png',{ frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet('buffIcons','assets/ui/buff_icons.png',{ frameWidth: 16, frameHeight: 16 });
-    this.load.spritesheet('buttonDescription','assets/ui/button_description.png',{ frameWidth: 64, frameHeight: 24 });
+    this.load.spritesheet('buttonDescription','assets/ui/button_description.png',{ frameWidth: 56, frameHeight: 19 });
     this.load.spritesheet('buffDescription','assets/ui/buff_description.png',{ frameWidth: 32, frameHeight: 24 });
     this.load.spritesheet('buyMenuButtons','assets/ui/buy_menu_props.png',{ frameWidth: 48, frameHeight: 16 });
     this.load.spritesheet('buyMenuItems','assets/ui/buy_menu_items.png',{ frameWidth: 64, frameHeight: 80 });
-    this.load.spritesheet('buyMenuCategories','assets/ui/buy_menu_categories.png',{ frameWidth: 64, frameHeight: 16 });
+    this.load.spritesheet('buyMenuCategories','assets/ui/buy_menu_categories.png',{ frameWidth: 72, frameHeight: 16 });
     this.load.image('uiBg','assets/ui/UI.png');
     this.load.image('buyMenuBg','assets/ui/buy_menu.png');
+    this.load.image('popupEvent','assets/ui/popup_event.png');
     this.load.bitmapFont('mainFont', 'assets/ui/font.png','assets/ui/font.fnt');
     this.load.bitmapFont('mainFont2', 'assets/ui/font2.png','assets/ui/font2.fnt');
     this.load.bitmapFont('mainFont8', 'assets/ui/font8.png','assets/ui/font8.fnt');
 
+    this.popupEvent;
     this.bg;
+    this.currentStageCounter=0;
     this.buyMenuObj;
     this.buyMenu;
     this.buyMenuMoney;
@@ -145,25 +149,29 @@ function preload (){
     this.expGain;
     this.moneyAmount;
     this.expAmount;
+    this.moneyMultiplier = 1;
+    this.expMultiplier = 1;
     this.isCareSelected = true;
     this.buyMenuCamera;
     this.buyMenuCategorySelect;
+    this.checkItemEquip = checkItemEquip;
+    this.renderBuyMenuItem = renderBuyMenuItem;
+    this.repositionBuffs = repositionBuffs;
     this.buyMenuItemsCount = this.buyMenuItemsCount + 1 || 0;
 
     this.buttonLeftSelected = false;
     this.buttonRightSelected = false;
     this.buttonCharacterSelected = false;
     this.allButtonCharacterUnlock = false;
-    this.activeButtonNonCharacterCount = [2,2,1];
+    this.activeButtonNonCharacterCount = [2,1,1];
 
-    this.currentBuffCharacter = null;
-    this.currentBuffLeft = null;
-    this.currentBuffRight = null;
+    this.currentBuffCharacter = [];
+    this.currentBuffLeft = [];
+    this.currentBuffRight = [];
 
     this.activeButtonLeft = [];
     this.activeButtonRight = [];
     this.activeButtonCharacter = [];
-    this.buyMenuItems = {toy:[], b:[], c:[], d:[], e:[], f:[], };
     this.buyMenuCategories = [];
 
     this.inputs = [];
@@ -188,16 +196,10 @@ function create (){
         repeat: -1
     });
 
-    crib = this.add.sprite(402,288+(12*scale),'crib');
-    crib.setScale(scale);
-
     player = this.add.sprite(400-32,300-44,'baby').setOrigin(0);
     player.setScale(scale);
     player.anims.play('baby_idle',true);
-
-    bed = this.add.image(560,236,'smallBed');
-    bed.setScale(scale);
-    bed.visible = false;
+    player.depth = 1;
 
     nextStage = this.add.image(400,600-(16*scale),'button',0);
     nextStage.setScale(scale);
@@ -223,27 +225,47 @@ function create (){
     nextStage.on('pointerup', function () {
         if (!nextStageLocked){
             nextStage.setFrame(1);
-            if (currentStage == 1){
+            currentStage++;
+            player.anims.play(characterIdle[currentStage+this.currentStageCounter],true);
+            
+            if (currentStage+this.currentStageCounter == 2){
                 this.bg.setFrame(1);
-                crib.destroy();
-                bed.visible = true;
+                this.buyMenuCategories[0].data.values.itemRender.setVisible(true);
+                this.buyMenuCategories[1].data.values.itemRender.setVisible(false);
             }
-            if (currentStage == 2){
+            if (currentStage+this.currentStageCounter == 3){
                 player.setPosition(400-32,300-96);
             }
-            currentStage++;
-            player.anims.play(characterIdle[currentStage],true);
+
+            let leftCycle, rightCycle;
+            if (currentStage-1 <= 1){
+                leftCycle = activeButtonLeft[1].data.values.cycleCount;
+                rightCycle = activeButtonRight[1].data.values.cycleCount;
+            }
+            else {
+                leftCycle = activeButtonLeft[0].data.values.cycleCount;
+                rightCycle = activeButtonRight[0].data.values.cycleCount;
+            }
+
+            clearBuffs(this.currentBuffCharacter);
+            clearBuffs(this.currentBuffLeft);
+            clearBuffs(this.currentBuffRight);
 
             for (let x = 0 ; x != activeButtonLeft.length ; x++){
                 activeButtonLeft[x].data.values.description.destroy();
+                activeButtonLeft[x].data.values.timeEvent.paused = true;
+                activeButtonLeft[x].data.values.descriptionPopup.destroy();
                 activeButtonLeft[x].destroy();
             }
             for (let x = 0 ; x != activeButtonRight.length ; x++){
                 activeButtonRight[x].data.values.description.destroy();
+                activeButtonRight[x].data.values.timeEvent.paused = true;
+                activeButtonRight[x].data.values.descriptionPopup.destroy();
                 activeButtonRight[x].destroy();
             }
             for (let x = 0 ; x != activeButtonCharacter.length ; x++){
                 activeButtonCharacter[x].data.values.description.destroy();
+                activeButtonCharacter[x].data.values.timeEvent.paused = true;
                 activeButtonCharacter[x].destroy();
             }
             activeButtonLeft.length = 0;
@@ -260,7 +282,24 @@ function create (){
             }
             activeButton(this,activeButtonCharacter,
                 'character',getActiveButtonStats(this,'character',currentStage+1,1,buffList));
+            this.buttonLeftSelected = false;
+            this.buttonRightSelected = false;
+            this.buttonCharacterSelected = false;
 
+            if (currentStage <= 1){
+                money.setData('promotionEventPopup', 
+                new popupEvent(this,'Your mother gain '+activeButtonLeft[1].data.values.gain+
+                    '\ncash per cycle,'+
+                    '\nwhile you father \ngain '+
+                    activeButtonRight[1].data.values.gain+' cash per cycle \nas a promotion \nto their work',false));
+            }
+            else {
+                money.setData('promotionEventPopup', 
+                new popupEvent(this,'Your mother gain '+activeButtonLeft[0].data.values.gain+
+                    ', while you father gain '+activeButtonRight[0].data.values.gain+'as a promotion to their work',false));
+            }
+
+            putAllActiveButtonEvent(this);
             nextStageLocked = true;
             nextStage.setTexture('lockedButton',0);
             this.allButtonCharacterUnlock = false;
@@ -292,11 +331,15 @@ function create (){
 
     money = this.add.image(130,103,'props',0).setOrigin(0);
     money.setScale(scale);
+    money.depth = 1;
     exp = this.add.image(130,137,'props',1).setOrigin(0);
     exp.setScale(scale);
+    exp.depth = 1;
 
     moneyAmount = this.add.bitmapText(175,111,'mainFont').setOrigin(0);
     expAmount = this.add.bitmapText(175,145,'mainFont').setOrigin(0);
+    moneyAmount.depth = 1;
+    expAmount.depth = 1;
     this.moneyAmount = moneyAmount;
     this.expAmount = expAmount;
 
@@ -341,8 +384,9 @@ function update(){
         let y = buttons.y;
         graphics.fillRect(x+20, y+24, 88 * buttons.data.values.timeEvent.getProgress(), 4);
     }
+
     checkUnlockableActiveButton(this);
-    // console.log(currentStage);
+
     if (this.allButtonCharacterUnlock && nextStageData(this, currentStage+1) && nextStageLocked) {
         nextStageWasLocked = true;
     }
@@ -351,66 +395,45 @@ function update(){
 function putAllActiveButtonEvent(game){
     for (var x = 0 ; x != game.activeButtonLeft.length ; x++){
         game.inputs.push(game.activeButtonLeft[x]);
-        game.inputs.push(game.activeButtonLeft[x].data.values.buff.icon);
     }
     for (var x = 0 ; x != game.activeButtonRight.length ; x++){
         game.inputs.push(game.activeButtonRight[x]);
-        game.inputs.push(game.activeButtonRight[x].data.values.buff.icon);
     }
     for (var x = 0 ; x != game.activeButtonCharacter.length ; x++){
         game.inputs.push(game.activeButtonCharacter[x]);
-        game.inputs.push(game.activeButtonCharacter[x].data.values.buff.icon);
     }
 }
 
 function disableActiveButtonEvent(game){
+    console.log(game.inputs.length);
     for (var x = 0 ; x != game.inputs.length ; x++){
         game.inputs[x].disableInteractive();
+        if (game.inputs[x].data){
+            for (let y = 0 ; y != game.inputs[x].data.values.buff.length ; y++){
+                game.inputs[x].data.values.buff[y].icon.disableInteractive();
+            }
+        }
     }
 }
 
 function enableActiveButtonEvent(game){
     for (var x = 0 ; x != game.inputs.length ; x++){
         game.inputs[x].setInteractive();
+        if (game.inputs[x].data){
+            for (let y = 0 ; y != game.inputs[x].data.values.buff.length ; y++){
+                game.inputs[x].data.values.buff[y].icon.setInteractive();
+            }
+        }
     }
 }
 
-function gainGold(gain, button){
-    moneyAmount.setText(moneyAmount.data.values.amount += gain);
+function gainGold(gain, button=''){
+    moneyAmount.setText(moneyAmount.data.values.amount += (gain*moneyMultiplier));
     this.buyMenuMoney.setText(moneyAmount.data.values.amount);
     let buttonData = button.data.values;
-    let currentBuff;
+    buttonData.cycleCount++;
 
-    if (buttonData.position == 'left' && this.currentBuffLeft){
-        checkActiveBuffs(this.currentBuffLeft);
-        currentBuff = this.currentBuffLeft;
-    }
-    else if (buttonData.position == 'right' && this.currentBuffRight){
-        checkActiveBuffs(this.currentBuffRight);
-        currentBuff = this.currentBuffRight;
-    }
-    else if (buttonData.position == 'character' && this.currentBuffCharacter){
-        checkActiveBuffs(this.currentBuffCharacter);
-        currentBuff = this.currentBuffCharacter;
-    }
-
-    if (Phaser.Math.Between(1,100) <= buttonData.buff.chance && !buttonData.buff.isActive){
-        if (currentBuff){
-            if (currentBuff.isActive){
-                currentBuff.deactivate();
-            } 
-        }
-        buttonData.buff.active();
-        if (buttonData.position == 'left'){
-            this.currentBuffLeft = buttonData.buff;
-        }
-        else if (buttonData.position == 'right'){
-            this.currentBuffRight = buttonData.buff;
-        }
-        else if (buttonData.position == 'character'){
-            this.currentBuffCharacter = buttonData.buff;
-        }
-    }
+    updateBuffs(this, buttonData);
 
     if (buttonData.pause){
         buttonData.timeEvent.paused = true;
@@ -428,10 +451,18 @@ function gainGold(gain, button){
     }
 }
 
-function expGain(gain, button){
-    expAmount.setText(expAmount.data.values.amount += gain);
+function expGain(gain, button=''){
+    console.log(gain);
+    expAmount.setText(expAmount.data.values.amount += (gain*this.expMultiplier));
     let buttonData = button.data.values;
-    let currentBuff;
+
+    if (expAmount.data.values.amount >= 750 && this.currentStageCounter <= 0){
+        this.currentStageCounter = 1;
+        player.anims.play(characterIdle[currentStage+this.currentStageCounter],true);
+    }
+    // if (expAmount.data.values.amount >= 750 && this.currentStageCounter <= 0){
+    //     this.currentStageCounter = 1;
+    // }
 
     if (buttonData.requiredTurnsToUnlock){
         if (buttonData.requiredTurnsToUnlock > 0){
@@ -439,36 +470,7 @@ function expGain(gain, button){
         }
     }
 
-    if (buttonData.position == 'left' && this.currentBuffLeft){
-        checkActiveBuffs(this.currentBuffLeft);
-        currentBuff = this.currentBuffLeft;
-    }
-    else if (buttonData.position == 'right' && this.currentBuffRight){
-        checkActiveBuffs(this.currentBuffRight);
-        currentBuff = this.currentBuffRight;
-    }
-    else if (buttonData.position == 'character' && this.currentBuffCharacter){
-        checkActiveBuffs(this.currentBuffCharacter);
-        currentBuff = this.currentBuffCharacter;
-    }
-
-    if (Phaser.Math.Between(1,100) <= buttonData.buff.chance && !buttonData.buff.isActive){
-        if (currentBuff){
-            if (currentBuff.isActive){
-                currentBuff.deactivate();
-            } 
-        }
-        buttonData.buff.active();
-        if (buttonData.position == 'left'){
-            this.currentBuffLeft = buttonData.buff;
-        }
-        else if (buttonData.position == 'right'){
-            this.currentBuffRight = buttonData.buff;
-        }
-        else if (buttonData.position == 'character'){
-            this.currentBuffCharacter = buttonData.buff;
-        }
-    }
+    updateBuffs(this, buttonData);
 
     if (buttonData.pause){
         buttonData.timeEvent.paused = true;
@@ -545,10 +547,7 @@ function buyMenu(game){
     game.buyMenuMoney = game.add.bitmapText(642,88,'mainFont').setOrigin(0);
     game.buyMenuMoney.depth = 2;
 
-    buyMenuItems(game,game.buyMenuItems);
-
     game.buyMenuCamera = game.cameras.add(252, 162,416,438).setOrigin(0);
-    // game.buyMenuCamera.setZoom(0.3);
     game.buyMenuCamera.scrollY = 600;
 
     game.fakeBuyMenuBg = game.add.image(252, 162,'buyMenuBg').setOrigin(0);
@@ -569,9 +568,12 @@ function buyMenu(game){
         game.fakeBuyMenuBg.data.values.isClicked = false;
     });
 
-    createBuyMenuCategory(game,'TOY', true);
-    createBuyMenuCategory(game, 'bB');
-    createBuyMenuCategory(game, 'cC');
+    createBuyMenuCategory(game,'SMALL BED', 0, true);
+    createBuyMenuCategory(game, 'CRIB', 0);
+    createBuyMenuCategory(game, 'DESK', 1, false, false,4);
+    createBuyMenuCategory(game, 'TOY', 1);
+    createBuyMenuCategory(game, 'SCHOOL SUPPLIES', 2, false, true);
+    buyMenuItems(game,game.buyMenuCategories,buyMenuItemsData);
 
     game.input.on('gameobjectmove',function(pointer,gameObject){
         if(game.fakeBuyMenuBg.data.values.isClicked){
@@ -626,16 +628,25 @@ function buyMenu(game){
     }
 }
 
-function createBuyMenuCategory(game, name, selected = false){
+function createBuyMenuCategory(game, name, stageAvailable, selected = false, needPrimaryItem=false, primaryItemPointer = ''){
     let button = game.add.image(66,162+(32*(game.buyMenuCategories.length+1)),'buyMenuCategories',0).setOrigin(0);
     button.setInteractive();
     button.setData({
         isSelected: selected,
+        stageAvailable: stageAvailable,
         number: game.buyMenuCategories.length,
         name: name,
-        text: game.add.bitmapText(82,170+(32*(game.buyMenuCategories.length+1)), 'mainFont', name).setFontSize(16),
-
+        text: game.add.bitmapText(74,178+(32*(game.buyMenuCategories.length+1)), 'mainFont', name).setFontSize(16).setOrigin(0,.5),
+        itemSelect: '',
+        itemList: [],
+        itemRender: '',
+        needPrimaryItem: needPrimaryItem,
+        primaryItemEquip: false,
+        primaryItemPointer: primaryItemPointer,
     });
+    if (button.data.values.text.width > 125){
+        button.data.values.text.setFontSize(8).setOrigin(0,.5);
+    }
     button.setScale(2);
     button.depth = 2;
     button.data.values.text.depth = 2;
@@ -644,26 +655,51 @@ function createBuyMenuCategory(game, name, selected = false){
         game.buyMenuCategorySelect = button;
     }
     button.on('pointerout',function() {
-        if (!button.isSelected){
+        if (!button.data.values.isSelected && button.data.values.stageAvailable <= currentStage){
             button.setFrame(0);
         }
     });
     button.on('pointerover',function() {
-        if (!button.isSelected){
+        if (!button.data.values.isSelected && button.data.values.stageAvailable <= currentStage){
             button.setFrame(2);
         }
     });
     button.on('pointerup',function(){
-        button.setFrame(1);
-        button.isSelected = true;
-        game.buyMenuCamera.scrollX = 416*button.data.values.number;
-        if (game.buyMenuCategorySelect){
-            game.buyMenuCategorySelect.isSelected = false;
-            game.buyMenuCategorySelect.setFrame(0);
+        if (!button.isSelected && button.data.values.stageAvailable <= currentStage){
+            game.buyMenuCamera.scrollX = 416*button.data.values.number;
+            if (game.buyMenuCategorySelect){
+                game.buyMenuCategorySelect.data.values.isSelected = false;
+                game.buyMenuCategorySelect.setFrame(0);
+            }
+            game.buyMenuCategorySelect = button;
+            game.buyMenuCategorySelect.setFrame(1);
+            game.buyMenuCategorySelect.data.values.isSelected = true;
+
         }
-        game.buyMenuCategorySelect = button;
     });
     game.buyMenuCategories.push(button);
+}
+
+function renderBuyMenuItem(game){
+    if(game.buyMenuCategorySelect.data.values.itemSelect){
+        let data = game.buyMenuCategorySelect.data.values.itemSelect.data.values;
+        if (data.position-1 == 0){
+            game.buyMenuCategorySelect.data.values.itemRender = game.add.image(560,224, 'smallBed',data.itemNumber).setScale(2).setVisible(false);
+        }
+        if (data.position-1 == 1){
+            game.buyMenuCategorySelect.data.values.itemRender = game.add.image(402,312,'crib',data.itemNumber).setScale(2);
+        }
+        if (data.position-1 == 2){
+            game.buyMenuCategorySelect.data.values.itemRender = game.add.image(240,130,'desk',data.itemNumber).setOrigin(0).setScale(2);
+        }
+        if (data.position-1 == 3){
+            game.buyMenuCategorySelect.data.values.itemRender = game.add.image(200,400,'buyMenuIcons',data.iconItemNumber).setOrigin(0).setScale(2);
+        }
+        if (data.position-1 == 4){
+            game.buyMenuCategorySelect.data.values.itemRender = game.add.image(306,144,'buyMenuIcons',data.iconItemNumber).setOrigin(0).setScale(2);
+        }    
+    }
+    
 }
 
 function saveManager(game){
@@ -672,7 +708,7 @@ function saveManager(game){
             delay:1000, loop:true, callback: save,
             callbackScope: this, args:[game],
         });
-    game.saveGame.clear();
+    // game.saveGame.clear();
     if (!game.saveGame.getItem('wasSaved')){
         console.log('write');
         game.saveGame.setItem('money',0);
@@ -683,6 +719,17 @@ function saveManager(game){
         game.expAmount.setData('amount',parseInt(game.saveGame.getItem('exp')));
         game.expAmount.setText(parseInt(game.saveGame.getItem('exp')));
         game.saveGame.setItem('stage', 0);
+        game.saveGame.setItem('stageCounter', 0);
+
+        game.buyMenuCategorySelect = game.buyMenuCategories[1];
+        game.buyMenuCategorySelect.data.values.itemSelect = game.buyMenuCategories[1].data.values.itemList[0];
+        game.buyMenuCategories[1].data.values.itemList[0].data.values.buyButton.setFrame(2);
+        game.buyMenuCategories[1].data.values.itemList[0].data.values.isBrought = true;
+        game.buyMenuCategories[1].data.values.itemList[0].data.values.canBeBrought = true;
+        game.buyMenuCategories[1].data.values.itemList[0].data.values.isUsed = true;
+        renderBuyMenuItem(game);
+        game.buyMenuCategorySelect = game.buyMenuCategories[0];
+
         activeButton(game,activeButtonLeft,
             'left',getActiveButtonStats(game,'left',1,1,buffList));
 
@@ -720,6 +767,7 @@ function saveManager(game){
             buttonCharacterSelected: game.buttonCharacterSelected,
         }));
         game.saveGame.setItem('stage', currentStage);
+        game.saveGame.setItem('stageCounter', game.currentStageCounter);
 
         let activeLeft = {};
         let activeRight = {};
@@ -806,6 +854,18 @@ function saveManager(game){
             }));
         }
 
+        let buyItems = [];
+        for (let x = 0 ; x != game.buyMenuCategories.length ; x++){
+            let data = game.buyMenuCategories[x].data.values.itemList;
+            for (let y = 0 ; y != data.length ; y++){
+                buyItems[buyItems.length] = {
+                    isBrought: data[y].data.values.isBrought,
+                    canBeBrought: data[y].data.values.canBeBrought,
+                    isUsed: data[y].data.values.isUsed,
+                }
+            }
+        }
+        game.saveGame.setItem('buyItems', JSON.stringify(buyItems));
     }
 
     this.load = function(game){
@@ -818,16 +878,17 @@ function saveManager(game){
         game.buttonRightSelected = buttonSelected.buttonRightSelected;
         game.buttonCharacterSelected = buttonSelected.buttonCharacterSelected;
         currentStage = parseInt(loadGame.getItem('stage'));
+        game.currentStageCounter = parseInt(loadGame.getItem('stageCounter'));
+        let moneyAccumulate = 0, expAccumulate = 0;
 
-        if (currentStage >= 2){
+        if (currentStage+game.currentStageCounter >= 2){
             game.bg.setFrame(1);
             crib.destroy();
             bed.visible = true;
         }
-        if (currentStage >= 3){
+        if (currentStage+game.currentStageCounter >= 3){
             player.setPosition(400-32,300-96);
         }
-        console.log(currentStage);
         player.anims.play(characterIdle[currentStage],true);
 
         let elapseTime = loadGame.getItem('time');
@@ -838,23 +899,51 @@ function saveManager(game){
         let activeLeft = JSON.parse(loadGame.getItem('activeLeft'));
         if (activeLeft != null){
             for (var x = 0 ; x != Object.keys(activeLeft).length ; x++){
-                loadActiveButton(game,'left',x,activeLeft[x],elapseTime);
+                loadActiveButton(game,'left',x,activeLeft[x],elapseTime, moneyAccumulate, expAccumulate);
             }
         }
 
         let activeRight = JSON.parse(loadGame.getItem('activeRight'));
         if (activeRight != null){
             for (var x = 0 ; x != Object.keys(activeRight).length ; x++){
-                loadActiveButton(game,'right',x,activeRight[x],elapseTime);
+                loadActiveButton(game,'right',x,activeRight[x],elapseTime, moneyAccumulate, expAccumulate);
             }
         }
 
         let activeCharacter = JSON.parse(loadGame.getItem('activeCharacter'));
         if (activeCharacter != null){
             for (var x = 0 ; x != Object.keys(activeCharacter).length ; x++){
-                loadActiveButton(game,'character',x,activeCharacter[x],elapseTime);
+                loadActiveButton(game,'character',x,activeCharacter[x],elapseTime, moneyAccumulate, expAccumulate);
             }
         }
+
+        let buyItems = JSON.parse(loadGame.getItem('buyItems'));
+        if (buyItems != null){
+            let currentIndex = 0;
+            for (let x = 0 ; x != game.buyMenuCategories.length ; x++){
+                let data = game.buyMenuCategories[x].data.values.itemList;
+                game.buyMenuCategorySelect = game.buyMenuCategories[x];
+                for (let y = 0 ; y != data.length ; y++){
+                    let data2 = data[y].data.values;
+                    data2.isBrought = buyItems[currentIndex].isBrought;
+                    data2.canBeBrought = buyItems[currentIndex].canBeBrought;
+                    data2.isUsed = buyItems[currentIndex].isUsed;
+                    if (data2.isUsed){
+                        data2.buyButton.setFrame(2);
+                        game.buyMenuCategories[x].data.values.itemSelect = data[y];
+                    }
+                    currentIndex++;
+                }
+                renderBuyMenuItem(game);
+            }
+            checkItemEquip(game);
+        }
+
+        if (game.saveGame.getItem('wasSaved')){
+            moneyAmount.setData('offlineEvent', new popupEvent(game,
+                'While you\'re gone,\nYou gain '+moneyAccumulate+' cash \nand '+expAccumulate+' exp' ,false));            
+        }
+
 
     }
 }
@@ -870,6 +959,7 @@ function loadActiveButton(game,position,x,Button,elapseTime){
     }
     let buttonElapseTime = button.elapseTime;
     let delay = button.delay;
+    let moneyAccumulate, expAccumulate;
     if (!button.pause){
         console.log('pass');
         if (delay < ((elapseTime)+(buttonElapseTime*delay))){
@@ -878,10 +968,12 @@ function loadActiveButton(game,position,x,Button,elapseTime){
             if (button.event == 'gainGold'){
                 moneyAmount.data.values.amount += button.gain*accumulate;
                 moneyAmount.setText(moneyAmount.data.values.amount);
+                moneyAccumulate += accumulate;
             }
             else if (button.event == 'expGain'){
                 expAmount.data.values.amount += button.gain*accumulate;
                 expAmount.setText(expAmount.data.values.amount);
+                expAccumulate += accumulate;
             }
             buttonElapseTime = buttonElapseTime-(delay*accumulate);
         }
@@ -994,7 +1086,6 @@ function checkUnlockableActiveButton(game){
 
     if (activeButtonCharacter[x-1]){
         button2 = activeButtonCharacter[x-1].data.values;
-        // console.log(button.requiredExpToUnlock +'|'+ button2.requiredTurnsToUnlock +'|'+ !button.unlocked);
         if (button.requiredExpToUnlock == -1 && button2.requiredTurnsToUnlock == 0 && !button.unlocked){
             button2 = button;
             turnsUnlocked = true;
@@ -1002,8 +1093,6 @@ function checkUnlockableActiveButton(game){
         if (button.requiredExpToUnlock == -1 && button.unlocked){
             button2 = button;
         }
-        // console.log(button2.description.text);
-        // console.log(button.description.text);
         if (button2.requiredTurnsToUnlock){
             if (button2.requiredTurnsToUnlock == 0){
                 turnsUnlocked = true;
@@ -1035,12 +1124,117 @@ function checkUnlockableActiveButton(game){
     }
 }
 
-function checkActiveBuffs(buff){
-    if (buff.numberOfTurns > 0 && buff.numberOfTurns != -1 && buff.isActive){
-        buff.numberOfTurns -= 1;
+function updateBuffs(game, buttonData){
+    let currentBuff;
+    if (buttonData.position == 'left' && game.currentBuffLeft){
+        checkActiveBuffs(game.currentBuffLeft);
+        currentBuff = game.currentBuffLeft;
     }
-    if (buff.numberOfTurns == 0 && buff.numberOfTurns != -1 && buff.isActive){
-        buff.deactivate();
+    else if (buttonData.position == 'right' && game.currentBuffRight){
+        checkActiveBuffs(game.currentBuffRight);
+        currentBuff = game.currentBuffRight;
+    }
+    else if (buttonData.position == 'character' && game.currentBuffCharacter){
+        checkActiveBuffs(game.currentBuffCharacter);
+        currentBuff = game.currentBuffCharacter;
+    }
+
+    if (currentBuff){
+        for (var x = 0 ; x < currentBuff.length ; x++){
+            if (!currentBuff[x].isActive){
+                currentBuff.splice(x,1);
+            }
+        }
+    }
+
+    for (var x = 0 ; x != buttonData.buff.length ; x++){
+        if (Phaser.Math.Between(1,100) <= buttonData.buff[x].chance && !buttonData.buff[x].isActive){
+            if (currentBuff){
+                for (var y = 0 ; y < currentBuff.length ; y++){
+                    if (currentBuff[y].buffNumber == buttonData.buff[x].buffNumber && !currentBuff[y].immune){
+                        currentBuff[y].deactivate();
+                        currentBuff.splice(y,1);
+                    }
+                }
+            }
+            buttonData.buff[x].active();
+            
+            if (buttonData.position == 'left'){
+                game.currentBuffLeft.push(buttonData.buff[x]);
+            }
+            else if (buttonData.position == 'right'){
+                game.currentBuffRight.push(buttonData.buff[x]);
+            }
+            else if (buttonData.position == 'character'){
+                game.currentBuffCharacter.push(buttonData.buff[x]);
+            }
+            repositionBuffs(game);
+            break;
+        }
+    }
+}
+
+function repositionBuffs(game){
+    for (let x = 0 ; x < game.currentBuffLeft.length ; x++){
+        if (!game.currentBuffLeft[x].isActive){
+            game.currentBuffLeft.splice(x--,1);
+        }
+        else{
+            game.currentBuffLeft[x].icon.x = game.currentBuffLeft[x].x+(32*x);
+        }
+    }
+    for (let x = 0 ; x < game.currentBuffRight.length ; x++){
+        if (!game.currentBuffRight[x].isActive){
+            game.currentBuffRight.splice(x--,1);
+        }
+        else{
+            game.currentBuffRight[x].icon.x = game.currentBuffRight[x].x+(32*x);
+        }
+    }
+    for (let x = 0 ; x < game.currentBuffCharacter.length ; x++){
+        if (!game.currentBuffCharacter[x].isActive){
+            game.currentBuffCharacter.splice(x--,1);
+        }
+        else{
+            game.currentBuffCharacter[x].icon.x = game.currentBuffCharacter[x].x+(32*x);
+        }
+    }
+}
+
+function checkActiveBuffs(buff){
+    for (var x = 0 ; x < buff.length ; x++){
+        if (buff[x].numberOfTurns > 0 && buff[x].numberOfTurns != -1 && buff[x].isActive){
+            buff[x].numberOfTurns -= 1;
+        }
+        if (buff[x].numberOfTurns == 0 && buff[x].numberOfTurns != -1 && buff[x].isActive){
+            buff[x].deactivate();
+            buff.splice[x,1];
+        }
+    }
+}
+
+function clearBuffs(buffArray){
+    console.log (buffArray.length);
+    for (let x = 0 ; x < buffArray.length ; x++){
+        buffArray[x].deactivate();
+    }
+}
+
+function checkItemEquip(game){
+    for (let x = 0 ; x != activeButtonCharacter.length ; x++){
+        let data = activeButtonCharacter[x].data.values;
+        if (data.itemEquipIndex){
+            if (game.buyMenuCategories[data.itemEquipIndex-1].data.values.itemSelect){
+                let itemData = game.buyMenuCategories[data.itemEquipIndex-1].data.values.itemSelect.data.values;
+                if (data.event == 'gainGold'){
+                    data.gain += itemData.gainMoney;
+                }
+                else if (data.event == 'expGain'){
+                    data.gain += itemData.gainExp;
+                }
+                data.timeEvent.args[0] = data.gain;
+            }
+        }
     }
 }
 

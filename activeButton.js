@@ -28,14 +28,9 @@ export function activeButton(game,buttonArray,position,data){
     buttonData.description = game.add.bitmapText(x+64,y+12,'mainFont', data.description).setOrigin(0.5);
     buttonData.descriptionPopup = new function(){
     	this.popupBG = game.add.sprite(x+72,y+58,'buttonDescription',0);
-    	this.popupBG.setScale(2);
     	this.isPointed = false;
-    	if (buttonData.requiredExpToUnlock != -1){
-    		this.popupText = game.add.bitmapText(x+18,y+44,'mainFont2','Required:\nEXP: '+buttonData.requiredExpToUnlock+' \nBUTTON: 2');
-    	}
-    	else{
-			this.popupText = game.add.bitmapText(x+18,y+44,'mainFont2','Required:\nBUTTON: 2');
-    	}
+    	this.popupText = game.add.bitmapText(x+18,y+44,'mainFont2',buttonData.textDescription);
+    	this.popupBG.setScale(2);
     	
     	this.show = function(){
     		this.popupBG.setVisible(true);
@@ -48,10 +43,20 @@ export function activeButton(game,buttonArray,position,data){
     		this.popupText.setVisible(false);
     		this.isPointed = false;
     	}
+
+        this.destroy = function(){
+            this.popupBG.destroy();
+            this.popupText.destroy();
+
+        }
     };
     buttonData.descriptionPopup.hide();
     buttonData.timeEvent.args = [button.data.values.gain, button];
-    buttonData.buff.setButton(button);
+
+    for (var a = 0 ; a != buttonData.buff.length ; a++){
+        buttonData.buff[a].setButton(button);
+    }
+
     if (!buttonData.unlocked){
     	button.setFrame(3);
     }
@@ -94,16 +99,27 @@ export function activeButton(game,buttonArray,position,data){
         }
     });
     button.on('pointerup',function(){
+    	game.checkItemEquip(game);
     	if (buttonData.unlocked){
     		if (buttonData.isCare){
     			game.isCareSelected = true;
     		}
 
+    		let itemEquipPass = true;
+
+    		if (buttonData.itemEquipIndex){
+    			let data = game.buyMenuCategories[buttonData.itemEquipIndex-1].data.values.itemSelect;
+    			if (!data){
+    				itemEquipPass = false;
+    			}
+    		}
+
             if (buttonData.timeEvent.paused && 
         	(!game.buttonLeftSelected && position == 'left') ||
         	(!game.buttonRightSelected && position == 'right') || 
-        	(!game.buttonCharacterSelected && position == 'character' && (game.isCareSelected))){
-        		
+        	(!game.buttonCharacterSelected && position == 'character') && 
+        	(game.isCareSelected) &&
+        	(itemEquipPass)){
                 buttonData.timeEvent.paused = false;
                 buttonData.pause = false;
                 buttonData.pausedMidway = false;
@@ -140,7 +156,7 @@ export function activeButton(game,buttonArray,position,data){
 	                });
 	                buttonData.pausedMidway = true;
                 }
-                if (!game.buttonCharacterSelected && (position == 'left' || position == 'right') && game.isCareSelected){
+                if (!game.buttonCharacterSelected && (position == 'left' || position == 'right') && game.isCareSelected && buttonData.isCare){
                 	game.isCareSelected = false;
 				}
             }

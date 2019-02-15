@@ -1,5 +1,5 @@
 export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startAt=0){
-	var buff;
+	var buff = [];
 
 	switch (location){
 		case 'left':
@@ -7,7 +7,8 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 				case 1:
 					switch(buttonNo){
 						case 1:
-							buff = buffs(5);
+							buff.push(buffs(6));
+							buff[0] = new buff[0](game,{x:48, y: 209});
 							return {
 									stage: stageNo,
 									number: buttonNo,
@@ -16,16 +17,18 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        pause: true,
 							        pausedMidway: false,
 							        event: game.gainMoney.name,
-							        buff: new buff(game,{x:48, y: 209}),
+							        buff: buff,
 							        gain: 0,
 							        isCare: true,
+							        textDescription: '',
 							        timeEvent: game.time.addEvent({
 							            delay:1000, loop:true, callback: game.gainMoney,
 							            callbackScope: game, paused: true, startAt: startAt,
 							        })
 							    };
 						case 2:
-							buff = buffs(5);
+							buff.push(buffs(5));
+							buff[0] = new buff[0](game,{x:48, y: 209});
 							return {
 									stage: stageNo,
 									number: buttonNo,
@@ -34,8 +37,10 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        pause: true,
 							        pausedMidway: false,
 							        event: game.gainMoney.name,
-							        buff: new buff(game,{x:48, y: 209}),
+							        buff: buff,
 							        gain: 2,
+							        textDescription: '',
+							        cycleCount: 0,
 							        timeEvent: game.time.addEvent({
 							            delay:1000, loop:true, callback: game.gainMoney,
 							            callbackScope: game, paused: true, startAt: startAt,
@@ -45,7 +50,8 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 				case 2:
 					switch(buttonNo){
 						case 1:
-							buff = buffs(5);
+							buff.push(buffs(6));
+							buff[0] = new buff[0](game,{x:48, y: 209});
 							return {
 									stage: stageNo,
 									number: buttonNo,
@@ -54,16 +60,18 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        pause: true,
 							        pausedMidway: false,
 							        event: game.gainMoney.name,
-							        buff: new buff(game,{x:48, y: 209}),
+							        buff: buff,
 							        gain: 0,
 							        isCare: true,
+							        textDescription: '',
 							        timeEvent: game.time.addEvent({
 							            delay:1000, loop:true, callback: game.gainMoney,
 							            callbackScope: game, paused: true, startAt: startAt,
 							        })
 							    };
 						case 2:
-							buff = buffs(5);
+							buff.push(buffs(5));
+							buff[0] = new buff[0](game,{x:48, y: 209});
 							return {
 									stage: stageNo,
 									number: buttonNo,
@@ -72,8 +80,31 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        pause: true,
 							        pausedMidway: false,
 							        event: game.gainMoney.name,
-							        buff: new buff(game,{x:48, y: 209}),
+							        buff: buff,
 							        gain: 2,
+							        textDescription: '',
+							        timeEvent: game.time.addEvent({
+							            delay:1000, loop:true, callback: game.gainMoney,
+							            callbackScope: game, paused: true, startAt: startAt,
+							        })
+							    };
+					}
+				case 3:
+					switch(buttonNo){
+						case 1:
+							buff.push(buffs(5));
+							buff[0] = new buff[0](game,{x:48, y: 209});
+							return {
+									stage: stageNo,
+									number: buttonNo,
+							        description: 'WORK',
+							        unlocked: true,
+							        pause: true,
+							        pausedMidway: false,
+							        event: game.gainMoney.name,
+							        buff: buff,
+							        gain: 2,
+							        textDescription: '',
 							        timeEvent: game.time.addEvent({
 							            delay:1000, loop:true, callback: game.gainMoney,
 							            callbackScope: game, paused: true, startAt: startAt,
@@ -87,7 +118,8 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 				case 1:
 					switch(buttonNo){
 						case 1:
-							buff = buffs(5);
+							buff.push(buffs(6));
+							buff[0] = new buff[0](game,{x:721, y: 209});
 							return {
 									stage: stageNo,
 									number: buttonNo,
@@ -96,16 +128,18 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        pause: true,
 							        pausedMidway: false,
 							        event: game.gainMoney.name,
-							        buff: new buff(game,{x:721, y: 209}),
+							        buff: buff,
 							        gain: 0,
 							        isCare: true,
+							        textDescription: '',
 							        timeEvent: game.time.addEvent({
 							            delay:1000, loop:true, callback: game.gainMoney,
 							            callbackScope: game, paused: true, startAt: startAt,
 							        })
 							    };
 						case 2:
-							buff = buffs(5);
+							buff.push(buffs(5));
+							buff[0] = new buff[0](game,{x:721, y: 209});
 							return {
 									stage: stageNo,
 									number: buttonNo,
@@ -114,8 +148,10 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        pause: true,
 							        pausedMidway: false,
 							        event: game.gainMoney.name,
-							        buff: new buff(game,{x:48, y: 209}),
+							        buff: buff,
 							        gain: 2,
+							        textDescription: '',
+							        cycleCount: 0,
 							        timeEvent: game.time.addEvent({
 							            delay:1000, loop:true, callback: game.gainMoney,
 							            callbackScope: game, paused: true, startAt: startAt,
@@ -125,7 +161,8 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 				case 2:
 					switch(buttonNo){
 						case 1:
-							buff = buffs(5);
+							buff.push(buffs(6));
+							buff[0] = new buff[0](game,{x:721, y: 209});
 							return {
 									stage: stageNo,
 									number: buttonNo,
@@ -134,16 +171,18 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        pause: true,
 							        pausedMidway: false,
 							        event: game.gainMoney.name,
-							        buff: new buff(game,{x:48, y: 209}),
+							        buff: buff,
 							        gain: 0,
 							        isCare: true,
+							        textDescription: '',
 							        timeEvent: game.time.addEvent({
 							            delay:1000, loop:true, callback: game.gainMoney,
 							            callbackScope: game, paused: true, startAt: startAt,
 							        })
 							    };
 						case 2:
-							buff = buffs(5);
+							buff.push(buffs(5));
+							buff[0] = new buff[0](game,{x:721, y: 209});
 							return {
 									stage: stageNo,
 									number: buttonNo,
@@ -152,8 +191,31 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        pause: true,
 							        pausedMidway: false,
 							        event: game.gainMoney.name,
-							        buff: new buff(game,{x:721, y: 209}),
+							        buff: buff,
 							        gain: 2,
+							        textDescription: '',
+							        timeEvent: game.time.addEvent({
+							            delay:1000, loop:true, callback: game.gainMoney,
+							            callbackScope: game, paused: true, startAt: startAt,
+							        })
+							    };
+					}
+				case 3:
+					switch(buttonNo){
+						case 1:
+							buff.push(buffs(5));
+							buff[0] = new buff[0](game,{x:721, y: 209});
+							return {
+									stage: stageNo,
+									number: buttonNo,
+							        description: 'WORK',
+							        unlocked: true,
+							        pause: true,
+							        pausedMidway: false,
+							        event: game.gainMoney.name,
+							        buff: buff,
+							        gain: 2,
+							        textDescription: '',
 							        timeEvent: game.time.addEvent({
 							            delay:1000, loop:true, callback: game.gainMoney,
 							            callbackScope: game, paused: true, startAt: startAt,
@@ -167,7 +229,8 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 				case 1:
 					switch(buttonNo){
 						case 1:
-							buff = buffs(1);
+							buff.push(buffs(2));
+							buff[0] = new buff[0](game,{x:48, y: 209});
 							return {
 									stage: stageNo,
 									number: buttonNo,
@@ -175,18 +238,20 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        pause: true,
 							        pausedMidway: false,
 							        event: game.expGain.name,
-							        buff: new buff(game,{x:130, y: 172}),
+							        buff: buff,
 							        unlocked: true,
 							        gain: 2000,
 							        requiredExpToUnlock: 0,
 							        requiredMoneyToUnlock: 0,
+							        textDescription: '',
 							        timeEvent: game.time.addEvent({
 							            delay:1000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true, startAt: startAt,
 							        })
 							    };
 						case 2:
-							buff = buffs(1);
+							buff.push(buffs(1));
+							buff[0] = new buff[0](game,{x:48, y: 209});
 							return {
 									stage: stageNo,
 									number: buttonNo,
@@ -194,18 +259,20 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        pause: true,
 							        pausedMidway: false,
 							        event: game.expGain.name,
-							        buff: new buff(game,{x:130, y: 172}),
+							        buff: buff,
 							        unlocked: false,
-							        gain: 2,
+							        gain: 6,
 							        requiredExpToUnlock: 50,
 							        requiredMoneyToUnlock: 0,
+							        textDescription: 'REQUIRED:\nEXP: 50',
 							        timeEvent: game.time.addEvent({
 							            delay:1000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true, startAt: startAt,
 							        })
 							    };
 						case 3:
-							buff = buffs(4);
+							buff.push(buffs(4));
+							buff[0] = new buff[0](game,{x:48, y: 209});
 							return {
 									stage: stageNo,
 									number: buttonNo,
@@ -213,18 +280,20 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        pause: true,
 							        pausedMidway: false,
 							        event: game.expGain.name,
-							        buff: new buff(game,{x:130, y: 172}),
+							        buff: buff,
 							        unlocked: false,
-							        gain: 2,
+							        gain: 0,
 							        requiredExpToUnlock: 250,
 							        requiredMoneyToUnlock: 0,
+							        textDescription: 'REQUIRED:\nEXP: 250',
 							        timeEvent: game.time.addEvent({
-							            delay:1000, loop:true, callback: game.expGain,
+							            delay:5000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true, startAt: startAt,
 							        })
 							    };
 						case 4:
-							buff = buffs(3);
+							buff.push(buffs(3));
+							buff[0] = new buff[0](game,{x:48, y: 209});
 							return {
 									stage: stageNo,
 									number: buttonNo,
@@ -232,19 +301,21 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        pause: true,
 							        pausedMidway: false,
 							        event: game.expGain.name,
-							        buff: new buff(game,{x:130, y: 172}),
+							        buff: buff,
 							        unlocked: false,
-							        gain: 2,
+							        gain: 25,
 							        requiredExpToUnlock: 550,
 							        requiredMoneyToUnlock: 0,
 							        requiredTurnsToUnlock: 0,
+							        textDescription: 'REQUIRED:\nEXP: 550',
 							        timeEvent: game.time.addEvent({
-							            delay:1000, loop:true, callback: game.expGain,
+							            delay:60000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true, startAt: startAt,
 							        })
 							    };
 						case 5:
-							buff = buffs(3);
+							buff.push(buffs(3));
+							buff[0] = new buff[0](game,{x:48, y: 209});
 							return {
 									stage: stageNo,
 									number: buttonNo,
@@ -252,19 +323,21 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        pause: true,
 							        pausedMidway: false,
 							        event: game.expGain.name,
-							        buff: new buff(game,{x:130, y: 172}),
+							        buff: buff,
 							        unlocked: false,
-							        gain: 2,
+							        gain: 40,
 							        requiredExpToUnlock: 800,
 							        requiredMoneyToUnlock: 0,
-							        requiredTurnsToUnlock: 1,
+							        requiredTurnsToUnlock: 0,
+							        textDescription: 'REQUIRED:\nEXP: 800\nCRAWL: 1',
 							        timeEvent: game.time.addEvent({
-							            delay:1000, loop:true, callback: game.expGain,
+							            delay:90000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true, startAt: startAt,
 							        })
 							    };
 						case 6:
-							buff = buffs(3);
+							buff.push(buffs(3));
+							buff[0] = new buff[0](game,{x:48, y: 209});
 							return {
 									stage: stageNo,
 									number: buttonNo,
@@ -272,14 +345,15 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        pause: true,
 							        pausedMidway: false,
 							        event: game.expGain.name,
-							        buff: new buff(game,{x:130, y: 172}),
+							        buff: buff,
 							        unlocked: false,
-							        gain: 2,
+							        gain: 65,
 							        requiredExpToUnlock: -1,
 							        requiredMoneyToUnlock: 0,
-							        requiredTurnsToUnlock: 1,
+							        requiredTurnsToUnlock: 0,
+							        textDescription: 'REQUIRED:\nSTAND: 2',
 							        timeEvent: game.time.addEvent({
-							            delay:1000, loop:true, callback: game.expGain,
+							            delay:120000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true, startAt: startAt,
 							        })
 							    };
@@ -289,27 +363,8 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 				case 2:
 					switch(buttonNo){
 						case 1:
-							buff = buffs(3);
-							return {
-									stage: stageNo,
-									number: buttonNo,
-							        description: 'EAT',
-							        pause: true,
-							        pausedMidway: false,
-							        event: game.expGain.name,
-							        buff: new buff(game,{x:130, y: 172}),
-							        unlocked: false,
-							        gain: 0,
-							        requiredExpToUnlock: 0,
-							        requiredMoneyToUnlock: 0,
-							        requiredTurnsToUnlock: 0,
-							        timeEvent: game.time.addEvent({
-							            delay:1000, loop:true, callback: game.expGain,
-							            callbackScope: game, paused: true, startAt: startAt,
-							        })
-							    };
-						case 2:
-							buff = buffs(3);
+							buff.push(buffs(7));
+							buff[0] = new buff[0](game,{x:48, y: 209});
 							return {
 									stage: stageNo,
 									number: buttonNo,
@@ -317,19 +372,23 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        pause: true,
 							        pausedMidway: false,
 							        event: game.expGain.name,
-							        buff: new buff(game,{x:130, y: 172}),
+							        buff: buff,
 							        unlocked: true,
 							        gain: 0,
 							        requiredExpToUnlock: 0,
 							        requiredMoneyToUnlock: 0,
 							        requiredTurnsToUnlock: 0,
+							        textDescription: '',
+							        itemRequired: true,
+							        itemEquipIndex: 3,
 							        timeEvent: game.time.addEvent({
-							            delay:1000, loop:true, callback: game.expGain,
+							            delay:120000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true, startAt: startAt,
 							        })
 							    };
-						case 3:
-							buff = buffs(3);
+						case 2:
+							buff.push(buffs(3));
+							buff[0] = new buff[0](game,{x:48, y: 209});
 							return {
 									stage: stageNo,
 									number: buttonNo,
@@ -337,19 +396,21 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        pause: true,
 							        pausedMidway: false,
 							        event: game.expGain.name,
-							        buff: new buff(game,{x:130, y: 172}),
+							        buff: buff,
 							        unlocked: true,
 							        gain: 2,
 							        requiredExpToUnlock: 2000,
 							        requiredMoneyToUnlock: 0,
-							        requiredTurnsToUnlock: 1,
+							        requiredTurnsToUnlock: 0,
+							        textDescription: '',
 							        timeEvent: game.time.addEvent({
-							            delay:1000, loop:true, callback: game.expGain,
+							            delay:180000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true, startAt: startAt,
 							        })
 							    };
-						case 4:
-							buff = buffs(3);
+						case 3:
+							buff.push(buffs(3));
+							buff[0] = new buff[0](game,{x:48, y: 209});
 							return {
 									stage: stageNo,
 									number: buttonNo,
@@ -357,20 +418,75 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        pause: true,
 							        pausedMidway: false,
 							        event: game.expGain.name,
-							        buff: new buff(game,{x:130, y: 172}),
+							        buff: buff,
 							        unlocked: false,
-							        gain: 2,
+							        gain: 185,
 							        requiredExpToUnlock: -1,
 							        requiredMoneyToUnlock: 0,
 							        requiredTurnsToUnlock: 0,
+							        textDescription: '',
 							        timeEvent: game.time.addEvent({
-							            delay:1000, loop:true, callback: game.expGain,
+							            delay:300000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true, startAt: startAt,
 							        })
 							    };
 						default:
 							return true;
 					}
+				case 3:
+					switch(buttonNo){
+						case 1:
+							buff.push(buffs(7));
+							buff[0] = new buff[0](game,{x:48, y: 209});
+							return {
+									stage: stageNo,
+									number: buttonNo,
+							        description: 'PLAY',
+							        pause: true,
+							        pausedMidway: false,
+							        event: game.expGain.name,
+							        buff: buff,
+							        unlocked: true,
+							        gain: 0,
+							        requiredExpToUnlock: 0,
+							        requiredMoneyToUnlock: 0,
+							        requiredTurnsToUnlock: 0,
+							        textDescription: '',
+							        itemRequired: true,
+							        itemEquipIndex: 3,
+							        timeEvent: game.time.addEvent({
+							            delay:120000, loop:true, callback: game.expGain,
+							            callbackScope: game, paused: true, startAt: startAt,
+							        })
+							    };
+						case 2:
+							buff.push(buffs(7));
+							buff[0] = new buff[0](game,{x:48, y: 209});
+							return {
+									stage: stageNo,
+									number: buttonNo,
+							        description: 'DAYCARE',
+							        pause: true,
+							        pausedMidway: false,
+							        event: game.expGain.name,
+							        buff: buff,
+							        unlocked: true,
+							        gain: 1,
+							        requiredExpToUnlock: -1,
+							        requiredMoneyToUnlock: 0,
+							        requiredTurnsToUnlock: 0,
+							        textDescription: '',
+							        itemRequired: false,
+							        itemEquipIndex: 3,
+							        timeEvent: game.time.addEvent({
+							            delay:120000, loop:true, callback: game.expGain,
+							            callbackScope: game, paused: true, startAt: startAt,
+							        })
+							    };
+						default:
+							return true;
+					}
+
 			}
 			
 	}
