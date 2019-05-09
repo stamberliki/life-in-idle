@@ -15,11 +15,12 @@ export function buyMenuItems(game, list,data){
 		buttonData.itemNumber = array.length;
 		buttonData.array = list[categoryNumber];
 		buttonData.descriptionPopup = new function(){
-	    	this.popupBG = game.add.sprite(x+72,y+58,'buttonDescription',0);
+	    	this.popupBG = game.add.nineslice(0,0,16,16,'descriptionPopup',4,8);
 	    	this.popupBG.setScale(2);
 	    	this.popupBG.depth = 4;
 	    	this.isPointed = false;
-			this.popupText = game.add.bitmapText(x+18,y+44,'mainFont2','Required:\nBUTTON: 2');
+			this.popupText = game.add.bitmapText(x+18,y+44,'mainFont2','0000000000\n000000000000');
+			this.popupBG.resize(this.popupText.getTextBounds().local.width, this.popupText.getTextBounds().local.height);
 	    	this.show = function(){
 	    		this.popupBG.setVisible(true);
 	    		this.popupText.setVisible(true);
@@ -78,9 +79,10 @@ export function buyMenuItems(game, list,data){
 			}
 		});
 		buttonData.buyButton.on('pointerdown',function(){
-			if (game.moneyAmount.data.values.amount >= buttonData.costMoney && !buttonData.isBrought){
+			console.log();
+			if (game.moneyAmount.data.values.amount >= buttonData.costMoney && game.moneyAmount.data.values.amount >= 0 && !buttonData.isBrought){
 				if (buttonData.array.data.values.needPrimaryItem){
-					if (buttonData.array.data.values.primaryItemEquip){
+					if (list[buttonData.array.data.values.primaryItemPointer].data.values.itemSelect){
 						game.moneyAmount.data.values.amount -= buttonData.costMoney;
 						game.moneyAmount.setText(game.moneyAmount.data.values.amount);
 						game.buyMenuMoney.setText(game.moneyAmount.data.values.amount);
@@ -92,11 +94,7 @@ export function buyMenuItems(game, list,data){
 					game.moneyAmount.setText(game.moneyAmount.data.values.amount);
 					game.buyMenuMoney.setText(game.moneyAmount.data.values.amount);
 					buttonData.canBeBrought = true;
-					if (buttonData.array.data.values.primaryItemPointer){
-						list[buttonData.array.data.values.primaryItemPointer].data.values.primaryItemEquip = true;
-					}
 				}
-
 			}
 			if (!buttonData.canBeBrought){
 				buttonData.buyButton.setFrame(3);
@@ -124,5 +122,9 @@ export function buyMenuItems(game, list,data){
 
 	getItemlist(4).push(createItems(5,getItemlist(4),4));
 	getItemlist(4).push(createItems(5,getItemlist(4),4));
+	getItemlist(4).push(createItems(5,getItemlist(4),4));
+
+	getItemlist(5).push(createItems(6,getItemlist(5),5));
+	getItemlist(5).push(createItems(6,getItemlist(5),5));
 
 }

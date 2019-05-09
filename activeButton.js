@@ -3,34 +3,35 @@ export function activeButton(game,buttonArray,position,data){
 	let x;
 	let y;
 	if ( position == 'left' ){
-	    x = -1;
-	    y = 189+((size+1)*54);
+	    x = 64;
+	    y = 213+((size+1)*54);
 	}
 	else if( position == 'right'){
-	    x = 673;
-	    y = 189+((size+1)*54);
+	    x = 736;
+	    y = 213+((size+1)*54);
 	}
 	else if ( position == 'character'){
-	    x = 332+(size*160);
-	    y = 8;
+	    x = 388+(size*160);
+	    y = 26;
 	    if (size > 2){
-	        x = 332+((size-3)*160);
-	        y = 32+16+8;
+	        x = 388+((size-3)*160);
+	        y = 74;
 	    }
 	}
-    let button = game.add.sprite(x,y,'activeButton',1).setOrigin(0);
+    let button = game.add.sprite(x,y,'activeButton',1).setOrigin(0.5);
     button.setScale(2);
     button.setInteractive();
     button.setData(data);
     let buttonData = button.data.values;
     buttonData.buttonNumber = size;
     buttonData.position = position;
-    buttonData.description = game.add.bitmapText(x+64,y+12,'mainFont', data.description).setOrigin(0.5);
+    buttonData.description = game.add.bitmapText(x,y-6,'mainFont', data.description).setOrigin(0.5);
     buttonData.descriptionPopup = new function(){
-    	this.popupBG = game.add.sprite(x+72,y+58,'buttonDescription',0);
+    	this.popupBG = game.add.nineslice(0,0,16,16,'descriptionPopup',4);
     	this.isPointed = false;
-    	this.popupText = game.add.bitmapText(x+18,y+44,'mainFont2',buttonData.textDescription);
+    	this.popupText = game.add.bitmapText(x+18,y+44,'mainFont2','0000000000\n000000000000');
     	this.popupBG.setScale(2);
+        this.popupBG.resize(this.popupText.getTextBounds().local.width,this.popupText.getTextBounds().local.height);
     	
     	this.show = function(){
     		this.popupBG.setVisible(true);
@@ -47,11 +48,14 @@ export function activeButton(game,buttonArray,position,data){
         this.destroy = function(){
             this.popupBG.destroy();
             this.popupText.destroy();
-
         }
+        
     };
     buttonData.descriptionPopup.hide();
     buttonData.timeEvent.args = [button.data.values.gain, button];
+    if (buttonData.secondaryTimeEvent){
+        buttonData.secondaryTimeEvent.args = [button.data.values.gain, button];
+    }
 
     for (var a = 0 ; a != buttonData.buff.length ; a++){
         buttonData.buff[a].setButton(button);
@@ -76,10 +80,7 @@ export function activeButton(game,buttonArray,position,data){
 	    }
     });
     button.on('pointerout',function(){
-        if(!buttonData.pause || (buttonData.timeEvent.paused && buttonData.unlocked) &&
-        	((!game.buttonLeftSelected && position == 'left') ||
-        	(!game.buttonRightSelected && position == 'right') || 
-        	(!game.buttonCharacterSelected && position == 'character'))){
+        if(button.frame.name == 0){
             button.setFrame(1);
         	buttonData.descriptionPopup.hide();
         }
@@ -88,10 +89,22 @@ export function activeButton(game,buttonArray,position,data){
         }
     });
     button.on('pointerover',function(){
-        if(!buttonData.pause || (buttonData.timeEvent.paused && buttonData.unlocked) &&
-        	((!game.buttonLeftSelected && position == 'left') ||
-        	(!game.buttonRightSelected && position == 'right') || 
-        	(!game.buttonCharacterSelected && position == 'character'))){
+        if (buttonData.itemRequired){
+            if (buttonData.itemEquipIndex){
+                let data = game.buyMenuCategories[buttonData.itemEquipIndex-1].data.values.itemSelect;
+                if (!data){
+                    buttonData.default.itemEquipPass = false;
+                }
+                else{
+                    buttonData.default.itemEquipPass = true;
+                }
+            }
+        }
+
+        if(!buttonData.default.pause || buttonData.default.itemEquipPass && buttonData.unlocked && !(!buttonData.timeEvent.loop && buttonData.timeEvent.hasDispatched && !buttonData.runOneWithLoop) &&
+            ((!game.buttonLeftSelected && position == 'left' && !(buttonData.isCare && game.isCareSelected)) ||
+            (!game.buttonRightSelected && position == 'right' && !(buttonData.isCare && game.isCareSelected)) || 
+            (!game.buttonCharacterSelected && position == 'character' && game.isCareSelected) || buttonData.ignoreSingleButtonOnly)){
             button.setFrame(0);
         }
         else if (!buttonData.unlocked){
@@ -100,42 +113,42 @@ export function activeButton(game,buttonArray,position,data){
     });
     button.on('pointerup',function(){
     	game.checkItemEquip(game);
-    	if (buttonData.unlocked){
-    		if (buttonData.isCare){
-    			game.isCareSelected = true;
-    		}
+    	if (buttonData.unlocked && !(!buttonData.timeEvent.loop && buttonData.timeEvent.hasDispatched && !buttonData.runOneWithLoop)){
 
-    		let itemEquipPass = true;
-
-    		if (buttonData.itemEquipIndex){
-    			let data = game.buyMenuCategories[buttonData.itemEquipIndex-1].data.values.itemSelect;
-    			if (!data){
-    				itemEquipPass = false;
-    			}
-    		}
-
-            if (buttonData.timeEvent.paused && 
-        	(!game.buttonLeftSelected && position == 'left') ||
-        	(!game.buttonRightSelected && position == 'right') || 
-        	(!game.buttonCharacterSelected && position == 'character') && 
-        	(game.isCareSelected) &&
-        	(itemEquipPass)){
-                buttonData.timeEvent.paused = false;
-                buttonData.pause = false;
-                buttonData.pausedMidway = false;
-                if (position == 'left'){
-                	game.buttonLeftSelected = true;
+            if (buttonData.popupEvent){
+                if (!buttonData.popupEvent.finished && !buttonData.popupEvent.requiredDelay){
+                    buttonData.popupEvent.show();
+                    buttonData.default.optionsPass = false;
                 }
-                else if (position == 'right'){
-                	game.buttonRightSelected = true;
+                else{
+                    buttonData.default.optionsPass = true;
                 }
-                else if (position == 'character'){
-                	game.buttonCharacterSelected = true;
-                }
-
             }
-            else if (!buttonData.timeEvent.paused){
-                buttonData.pause = true;
+
+            if (buttonData.timeEvent.paused && buttonData.default.optionsPass && buttonData.default.itemEquipPass &&
+            ((!game.buttonLeftSelected && position == 'left' && !(buttonData.isCare && game.isCareSelected)) ||
+            (!game.buttonRightSelected && position == 'right' && !(buttonData.isCare && game.isCareSelected)) || 
+            (!game.buttonCharacterSelected && position == 'character' && game.isCareSelected) || buttonData.ignoreSingleButtonOnly)){
+                if (buttonData.isCare){
+                    game.isCareSelected = true;
+                }
+                buttonData.timeEvent.paused = false;
+                buttonData.default.pause = false;
+                buttonData.default.pausedMidway = false;
+                if (!buttonData.ignoreSingleButtonOnly){
+                    if (position == 'left'){
+                        game.buttonLeftSelected = true;
+                    }
+                    else if (position == 'right'){
+                        game.buttonRightSelected = true;
+                    }
+                    else if (position == 'character'){
+                        game.buttonCharacterSelected = button;
+                    }
+                }
+            }
+            else if (!buttonData.timeEvent.paused && !buttonData.default.pause){
+                buttonData.default.pause = true;
                 button.anims.play('activeButtonStop',true);
                 if (buttonData.timeEvent.getProgress()*buttonData.timeEvent.delay+3000 < buttonData.timeEvent.delay){
 	                game.time.addEvent({
@@ -143,21 +156,29 @@ export function activeButton(game,buttonArray,position,data){
 			            	button.setFrame(1);
 			            	buttonData.timeEvent.paused = true;
 			            	button.anims.remove('activeButtonStop');
-			                if (position == 'left'){
-			                	game.buttonLeftSelected = false;
-			                }
-			                else if (position == 'right'){
-			                	game.buttonRightSelected = false;
-			                }
-			                else if (position == 'character'){
-			                	game.buttonCharacterSelected = false;
-			                }
+                            if (!buttonData.ignoreSingleButtonOnly){
+                                if (position == 'left'){
+                                    game.buttonLeftSelected = false;
+                                }
+                                else if (position == 'right'){
+                                    game.buttonRightSelected = false;
+                                }
+                                else if (position == 'character'){
+                                    game.buttonCharacterSelected = false;
+                                }
+                            }
 			            },
 	                });
-	                buttonData.pausedMidway = true;
+	                buttonData.default.pausedMidway = true;
                 }
-                if (!game.buttonCharacterSelected && (position == 'left' || position == 'right') && game.isCareSelected && buttonData.isCare){
+                if (game.buttonCharacterSelected && buttonData.isCare){
+                    game.buttonCharacterSelected.data.values.timeEvent.paused = true;
+                    game.buttonCharacterSelected.data.values.default.pausedMidway = true;
+                    game.buttonCharacterSelected.data.values.default.pause = true;
+                }
+                if ((position == 'left' || position == 'right') && game.isCareSelected && buttonData.isCare){
                 	game.isCareSelected = false;
+                    game.buttonCharacterSelected = false;
 				}
             }
         }

@@ -2,21 +2,28 @@ export function buffList(buffNumber){
 
 	function popupManager(a,game,positions){
 		a.descriptionPopup = new function(){
-	    	this.popupBG = game.add.sprite(positions.x+5,positions.y+28,'buffDescription',0).setOrigin(0);
+	    	this.popupBG = game.add.nineslice(0,0,16,16,'descriptionPopup',4).setOrigin(0);
 	    	this.popupBG.setScale(2);
 	    	this.popupBG.depth = 1;
-	    	this.popupText = game.add.bitmapText(positions.x+14,positions.y+36,'mainFont2',a.buffTextDescription);
+	    	this.popupText = game.add.bitmapText(0,0,'mainFont2',a.buffTextDescription);
+	    	this.popupTextName = game.add.bitmapText(0,0,'mainFont','0000000000\n000000000000').setFontSize(8);
+    		this.popupBG.resize(this.popupText.getTextBounds().local.width,
+    			this.popupTextName.getTextBounds().local.height+this.popupText.getTextBounds().local.height);
 	    	this.popupText.depth = 1;
+	    	this.popupTextName.depth = 1;
 	    	this.isPointed = false;
+
 	    	this.show = function(){
 	    		this.popupBG.setVisible(true);
 	    		this.popupText.setVisible(true);
+	    		this.popupTextName.setVisible(true);
 	    		this.isPointed = true;
 	    	}
 
 	    	this.hide = function(){
 	    		this.popupBG.setVisible(false);
 	    		this.popupText.setVisible(false);
+	    		this.popupTextName.setVisible(false);
 	    		this.isPointed = false;
 	    	}
 
@@ -34,7 +41,9 @@ export function buffList(buffNumber){
 		    		a.descriptionPopup.popupBG.x = pointer.x+8;
 		    		a.descriptionPopup.popupBG.y = pointer.y+8;
 		    		a.descriptionPopup.popupText.x = pointer.x+16;
-		    		a.descriptionPopup.popupText.y = pointer.y+16;
+		    		a.descriptionPopup.popupText.y = pointer.y+28;
+		    		a.descriptionPopup.popupTextName.x = pointer.x+16;
+		    		a.descriptionPopup.popupTextName.y = pointer.y+16;
 		    		a.descriptionPopup.popupBG.setOrigin(0);
 		    		a.descriptionPopup.popupText.setOrigin(0);
 
@@ -56,7 +65,7 @@ export function buffList(buffNumber){
 					this.icon.visible = false;
 					this.icon.setScale(2);
 					this.icon.setInteractive();
-					this.chance = 80;
+					this.chance = 25;
 					this.numberOfTurns = 0;
 					this.isActive = false;
 					this.buffNumber = buffNumber;
@@ -88,7 +97,6 @@ export function buffList(buffNumber){
 					this.icon.x = this.x;
 					this.icon.y = this.y;
 					this.game.repositionBuffs(this.game);
-
 				}
 
 			}
@@ -101,7 +109,7 @@ export function buffList(buffNumber){
 					this.name = 'Irritated';
 					this.description = 'desc';
 					this.icon = game.add.image(this.x, this.y, 'buffIcons', 1).setOrigin(0);
-					this.buffTextDescription = '';
+					this.buffTextDescription = 'aaaaaaaa';
 					this.icon.visible = false;
 					this.icon.setScale(2);
 					this.icon.setInteractive();
@@ -206,7 +214,7 @@ export function buffList(buffNumber){
 					this.icon.visible = false;
 					this.icon.setScale(2);
 					this.icon.setInteractive();
-					this.chance = 100;
+					this.chance = 20;
 					this.numberOfTurns = -1;
 					this.isActive = false;
 					this.buffNumber = buffNumber;
@@ -222,17 +230,17 @@ export function buffList(buffNumber){
 				}
 
 				active(){
-						for (var x = 0 ; x != this.game.currentBuffCharacter.length ; x++){
+						for (var x = 0 ; x < this.game.currentBuffCharacter.length ; x++){
 							if (this.game.currentBuffCharacter[x].isActive && !this.game.currentBuffCharacter[x].immune){
 								this.game.currentBuffCharacter[x].deactivate();
 							}
 						}
-						for (var x = 0 ; x != this.game.currentBuffLeft.length ; x++){
+						for (var x = 0 ; x < this.game.currentBuffLeft.length ; x++){
 							if (this.game.currentBuffLeft[x].isActive && !this.game.currentBuffLeft[x].immune){
 								this.game.currentBuffLeft[x].deactivate();
 							}
 						}
-						for (var x = 0 ; x != this.game.currentBuffRight.length ; x++){
+						for (var x = 0 ; x < this.game.currentBuffRight.length ; x++){
 							if (this.game.currentBuffRight[x].isActive && !this.game.currentBuffRight[x].immune){
 								this.game.currentBuffRight[x].deactivate();
 							}
@@ -266,7 +274,7 @@ export function buffList(buffNumber){
 					this.icon.visible = false;
 					this.icon.setScale(2);
 					this.icon.setInteractive();
-					this.chance = 80;
+					this.chance = 30;
 					this.numberOfTurns = -1;
 					this.isActive = false;
 					this.buffNumber = buffNumber;
@@ -376,7 +384,7 @@ export function buffList(buffNumber){
 					this.icon.visible = false;
 					this.icon.setScale(2);
 					this.icon.setInteractive();
-					this.chance = 100;
+					this.chance = 10;
 					this.numberOfTurns = -1;
 					this.isActive = false;
 					this.buffNumber = buffNumber;
@@ -410,6 +418,62 @@ export function buffList(buffNumber){
 					for ( var x = 0 ; x != this.game.activeButtonCharacter.length ; x++ ){
 						this.game.activeButtonCharacter[x].data.values.timeEvent.timeScale += 0.2;
 					}
+					this.icon.x = this.x;
+					this.icon.y = this.y;
+					this.game.repositionBuffs(this.game);
+				}
+
+			}
+		case 8:
+			return class {
+				constructor(game, positions){
+					this.game = game;
+					this.x = positions.x;
+					this.y = positions.y;
+					this.name = 'Idea';
+					this.description = 'desc';
+					this.icon = game.add.image(this.x, this.y, 'buffIcons', 7).setOrigin(0);
+					this.buffTextDescription = '';
+					this.icon.visible = false;
+					this.icon.setScale(2);
+					this.icon.setInteractive();
+					this.chance = 30;
+					this.numberOfTurns = -1;
+					this.isActive = false;
+					this.buffNumber = buffNumber;
+					this.buffType = 'buff';
+					this.button;
+					this.buffDuration;
+					this.immune = true;
+					popupManager(this,game,positions);
+
+				}
+
+				setButton(button){
+					this.button = button;
+				}
+
+				active(){
+					this.icon.visible = true;
+					this.isActive = true;
+					console.log(this.game.activeButtonCharacter[1].data.values.timeEvent.timeScale);
+					// console.log(this.);
+					this.game.activeButtonCharacter[1].data.values.timeEvent.timeScale += 
+						this.game.buyMenuCategories[this.button.data.values.itemEquipIndex-1]
+							.data.values.itemSelect.data.values.timeMultiplier / 100;
+					this.buffDuration = this.game.time.addEvent({
+			            delay:5000, callback: this.deactivate, callbackScope: this,
+					});
+					console.log(this.game.activeButtonCharacter[1].data.values.timeEvent.timeScale);
+				}
+
+				deactivate(){
+					this.icon.visible = false;
+					this.isActive = false;
+					this.buffDuration.destroy();
+					this.game.activeButtonCharacter[1].data.values.timeEvent.timeScale -= 
+						this.game.buyMenuCategories[this.button.data.values.itemEquipIndex-1]
+							.data.values.itemSelect.data.values.timeMultiplier / 100;
 					this.icon.x = this.x;
 					this.icon.y = this.y;
 					this.game.repositionBuffs(this.game);
