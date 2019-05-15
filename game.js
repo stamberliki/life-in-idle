@@ -117,6 +117,7 @@ function preload (){
     this.load.spritesheet('button','assets/ui/button.png',{ frameWidth: 64, frameHeight: 14 });
     this.load.spritesheet('button32','assets/ui/button32.png',{ frameWidth: 32, frameHeight: 14 });
     this.load.spritesheet('activeButton','assets/ui/active_button.png',{ frameWidth: 64, frameHeight: 18 });
+    this.load.spritesheet('activeButtonHoldAnim','assets/ui/active_button_hold_anim.png',{ frameWidth: 64, frameHeight: 20 });
     this.load.spritesheet('lockedButton','assets/ui/locked_button.png',{ frameWidth: 64, frameHeight: 19 });
     this.load.spritesheet('buyMenuIcons','assets/props/icons/buy_menu_icons.png',{ frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet('crib','assets/props/crib.png',{ frameWidth: 96, frameHeight: 64 });
@@ -264,15 +265,20 @@ function create (){
                 this.isCareSelected = true;
             }
 
-            let leftCycle, rightCycle;
+            let leftButton = {}, rightButton = {};
             if (currentStage-1 <= 1){
-                leftCycle = activeButtonLeft[1].data.values.cycleCount;
-                rightCycle = activeButtonRight[1].data.values.cycleCount;
+                leftButton['cycle'] = activeButtonLeft[1].data.values.gain+(activeButtonLeft[1].data.values.cycleCount*.75);
+                rightButton['cycle'] = activeButtonRight[1].data.values.gain+(activeButtonRight[1].data.values.cycleCount*.75);
+                leftButton['workData'] = activeButtonLeft[1].data.values.work.getData();
+                rightButton['workData'] = activeButtonRight[1].data.values.work.getData();
             }
             else {
-                leftCycle = activeButtonLeft[0].data.values.cycleCount;
-                rightCycle = activeButtonRight[0].data.values.cycleCount;
+                leftButton['cycle'] = activeButtonLeft[0].data.values.gain+(activeButtonLeft[0].data.values.cycleCount*.75);
+                rightButton['cycle'] = activeButtonRight[0].data.values.gain+(activeButtonRight[0].data.values.cycleCount*.75);
+                leftButton['workData'] = activeButtonLeft[0].data.values.work.getData();
+                rightButton['workData'] = activeButtonRight[0].data.values.work.getData();
             }
+            console.log(leftButton);
 
             clearBuffs(this.currentBuffCharacter);
             clearBuffs(this.currentBuffLeft);
@@ -322,10 +328,21 @@ function create (){
             this.buyMenuCategorySelect = buyMenuCategorySelectHolder;
 
             if (currentStage <= 1){
-                activeButtonLeft[1].data.values.gain += leftCycle*.75;
-                activeButtonLeft[1].data.values.cycleCount = leftCycle;
-                activeButtonRight[1].data.values.gain += rightCycle*.75;
-                activeButtonRight[1].data.values.cycleCount = rightCycle;
+                activeButtonLeft[1].data.values.cycleCount = leftButton.cycle;
+                activeButtonLeft[1].data.values.work.jobSelection.finished = leftButton.workData.jobSelectionFinished;
+                if (leftButton.workData.jobSelectionFinished){
+                    activeButtonLeft[1].data.values.work.acceptJob();
+                }
+                activeButtonLeft[1].data.values.gain = leftButton.cycle;
+                activeButtonLeft[1].data.values.timeEvent.args = [activeButtonLeft[1].data.values.gain, activeButtonLeft[1]];
+
+                activeButtonRight[1].data.values.cycleCount = rightButton.cycle;
+                activeButtonRight[1].data.values.work.jobSelection.finished = rightButton.workData.jobSelectionFinished;
+                if (rightButton.workData.jobSelectionFinished){
+                    activeButtonRight[1].data.values.work.acceptJob();
+                }
+                activeButtonRight[1].data.values.gain = rightButton.cycle;
+                activeButtonRight[1].data.values.timeEvent.args = [activeButtonRight[1].data.values.gain, activeButtonRight[1]];
                 money.setData('promotionEventPopup', 
                 new popupEvent(this).createAcknowledgeEvent('Your mother now have '+activeButtonLeft[1].data.values.gain+
                     '\ncash per cycle,'+
@@ -335,10 +352,21 @@ function create (){
                 money.data.values.promotionEventPopup.approveButton.data.values.text.y += 24;
             }
             else {
-                activeButtonLeft[0].data.values.gain += leftCycle*.75;
-                activeButtonLeft[0].data.values.cycleCount = leftCycle;
-                activeButtonRight[0].data.values.gain += rightCycle*.75;
-                activeButtonRight[0].data.values.cycleCount = rightCycle;
+                activeButtonLeft[0].data.values.cycleCount = leftButton.cycle;
+                activeButtonLeft[0].data.values.work.jobSelection.finished = leftButton.workData.jobSelectionFinished;
+                if (leftButton.workData.jobSelectionFinished){
+                    activeButtonLeft[0].data.values.work.acceptJob();
+                }
+                activeButtonLeft[0].data.values.gain = leftButton.cycle;
+                activeButtonLeft[0].data.values.timeEvent.args = [activeButtonLeft[0].data.values.gain, activeButtonLeft[0]];
+
+                activeButtonRight[0].data.values.cycleCount = rightButton.cycle;
+                activeButtonRight[0].data.values.work.jobSelection.finished = rightButton.workData.jobSelectionFinished;
+                if (rightButton.workData.jobSelectionFinished){
+                    activeButtonRight[0].data.values.work.acceptJob();
+                }
+                activeButtonRight[0].data.values.gain = rightButton.cycle;
+                activeButtonRight[0].data.values.timeEvent.args = [activeButtonRight[0].data.values.gain, activeButtonRight[0]];
                 money.setData('promotionEventPopup', 
                 new popupEvent(this).createAcknowledgeEvent('Your mother gain '+activeButtonLeft[0].data.values.gain+
                     '\ncash per cycle,'+
@@ -519,44 +547,8 @@ function gainGold(gain, button=''){
     updateBuffs(this, buttonData);
 
     if (buttonData.work){
-        if (buttonData.popupEvent){
-            if (buttonData.popupEvent.type == 'twoChoiceEvent' && !buttonData.popupEvent.finished){
-                let workTier;
-                if (this.tier == 'veryLow'){
-                    workTier = this.tier;
-                }
-                else if (this.tier == 'low'){
-                    workTier = Phaser.Math.RND.pick(['veryLow','low']);
-                }
-                else if (this.tier == 'average'){
-                    workTier = Phaser.Math.RND.pick(['veryLow','low','average']);
-                }
-                else if (this.tier == 'high'){
-                    workTier = Phaser.Math.RND.pick(['veryLow','low','average','high']);
-                }
-                else if (this.tier == 'veryHigh'){
-                    workTier = Phaser.Math.RND.pick(['veryLow','low','average','high','veryHigh']);
-                }
-                if (true){
-                    let list = buttonData.work.workData[workTier].nonDegree;
-                    list = list.concat(buttonData.work.workData[workTier].degree['Education']);
-                    buttonData.work.acceptedWorkName = Phaser.Math.RND.pick(list);
-                    buttonData.work.acceptedWorkGain = Phaser.Math.Between(buttonData.work.workData[workTier].minGain,buttonData.work.workData[workTier].maxGain);
-                    if (!buttonData.work.workData[workTier].degree['Education'].includes(buttonData.work.acceptedWorkName)){
-                        buttonData.work.acceptedWorkGain /= 2;
-                    }
-                }
-                else{
-                    buttonData.work.acceptedWorkName = Phaser.Math.RND.pick(buttonData.work.workData[workTier].nonDegree);
-                    buttonData.work.acceptedWorkGain = Phaser.Math.Between(buttonData.work.workData[workTier].minGain,buttonData.work.workData[workTier].maxGain)/2;
-                }
-
-                buttonData.popupEvent.text.setText('You applying as a\n'+buttonData.work.acceptedWorkName+'\nfor '+buttonData.work.acceptedWorkGain+' per cycle\nDo you want to apply?');
-                buttonData.popupEvent.popup.resize(Math.max((buttonData.popupEvent.text.getTextBounds().local.width/2)+400,496),
-                    (buttonData.popupEvent.text.getTextBounds().local.height/2)+322);
-                buttonData.popupEvent.popup.setOrigin(0.5).setScale(2);
-                buttonData.popupEvent.show();
-            }
+        if (!buttonData.work.jobSelection.finished){
+            buttonData.work.showJobSelection(this);
         }
     }
 
@@ -709,6 +701,12 @@ function createIdleAnim(game){
         frameRate: 2,
         repeat: -1
     });
+    game.anims.create({
+        key: 'activeButtonHoldAnimation',
+        frames: game.anims.generateFrameNumbers('activeButtonHoldAnim', { start: 0, end: 72 }),
+        frameRate: 24,
+        repeat: 0
+    });
 }
 
 function buyMenu(game){
@@ -852,7 +850,7 @@ function createBuyMenuCategory(game, name, stageAvailable, selected = false, nee
     });
     game.buyMenuCategories.push(button);
 }
-
+    
 function renderBuyMenuItem(game){
     if(game.buyMenuCategorySelect.data.values.itemSelect){
         let data = game.buyMenuCategorySelect.data.values.itemSelect.data.values;
@@ -906,10 +904,9 @@ function saveManager(game){
             callbackScope: this, args:[game],
         });
     // game.saveGame.clear();
-        game.moneyAmount.setData('amount',parseInt(game.saveGame.getItem('money')));
-        game.expAmount.setData('amount',parseInt(game.saveGame.getItem('exp')));
+    game.moneyAmount.setData('amount',parseInt(game.saveGame.getItem('money')));
+    game.expAmount.setData('amount',parseInt(game.saveGame.getItem('exp')));
     if (!game.saveGame.getItem('wasSaved')){
-        console.log('write');
         game.saveGame.setItem('money',0);
         game.saveGame.setItem('exp',0);
         game.moneyAmount.setData('amount',parseInt(game.saveGame.getItem('money')));
@@ -926,6 +923,7 @@ function saveManager(game){
             buttonCharacterSelected: game.buttonCharacterSelected,
         }));
         game.saveGame.setItem('tier','veryLow');
+        game.tier = 'veryLow';
         
         game.buyMenuCategories[1].data.values.itemList[0].data.values.buyButton.setFrame(2);
         game.buyMenuCategories[1].data.values.itemList[0].data.values.isBrought = true;
@@ -950,6 +948,19 @@ function saveManager(game){
 
         activeButton(game,activeButtonCharacter,
             'character',getActiveButtonStats(game,'character',1,1,buffList));
+
+        let buttonData = game.activeButtonLeft[1].data.values;
+        buttonData.work.generateJob(game);
+        buttonData.work.acceptJob();
+        buttonData.gain = 15;
+        buttonData.timeEvent.args[0] = 15;
+
+        buttonData = game.activeButtonRight[1].data.values;
+        buttonData.work.generateJob(game);
+        buttonData.work.acceptJob();
+        buttonData.gain = 15;
+        buttonData.timeEvent.args[0] = 15;
+
     }
 
     this.save = function(game){
@@ -967,7 +978,6 @@ function saveManager(game){
             buttonRightSelected: game.buttonRightSelected,
             buttonCharacterSelected: game.buttonCharacterSelected,
         }));
-        console.log(JSON.parse(game.saveGame.getItem('buttonSelected')));
         game.saveGame.setItem('stage', currentStage);
         game.saveGame.setItem('stageCounter', game.currentStageCounter);
         game.saveGame.setItem('isCareSelected',game.isCareSelected);
@@ -993,8 +1003,14 @@ function saveManager(game){
                 gain: buttons.gain,
                 buff: {},
             };
+            if(typeof buttons.runOneWithLoop !== 'undefined'){
+                activeLeft[x].runOneWithLoop = buttons.runOneWithLoop;
+            }
             if (buttons.popupEvent){
                 activeLeft[x].popupEventFinished = buttons.popupEvent.finished;
+            }
+            if (buttons.work){
+                activeLeft[x].workJobSelectionFinished = buttons.work.jobSelection.finished;
             }
             for (let y = 0 ; y != buttons.buff.length ; y++){
                 activeLeft[x].buff[y] = {
@@ -1021,8 +1037,14 @@ function saveManager(game){
                 gain: buttons.gain,
                 buff: {},
             };
+            if(typeof buttons.runOneWithLoop !== 'undefined'){
+                activeRight[x].runOneWithLoop = buttons.runOneWithLoop;
+            }
             if (buttons.popupEvent){
                 activeRight[x].popupEventFinished = buttons.popupEvent.finished;
+            }
+            if (buttons.work){
+                activeRight[x].workJobSelectionFinished = buttons.work.jobSelection.finished;
             }
             for (let y = 0 ; y != buttons.buff.length ; y++){
                 activeRight[x].buff[y] = {
@@ -1048,8 +1070,14 @@ function saveManager(game){
                 gain: buttons.gain,
                 buff: {},
             };
+            if(typeof buttons.runOneWithLoop !== 'undefined'){
+                activeCharacter[x].runOneWithLoop = buttons.runOneWithLoop;
+            }
             if (buttons.popupEvent){
                 activeCharacter[x].popupEventFinished = buttons.popupEvent.finished;
+            }
+            if (buttons.work){
+                activeCharacter[x].workJobSelectionFinished = buttons.work.jobSelection.finished;
             }
             for (let y = 0 ; y != buttons.buff.length ; y++){
                 activeCharacter[x].buff[y] = {
@@ -1059,6 +1087,7 @@ function saveManager(game){
                 }
             }
         }
+        console.log(activeCharacter);
         game.saveGame.setItem('activeCharacter', JSON.stringify(activeCharacter));
 
         let buyItems = [];
@@ -1082,7 +1111,6 @@ function saveManager(game){
         expAmount.setText(parseInt(loadGame.getItem('exp')));
         game.isCareSelected = loadGame.getItem('isCareSelected') === 'true';
         let buttonSelected = JSON.parse(loadGame.getItem('buttonSelected'));
-        console.log(buttonSelected);
         game.buttonLeftSelected = buttonSelected.buttonLeftSelected;
         game.buttonRightSelected = buttonSelected.buttonRightSelected;
         game.buttonCharacterSelected = buttonSelected.buttonCharacterSelected;
@@ -1171,6 +1199,8 @@ function loadActiveButton(game,position,x,Button,elapseTime, accumulateList){
     }
     let buttonElapseTime = button.elapseTime;
     let delay = 1*button.delay;
+    console.log(button);
+
     if (!button.pause){
         if (delay < ((elapseTime)+(buttonElapseTime*delay))){
             buttonElapseTime = ((elapseTime)+(buttonElapseTime*delay));
@@ -1194,85 +1224,59 @@ function loadActiveButton(game,position,x,Button,elapseTime, accumulateList){
     else{
         buttonElapseTime = buttonElapseTime*delay;
     }
-    console.log(buttonElapseTime);
+
     if (position == 'left'){
         activeButton(game,game.activeButtonLeft,'left',
-            getActiveButtonStats(game,'left',button.stage,button.number,buffList,buttonElapseTime));
-        let buttonData = game.activeButtonLeft[x].data.values;
-        buttonData.timeEvent.paused = button.pause;
-        buttonData.default.pause = button.pause;
-        buttonData.unlocked = button.unlocked;
-        buttonData.default.pausedMidway = button.pausedMidway;
-        buttonData.gain = button.gain;
-        if (buttonData.popupEvent){
-            buttonData.popupEvent.finished = button.popupEventFinished;
-        }
-        for (let y = 0 ; y != Object.keys(button.buff).length ; y++){
-            if (button.buff[y].isActive){
-                buttonData.buff[y].active();
-                game.currentBuffLeft.push(buttonData.buff[y]);
-                game.currentBuffLeft.numberOfTurns = button.buff[y].numberOfTurns;
-                if (game.currentBuffLeft.buffDuration){
-                    game.currentBuffLeft.buffDuration.elapsed = button.buff[y].buffDuration;
-                }
-            }
-        }
-        if (button.unlocked){
-            game.activeButtonLeft[x].setFrame(1);
-        }
+            getActiveButtonStats(game,'left',button.stage,button.number,buffList));
+        loadButton(game, game.activeButtonLeft[x], button, buttonElapseTime);
     }
 
     else if (position == 'right'){
         activeButton(game,game.activeButtonRight,'right',
-            getActiveButtonStats(game,'right',button.stage,button.number,buffList,buttonElapseTime));
-        let buttonData = game.activeButtonRight[x].data.values;
-        buttonData.timeEvent.paused = button.pause;
-        buttonData.default.pause = button.pause;
-        buttonData.unlocked = button.unlocked;
-        buttonData.default.pausedMidway = button.pausedMidway;
-        buttonData.gain = button.gain;
-        if (buttonData.popupEvent){
-            buttonData.popupEvent.finished = button.popupEventFinished;
-        }
-        for (let y = 0 ; y != Object.keys(button.buff).length ; y++){
-            if (button.buff[y].isActive){
-                buttonData.buff[y].active();
-                game.currentBuffRight.push(buttonData.buff[y]);
-                game.currentBuffRight.numberOfTurns = button.buff[y].numberOfTurns;
-                if (game.currentBuffRight.buffDuration){
-                    game.currentBuffRight.buffDuration.elapsed = button.buff[y].buffDuration;
-                }
-            }
-        }
-        if (button.unlocked){
-            game.activeButtonRight[x].setFrame(1);
-        }
+            getActiveButtonStats(game,'right',button.stage,button.number,buffList));
+        loadButton(game, game.activeButtonRight[x], button, buttonElapseTime);
     }
 
     else if (position == 'character'){
         activeButton(game,game.activeButtonCharacter,'character',
-            getActiveButtonStats(game,'character',button.stage,button.number,buffList,buttonElapseTime));
-        let buttonData = game.activeButtonCharacter[x].data.values;
-        buttonData.timeEvent.paused = button.pause;
-        buttonData.default.pause = button.pause;
-        buttonData.unlocked = button.unlocked;
-        buttonData.default.pausedMidway = button.pausedMidway;
-        if (buttonData.popupEvent){
-            buttonData.popupEvent.finished = button.popupEventFinished;
+            getActiveButtonStats(game,'character',button.stage,button.number,buffList));
+        loadButton(game, game.activeButtonCharacter[x], button, buttonElapseTime);
+    }
+}
+
+function loadButton(game,activeButtonPosition,button,buttonElapseTime){
+    let buttonData = activeButtonPosition.data.values;
+    if (buttonData.work){
+        buttonData.work.jobSelection.finished = button.workJobSelectionFinished;
+        if (buttonData.work.jobSelection.finished){
+            buttonData.timeEvent = buttonData.work.timeEvent;
+            buttonData.timeEvent.args = [button.gain, activeButtonPosition];
         }
-        for (let y = 0 ; y != Object.keys(button.buff).length ; y++){
-            if (button.buff[y].isActive){
-                buttonData.buff[y].active();
-                game.currentBuffCharacter.push(buttonData.buff[y]);
-                game.currentBuffCharacter.numberOfTurns = button.buff[y].numberOfTurns;
-                if (game.currentBuffCharacter.buffDuration){
-                    game.currentBuffCharacter.buffDuration.elapsed = button.buff[y].buffDuration;
-                }
+    }
+    buttonData.timeEvent.elapsed = buttonElapseTime;
+    buttonData.timeEvent.paused = button.pause;
+    buttonData.default.pause = button.pause;
+    buttonData.unlocked = button.unlocked;
+    buttonData.default.pausedMidway = button.pausedMidway;
+    buttonData.gain = button.gain;
+    if (typeof buttonData.runOneWithLoop !== 'undefined'){
+        buttonData.runOneWithLoop = button.runOneWithLoop;
+    }
+    if (buttonData.popupEvent){
+        buttonData.popupEvent.finished = button.popupEventFinished;
+    }
+    for (let y = 0 ; y != Object.keys(button.buff).length ; y++){
+        if (button.buff[y].isActive){
+            buttonData.buff[y].active();
+            game.currentBuffLeft.push(buttonData.buff[y]);
+            game.currentBuffLeft.numberOfTurns = button.buff[y].numberOfTurns;
+            if (game.currentBuffLeft.buffDuration){
+                game.currentBuffLeft.buffDuration.elapsed = button.buff[y].buffDuration;
             }
         }
-        if (button.unlocked){
-            game.activeButtonCharacter[x].setFrame(1);
-        }  
+    }
+    if (button.unlocked){
+        activeButtonPosition.setFrame(1);
     }
 }
 

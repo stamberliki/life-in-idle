@@ -1,4 +1,4 @@
-export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startAt=0){
+export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 	var buff = [];
 	var popupEvent = new game.popupEvent(game);
 
@@ -32,7 +32,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        textDescription: '',
 							        timeEvent: game.time.addEvent({
 							            delay:30000, loop:true, callback: game.gainMoney,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						case 2:
@@ -41,16 +41,21 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							return {
 									default: getDefault(),
 							        description: 'WORK',
-							        unlocked: true,
 							        event: game.gainMoney.name,
 							        buff: buff,
-							        gain: 15,
+							        unlocked: true,
+							        gain: 0,
+							        requiredExpToUnlock: 0,
+							        requiredMoneyToUnlock: 0,
+							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
+							        runOneWithLoop: true,
 							        cycleCount: 0,
 							        timeEvent: game.time.addEvent({
-							            delay:15000, loop:true, callback: game.gainMoney,
-							            callbackScope: game, paused: true, startAt: startAt,
-							        })
+							            delay:1000, loop:true, callback: game.gainMoney,
+							            callbackScope: game, paused: true,
+							        }),
+							        work: new game.workManager(game),
 							    };
 					}
 				case 2:
@@ -69,7 +74,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        textDescription: '',
 							        timeEvent: game.time.addEvent({
 							            delay:30000, loop:true, callback: game.gainMoney,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						case 2:
@@ -78,16 +83,21 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							return {
 									default: getDefault(),
 							        description: 'WORK',
-							        unlocked: true,
 							        event: game.gainMoney.name,
 							        buff: buff,
-							        gain: 15,
+							        unlocked: true,
+							        gain: 0,
+							        requiredExpToUnlock: 0,
+							        requiredMoneyToUnlock: 0,
+							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
+							        runOneWithLoop: true,
 							        cycleCount: 0,
 							        timeEvent: game.time.addEvent({
-							            delay:15000, loop:true, callback: game.gainMoney,
-							            callbackScope: game, paused: true, startAt: startAt,
-							        })
+							            delay:1000, loop:true, callback: game.gainMoney,
+							            callbackScope: game, paused: true,
+							        }),
+							        work: new game.workManager(game),
 							    };
 					}
 				case 3:
@@ -98,16 +108,21 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							return {
 									default: getDefault(),
 							        description: 'WORK',
-							        unlocked: true,
 							        event: game.gainMoney.name,
 							        buff: buff,
-							        gain: 15,
+							        unlocked: true,
+							        gain: 0,
+							        requiredExpToUnlock: 0,
+							        requiredMoneyToUnlock: 0,
+							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
+							        runOneWithLoop: true,
 							        cycleCount: 0,
 							        timeEvent: game.time.addEvent({
-							            delay:15000, loop:true, callback: game.gainMoney,
-							            callbackScope: game, paused: true, startAt: startAt,
-							        })
+							            delay:1000, loop:true, callback: game.gainMoney,
+							            callbackScope: game, paused: true,
+							        }),
+							        work: new game.workManager(game),
 							    };
 					}
 				case 4:
@@ -118,16 +133,21 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							return {
 									default: getDefault(),
 							        description: 'WORK',
-							        unlocked: true,
 							        event: game.gainMoney.name,
 							        buff: buff,
-							        gain: 15,
+							        unlocked: true,
+							        gain: 0,
+							        requiredExpToUnlock: 0,
+							        requiredMoneyToUnlock: 0,
+							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
+							        runOneWithLoop: true,
 							        cycleCount: 0,
 							        timeEvent: game.time.addEvent({
-							            delay:15000, loop:true, callback: game.gainMoney,
-							            callbackScope: game, paused: true, startAt: startAt,
-							        })
+							            delay:1000, loop:true, callback: game.gainMoney,
+							            callbackScope: game, paused: true,
+							        }),
+							        work: new game.workManager(game),
 							    };
 					}
 				case 5:
@@ -138,16 +158,21 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							return {
 									default: getDefault(),
 							        description: 'WORK',
-							        unlocked: true,
 							        event: game.gainMoney.name,
 							        buff: buff,
-							        gain: 15,
+							        unlocked: true,
+							        gain: 0,
+							        requiredExpToUnlock: 0,
+							        requiredMoneyToUnlock: 0,
+							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
+							        runOneWithLoop: true,
 							        cycleCount: 0,
 							        timeEvent: game.time.addEvent({
-							            delay:15000, loop:true, callback: game.gainMoney,
-							            callbackScope: game, paused: true, startAt: startAt,
-							        })
+							            delay:1000, loop:true, callback: game.gainMoney,
+							            callbackScope: game, paused: true,
+							        }),
+							        work: new game.workManager(game),
 							    };
 					}
 			}
@@ -170,7 +195,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        textDescription: '',
 							        timeEvent: game.time.addEvent({
 							            delay:30000, loop:true, callback: game.gainMoney,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						case 2:
@@ -179,16 +204,21 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							return {
 									default: getDefault(),
 							        description: 'WORK',
-							        unlocked: true,
 							        event: game.gainMoney.name,
 							        buff: buff,
-							        gain: 15,
+							        unlocked: true,
+							        gain: 0,
+							        requiredExpToUnlock: 0,
+							        requiredMoneyToUnlock: 0,
+							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
+							        runOneWithLoop: true,
 							        cycleCount: 0,
 							        timeEvent: game.time.addEvent({
-							            delay:15000, loop:true, callback: game.gainMoney,
-							            callbackScope: game, paused: true, startAt: startAt,
-							        })
+							            delay:1000, loop:true, callback: game.gainMoney,
+							            callbackScope: game, paused: true,
+							        }),
+							        work: new game.workManager(game),
 							    };
 					}
 				case 2:
@@ -207,7 +237,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        textDescription: '',
 							        timeEvent: game.time.addEvent({
 							            delay:30000, loop:true, callback: game.gainMoney,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						case 2:
@@ -216,16 +246,21 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							return {
 									default: getDefault(),
 							        description: 'WORK',
-							        unlocked: true,
 							        event: game.gainMoney.name,
 							        buff: buff,
-							        gain: 15,
+							        unlocked: true,
+							        gain: 0,
+							        requiredExpToUnlock: 0,
+							        requiredMoneyToUnlock: 0,
+							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
+							        runOneWithLoop: true,
 							        cycleCount: 0,
 							        timeEvent: game.time.addEvent({
-							            delay:15000, loop:true, callback: game.gainMoney,
-							            callbackScope: game, paused: true, startAt: startAt,
-							        })
+							            delay:1000, loop:true, callback: game.gainMoney,
+							            callbackScope: game, paused: true,
+							        }),
+							        work: new game.workManager(game),
 							    };
 					}
 				case 3:
@@ -236,16 +271,21 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							return {
 									default: getDefault(),
 							        description: 'WORK',
-							        unlocked: true,
 							        event: game.gainMoney.name,
 							        buff: buff,
-							        gain: 15,
+							        unlocked: true,
+							        gain: 0,
+							        requiredExpToUnlock: 0,
+							        requiredMoneyToUnlock: 0,
+							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
+							        runOneWithLoop: true,
 							        cycleCount: 0,
 							        timeEvent: game.time.addEvent({
-							            delay:15000, loop:true, callback: game.gainMoney,
-							            callbackScope: game, paused: true, startAt: startAt,
-							        })
+							            delay:1000, loop:true, callback: game.gainMoney,
+							            callbackScope: game, paused: true,
+							        }),
+							        work: new game.workManager(game),
 							    };
 					}
 				case 4:
@@ -255,18 +295,22 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							buff[0] = new buff[0](game,{x:721, y: 209});
 							return {
 									default: getDefault(),
-									number: buttonNo,
 							        description: 'WORK',
-							        unlocked: true,
 							        event: game.gainMoney.name,
 							        buff: buff,
-							        gain: 15,
+							        unlocked: true,
+							        gain: 0,
+							        requiredExpToUnlock: 0,
+							        requiredMoneyToUnlock: 0,
+							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
+							        runOneWithLoop: true,
 							        cycleCount: 0,
 							        timeEvent: game.time.addEvent({
-							            delay:15000, loop:true, callback: game.gainMoney,
-							            callbackScope: game, paused: true, startAt: startAt,
-							        })
+							            delay:1000, loop:true, callback: game.gainMoney,
+							            callbackScope: game, paused: true,
+							        }),
+							        work: new game.workManager(game),
 							    };
 					}
 				case 5:
@@ -277,16 +321,21 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							return {
 									default: getDefault(),
 							        description: 'WORK',
-							        unlocked: true,
 							        event: game.gainMoney.name,
 							        buff: buff,
-							        gain: 15,
+							        unlocked: true,
+							        gain: 0,
+							        requiredExpToUnlock: 0,
+							        requiredMoneyToUnlock: 0,
+							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
+							        runOneWithLoop: true,
 							        cycleCount: 0,
 							        timeEvent: game.time.addEvent({
-							            delay:15000, loop:true, callback: game.gainMoney,
-							            callbackScope: game, paused: true, startAt: startAt,
-							        })
+							            delay:1000, loop:true, callback: game.gainMoney,
+							            callbackScope: game, paused: true,
+							        }),
+							        work: new game.workManager(game),
 							    };
 					}
 			}
@@ -308,9 +357,10 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        requiredExpToUnlock: 0,
 							        requiredMoneyToUnlock: 0,
 							        textDescription: '',
+							        holdEvent: true,
 							        timeEvent: game.time.addEvent({
-							            delay:2000, loop:false, callback: game.expGain,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            delay:2000, loop:true, callback: game.expGain,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						case 2:
@@ -328,7 +378,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        textDescription: 'REQUIRED:\nEXP: 50',
 							        timeEvent: game.time.addEvent({
 							            delay:5000, loop:true, callback: game.expGain,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						case 3:
@@ -346,7 +396,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        textDescription: 'REQUIRED:\nEXP: 250',
 							        timeEvent: game.time.addEvent({
 							            delay:5000, loop:true, callback: game.expGain,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						case 4:
@@ -365,7 +415,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        textDescription: 'REQUIRED:\nEXP: 550',
 							        timeEvent: game.time.addEvent({
 							            delay: 7000, loop:true, callback: game.expGain,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						case 5:
@@ -384,7 +434,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        textDescription: 'REQUIRED:\nEXP: 800\nCRAWL: 1',
 							        timeEvent: game.time.addEvent({
 							            delay:13000, loop:true, callback: game.expGain,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						case 6:
@@ -403,7 +453,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        textDescription: 'REQUIRED:\nSTAND: 2',
 							        timeEvent: game.time.addEvent({
 							            delay:20000, loop:true, callback: game.expGain,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						default:
@@ -429,7 +479,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        itemEquipIndex: 4,
 							        timeEvent: game.time.addEvent({
 							            delay:60000, loop:true, callback: game.expGain,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						case 2:
@@ -448,7 +498,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        textDescription: '',
 							        timeEvent: game.time.addEvent({
 							            delay:35000, loop:true, callback: game.expGain,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						case 3:
@@ -467,7 +517,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        textDescription: '',
 							        timeEvent: game.time.addEvent({
 							            delay:50000, loop:true, callback: game.expGain,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						default:
@@ -493,7 +543,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        itemEquipIndex: 4,
 							        timeEvent: game.time.addEvent({
 							            delay:60000, loop:true, callback: game.expGain,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						case 2:
@@ -523,7 +573,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 						            ),
 							        timeEvent: game.time.addEvent({
 							            delay:300000, loop:false, callback: game.expGain,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						case 3:
@@ -544,7 +594,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        itemEquipIndex: 5,
 							        timeEvent: game.time.addEvent({
 							            delay:60000, loop:true, callback: game.expGain,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						default:
@@ -570,7 +620,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        itemEquipIndex: 4,
 							        timeEvent: game.time.addEvent({
 							            delay:60000, loop:true, callback: game.expGain,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						case 2:
@@ -601,7 +651,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 						            // randomEvent: {25:'false',50:'false',75:'false',100:'false',},
 							        timeEvent: game.time.addEvent({
 							            delay:600000, loop:false, callback: game.expGain,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						case 3:
@@ -622,7 +672,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        itemEquipIndex: 5,
 							        timeEvent: game.time.addEvent({
 							            delay:60000, loop:true, callback: game.expGain,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						default:
@@ -648,7 +698,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        itemEquipIndex: 4,
 							        timeEvent: game.time.addEvent({
 							            delay:90000, loop:true, callback: game.expGain,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						case 2:
@@ -669,7 +719,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        itemEquipIndex: 4,
 							        timeEvent: game.time.addEvent({
 							            delay:90000, loop:true, callback: game.expGain,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						case 3:
@@ -689,30 +739,9 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        runOneWithLoop: true,
 							        timeEvent: game.time.addEvent({
 							            delay:1000, loop:true, callback: game.gainMoney,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        }),
-							        secondaryTimeEvent: game.time.addEvent({
-							            delay:2000, loop:true, callback: game.gainMoney,
-							            callbackScope: game, paused: true, startAt: startAt,
-							        }),
-							        work: new game.workManager(),
-							        popupEvent: popupEvent.createTwoChoiceEvent('',{
-							        	text: 'Yes',
-							        	event: function(){
-							        		let buttonData = game.activeButtonCharacter[buttonNo-1].data.values;
-							        		buttonData.timeEvent = buttonData.secondaryTimeEvent;
-							        		buttonData.gain = buttonData.work.acceptedWorkGain;
-							        		buttonData.timeEvent.args[0] = buttonData.work.acceptedWorkGain;
-							        		buttonData.popupEvent.finished = true;
-							        		console.log(buttonData);
-							        	}
-							        },{
-							        	text: 'No',
-							        	event: function(){
-							        		let buttonData = game.activeButtonCharacter[buttonNo-1].data.values;
-							        	}
-							        },
-							        ).setRequiredDelay(true),
+							        work: new game.workManager(game),
 							    };
 						case 4:
 							buff.push(buffs(7));
@@ -732,7 +761,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        itemEquipIndex: 4,
 							        timeEvent: game.time.addEvent({
 							            delay:90000, loop:true, callback: game.expGain,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						case 5:
@@ -753,7 +782,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs,startA
 							        itemEquipIndex: 4,
 							        timeEvent: game.time.addEvent({
 							            delay:90000, loop:true, callback: game.expGain,
-							            callbackScope: game, paused: true, startAt: startAt,
+							            callbackScope: game, paused: true,
 							        })
 							    };
 						default:

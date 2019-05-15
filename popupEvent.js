@@ -65,6 +65,8 @@ export class popupEvent{
 		this.popup = this.game.add.nineslice(400, 300, 400, 300, 'popupEvent', [143, 193, 158, 193]).setOrigin(0.5).setScale(2);
 		this.popup.depth = 2;
 		this.text = this.game.add.bitmapText(400, 275,'mainFont2',text).setFontSize(16).setOrigin(0.5).setCenterAlign();
+		this.popup.resize(Math.max((this.text.getTextBounds().local.width/2)+400,496),(this.text.getTextBounds().local.height/2)+322);
+        this.popup.setOrigin(0.5).setScale(2);
 		this.text.depth = 2;
 
 		this.approveButton = this.game.add.sprite(344,342,'button32',0).setScale(2);

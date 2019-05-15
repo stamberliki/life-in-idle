@@ -23,6 +23,10 @@ export function activeButton(game,buttonArray,position,data){
     button.setInteractive();
     button.setData(data);
     let buttonData = button.data.values;
+    if(buttonData.work){
+        buttonData.work.setButton(button);
+        buttonData.holdEvent = game.add.sprite(x,y).setOrigin(0.5).setScale(2);
+    }
     buttonData.buttonNumber = size;
     buttonData.position = position;
     buttonData.description = game.add.bitmapText(x,y-6,'mainFont', data.description).setOrigin(0.5);
@@ -53,9 +57,6 @@ export function activeButton(game,buttonArray,position,data){
     };
     buttonData.descriptionPopup.hide();
     buttonData.timeEvent.args = [button.data.values.gain, button];
-    if (buttonData.secondaryTimeEvent){
-        buttonData.secondaryTimeEvent.args = [button.data.values.gain, button];
-    }
 
     for (var a = 0 ; a != buttonData.buff.length ; a++){
         buttonData.buff[a].setButton(button);
@@ -112,7 +113,20 @@ export function activeButton(game,buttonArray,position,data){
         }
     });
     button.on('pointerup',function(){
+        console.log(button);
     	game.checkItemEquip(game);
+        if (buttonData.work){
+            if (!buttonData.work.holdEvent.finished){
+                return;
+            }
+            else{
+                buttonData.work.holdTimeEventDelay.paused = true;
+                buttonData.work.holdTimeEvent.paused = true;
+                buttonData.work.holdTimeEventDelay.elapsed = 0;
+                buttonData.work.holdTimeEvent.elapsed = 0;
+                buttonData.holdEvent.setVisible(false);
+            }
+        }
     	if (buttonData.unlocked && !(!buttonData.timeEvent.loop && buttonData.timeEvent.hasDispatched && !buttonData.runOneWithLoop)){
 
             if (buttonData.popupEvent){
