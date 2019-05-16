@@ -278,7 +278,6 @@ function create (){
                 leftButton['workData'] = activeButtonLeft[0].data.values.work.getData();
                 rightButton['workData'] = activeButtonRight[0].data.values.work.getData();
             }
-            console.log(leftButton);
 
             clearBuffs(this.currentBuffCharacter);
             clearBuffs(this.currentBuffLeft);
@@ -331,6 +330,7 @@ function create (){
                 activeButtonLeft[1].data.values.cycleCount = leftButton.cycle;
                 activeButtonLeft[1].data.values.work.jobSelection.finished = leftButton.workData.jobSelectionFinished;
                 if (leftButton.workData.jobSelectionFinished){
+                    activeButtonLeft[1].data.values.work.acceptedWorkName = leftButton.workData.workName;
                     activeButtonLeft[1].data.values.work.acceptJob();
                 }
                 activeButtonLeft[1].data.values.gain = leftButton.cycle;
@@ -339,6 +339,7 @@ function create (){
                 activeButtonRight[1].data.values.cycleCount = rightButton.cycle;
                 activeButtonRight[1].data.values.work.jobSelection.finished = rightButton.workData.jobSelectionFinished;
                 if (rightButton.workData.jobSelectionFinished){
+                    activeButtonRight[1].data.values.work.acceptedWorkName = leftButton.workData.workName;
                     activeButtonRight[1].data.values.work.acceptJob();
                 }
                 activeButtonRight[1].data.values.gain = rightButton.cycle;
@@ -355,6 +356,7 @@ function create (){
                 activeButtonLeft[0].data.values.cycleCount = leftButton.cycle;
                 activeButtonLeft[0].data.values.work.jobSelection.finished = leftButton.workData.jobSelectionFinished;
                 if (leftButton.workData.jobSelectionFinished){
+                    activeButtonLeft[0].data.values.work.acceptedWorkName = leftButton.workData.workName;
                     activeButtonLeft[0].data.values.work.acceptJob();
                 }
                 activeButtonLeft[0].data.values.gain = leftButton.cycle;
@@ -363,6 +365,7 @@ function create (){
                 activeButtonRight[0].data.values.cycleCount = rightButton.cycle;
                 activeButtonRight[0].data.values.work.jobSelection.finished = rightButton.workData.jobSelectionFinished;
                 if (rightButton.workData.jobSelectionFinished){
+                    activeButtonRight[0].data.values.work.acceptedWorkName = leftButton.workData.workName;
                     activeButtonRight[0].data.values.work.acceptJob();
                 }
                 activeButtonRight[0].data.values.gain = rightButton.cycle;
@@ -960,7 +963,6 @@ function saveManager(game){
         buttonData.work.acceptJob();
         buttonData.gain = 15;
         buttonData.timeEvent.args[0] = 15;
-
     }
 
     this.save = function(game){
@@ -1011,6 +1013,7 @@ function saveManager(game){
             }
             if (buttons.work){
                 activeLeft[x].workJobSelectionFinished = buttons.work.jobSelection.finished;
+                activeLeft[x].workName = buttons.work.acceptedWorkName;
             }
             for (let y = 0 ; y != buttons.buff.length ; y++){
                 activeLeft[x].buff[y] = {
@@ -1045,6 +1048,7 @@ function saveManager(game){
             }
             if (buttons.work){
                 activeRight[x].workJobSelectionFinished = buttons.work.jobSelection.finished;
+                activeRight[x].workName = buttons.work.acceptedWorkName;
             }
             for (let y = 0 ; y != buttons.buff.length ; y++){
                 activeRight[x].buff[y] = {
@@ -1078,6 +1082,7 @@ function saveManager(game){
             }
             if (buttons.work){
                 activeCharacter[x].workJobSelectionFinished = buttons.work.jobSelection.finished;
+                activeCharacter[x].workName = buttons.work.acceptedWorkName;
             }
             for (let y = 0 ; y != buttons.buff.length ; y++){
                 activeCharacter[x].buff[y] = {
@@ -1087,7 +1092,6 @@ function saveManager(game){
                 }
             }
         }
-        console.log(activeCharacter);
         game.saveGame.setItem('activeCharacter', JSON.stringify(activeCharacter));
 
         let buyItems = [];
@@ -1249,8 +1253,9 @@ function loadButton(game,activeButtonPosition,button,buttonElapseTime){
     if (buttonData.work){
         buttonData.work.jobSelection.finished = button.workJobSelectionFinished;
         if (buttonData.work.jobSelection.finished){
-            buttonData.timeEvent = buttonData.work.timeEvent;
-            buttonData.timeEvent.args = [button.gain, activeButtonPosition];
+            buttonData.work.acceptedWorkGain = button.gain;
+            buttonData.work.acceptedWorkName = button.workName;
+            buttonData.work.acceptJob();
         }
     }
     buttonData.timeEvent.elapsed = buttonElapseTime;

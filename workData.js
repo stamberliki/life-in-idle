@@ -76,7 +76,7 @@ export class workData{
         },
         ).setRequiredDelay(true),
 
-        this.holdEvent = new game.popupEvent(game).createTwoChoiceEvent('You are about to quit your job as a\n'+this.acceptedWorkName+'\nDo you want to quit your job?',{
+        this.holdEvent = new game.popupEvent(game).createTwoChoiceEvent('',{
         	text: 'Yes',
         	event: function(){
         		let buttonData = _this.button.data.values;
@@ -183,6 +183,14 @@ export class workData{
 		this.holdTimeEvent.paused = true;
 	}
 
+	hideHoldAnim(){
+        this.holdTimeEventDelay.paused = true;
+        this.holdTimeEvent.paused = true;
+        this.holdTimeEventDelay.elapsed = 0;
+        this.holdTimeEvent.elapsed = 0;
+        this.button.data.values.holdEvent.setVisible(false);
+	}
+
 	acceptJob(){
 		let buttonData = this.button.data.values;
 		this.previousTimeEvent = buttonData.timeEvent;
@@ -191,6 +199,10 @@ export class workData{
 		buttonData.timeEvent.args = [this.acceptedWorkGain, this.button];
 		this.jobSelection.finished = true;
 		buttonData.runOneWithLoop = false;
+		this.holdEvent.text.setText('You are about to quit your job as a\n'+this.acceptedWorkName+'\nDo you want to quit your job?');
+		this.holdEvent.popup.resize(Math.max((this.holdEvent.text.getTextBounds().local.width/2)+400,496),
+                (this.holdEvent.text.getTextBounds().local.height/2)+322);
+        this.holdEvent.popup.setOrigin(0.5).setScale(2);
 	}
 
 	getData(){

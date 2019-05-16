@@ -88,6 +88,11 @@ export function activeButton(game,buttonArray,position,data){
         else{
         	buttonData.descriptionPopup.hide();
         }
+        if (buttonData.work){
+            if (!buttonData.work.holdTimeEvent.paused && buttonData.work.holdTimeEventDelay.paused){
+                buttonData.work.hideHoldAnim();
+            }
+        }
     });
     button.on('pointerover',function(){
         if (buttonData.itemRequired){
@@ -113,18 +118,14 @@ export function activeButton(game,buttonArray,position,data){
         }
     });
     button.on('pointerup',function(){
-        console.log(button);
     	game.checkItemEquip(game);
         if (buttonData.work){
             if (!buttonData.work.holdEvent.finished){
                 return;
             }
-            else{
-                buttonData.work.holdTimeEventDelay.paused = true;
-                buttonData.work.holdTimeEvent.paused = true;
-                buttonData.work.holdTimeEventDelay.elapsed = 0;
-                buttonData.work.holdTimeEvent.elapsed = 0;
-                buttonData.holdEvent.setVisible(false);
+            else if (!buttonData.work.holdTimeEvent.paused){
+                buttonData.work.hideHoldAnim();
+                return;
             }
         }
     	if (buttonData.unlocked && !(!buttonData.timeEvent.loop && buttonData.timeEvent.hasDispatched && !buttonData.runOneWithLoop)){
@@ -194,6 +195,10 @@ export function activeButton(game,buttonArray,position,data){
                 	game.isCareSelected = false;
                     game.buttonCharacterSelected = false;
 				}
+            }
+            if (!buttonData.work.holdTimeEventDelay.paused){
+                buttonData.work.hideHoldAnim();
+                return;
             }
         }
     });
