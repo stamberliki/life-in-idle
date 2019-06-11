@@ -8,5 +8,11 @@ export function nextStageData(game, stage){
 			return game.expAmount.data.values.amount >= 2000;
 		case 4:
 			return game.expAmount.data.values.amount >= 2000;
+		case 5:
+			return game.expAmount.data.values.amount >= 2000;
+		case 6:
+			return game.expAmount.data.values.amount >= 2000;
+		default:
+			return true;
 	}
 }

@@ -8,6 +8,8 @@ export class workData{
 			veryLow: {
 				minGain: 15,
 				maxGain: 20,
+				nonDegreePoint: 1,
+				degreePoint: 2, 
 				nonDegree:['Service Crew','Cashier','Dishwasher'],
 				degree:{
 					'College of Law':['Legislator'],
@@ -17,41 +19,47 @@ export class workData{
 			low: {
 				minGain: 40,
 				maxGain: 60,
-				nonDegree:{
-
-				},
+				nonDegreePoint: 2,
+				degreePoint: 4, 
+				nonDegree:['Delivery Driver'],
 				degree:{
-					
+					'Medical School': ['Nurse'],
+					'Education': ['Primary Education Teacher'],
 				}
 			},
 			average: {
 				minGain: 100,
 				maxGain: 130,
-				nonDegree:{
-
-				},
+				nonDegreePoint: 4,
+				degreePoint: 8, 
+				nonDegree: ['Customer Service'],
 				degree:{
-					
+					'Computer Science': ['Data Analyst', 'Graphic Artist']
 				}
 			},
 			high: {
 				minGain: 150,
 				maxGain: 175,
-				nonDegree:{
-
-				},
+				nonDegreePoint: 16,
+				degreePoint: 32, 
+				nonDegree: [''],
 				degree:{
-					
+					'Engineer': ['Architect'],
+					'College of Law': ['Lawyer'],
+					'Medical School': ['Professional Doctor'],
 				}
 			},
 			veryHigh: {
 				minGain: 200,
 				maxGain: 250,
-				nonDegree:{
-
-				},
+				nonDegreePoint: 64,
+				degreePoint: 128, 
+				nonDegree:[''],
 				degree:{
-					
+					'Computer Science': ['Software Developer'],
+					'Medical School': ['Pharmacist'],
+					'Avionics': ['Pilot'],
+					'Engineer': ['Engineer'],
 				}
 			},
 		};
@@ -63,6 +71,7 @@ export class workData{
         }),
         this.previousTimeEvent;
         this.workTier;
+        this.points = 0;
 
         this.jobSelection = new game.popupEvent(game).createTwoChoiceEvent('',{
         	text: 'Yes',
@@ -89,6 +98,7 @@ export class workData{
         		buttonData.timeEvent.args[0] = [0];
         		_this.jobSelection.finished = false;
         		buttonData.runOneWithLoop = true;
+				this.points = 0;
         		if (buttonData.position == 'left'){
         			_this.game.buttonLeftSelected = false;
         		}
@@ -102,7 +112,6 @@ export class workData{
         },{
         	text: 'No',
         	event: function(){
-
         	}
         });
         this.holdEvent.finished = true;
@@ -115,7 +124,6 @@ export class workData{
 		    delay:3000, loop:true, callback: this.showQuitJobEvent,
 		    callbackScope: this, paused: true,
     	});
-
 	}
 
 	setButton(button){
@@ -163,10 +171,12 @@ export class workData{
             if (!this.workData[this.workTier].degree[game.degree].includes(this.acceptedWorkName)){
                 this.acceptedWorkGain /= 2;
             }
+            this.points = this.workData[this.workTier].degreePoint;
         }
         else{
             this.acceptedWorkName = Phaser.Math.RND.pick(this.workData[this.workTier].nonDegree);
             this.acceptedWorkGain = Phaser.Math.Between(this.workData[this.workTier].minGain, this.workData[this.workTier].maxGain)/2;
+            this.points = this.workData[this.workTier].nonDegreePoint;
         }
 	}
 

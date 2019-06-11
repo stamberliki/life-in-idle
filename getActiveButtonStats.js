@@ -175,6 +175,31 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        work: new game.workManager(game),
 							    };
 					}
+				case 6:
+					switch(buttonNo){
+						case 1:
+							buff.push(buffs(5));
+							buff[0] = new buff[0](game,{x:48, y: 209});
+							return {
+									default: getDefault(),
+							        description: 'WORK',
+							        event: game.gainMoney.name,
+							        buff: buff,
+							        unlocked: true,
+							        gain: 0,
+							        requiredExpToUnlock: 0,
+							        requiredMoneyToUnlock: 0,
+							        requiredTurnsToUnlock: 0,
+							        textDescription: '',
+							        runOneWithLoop: true,
+							        cycleCount: 0,
+							        timeEvent: game.time.addEvent({
+							            delay:1000, loop:true, callback: game.gainMoney,
+							            callbackScope: game, paused: true,
+							        }),
+							        work: new game.workManager(game),
+							    };
+					}
 			}
 
 		case 'right':
@@ -314,6 +339,31 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							    };
 					}
 				case 5:
+					switch(buttonNo){
+						case 1:
+							buff.push(buffs(5));
+							buff[0] = new buff[0](game,{x:721, y: 209});
+							return {
+									default: getDefault(),
+							        description: 'WORK',
+							        event: game.gainMoney.name,
+							        buff: buff,
+							        unlocked: true,
+							        gain: 0,
+							        requiredExpToUnlock: 0,
+							        requiredMoneyToUnlock: 0,
+							        requiredTurnsToUnlock: 0,
+							        textDescription: '',
+							        runOneWithLoop: true,
+							        cycleCount: 0,
+							        timeEvent: game.time.addEvent({
+							            delay:1000, loop:true, callback: game.gainMoney,
+							            callbackScope: game, paused: true,
+							        }),
+							        work: new game.workManager(game),
+							    };
+					}
+				case 6:
 					switch(buttonNo){
 						case 1:
 							buff.push(buffs(5));
@@ -648,7 +698,6 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 						                {text:"Top-Class School" , cost: 1, gain: 1, button: buttonNo},
 						                {text:"World-Class School" , cost: 1, gain: 1, button: buttonNo},
 						            ),
-						            // randomEvent: {25:'false',50:'false',75:'false',100:'false',},
 							        timeEvent: game.time.addEvent({
 							            delay:600000, loop:false, callback: game.expGain,
 							            callbackScope: game, paused: true,
@@ -681,11 +730,11 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 				case 5:
 					switch(buttonNo){
 						case 1:
-							buff.push(buffs(7));
+							buff.push(buffs(0));
 							buff[0] = new buff[0](game,{x:48, y: 209});
 							return {
 									default: getDefault(),
-							        description: 'PLAY',
+							        description: 'RECREATION',
 							        event: game.expGain.name,
 							        buff: buff,
 							        unlocked: true,
@@ -694,10 +743,11 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        requiredMoneyToUnlock: 0,
 							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
-							        itemRequired: true,
-							        itemEquipIndex: 4,
+							        runOneWithLoop: true,
+							        cannotMidPause: true,
+							        recreation: new game.recreationManager(game),
 							        timeEvent: game.time.addEvent({
-							            delay:90000, loop:true, callback: game.expGain,
+							            delay:1000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true,
 							        })
 							    };
@@ -755,10 +805,18 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        gain: 0,
 							        requiredExpToUnlock: 0,
 							        requiredMoneyToUnlock: 0,
-							        requiredTurnsToUnlock: 1,
+							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
 							        itemRequired: false,
 							        itemEquipIndex: 4,
+							        popupEvent: popupEvent.createCategoriesEvent('1',
+							        	{text:"Cheap School" , cost: 1, gain: 1, button: buttonNo},
+						                {text:"Normal School" , cost: 1, gain: 1, button: buttonNo},
+						                {text:"Public School" , cost: 1, gain: 1, button: buttonNo},
+						                {text:"Private School" , cost: 1, gain: 1, button: buttonNo},
+						                {text:"Top-Class School" , cost: 1, gain: 1, button: buttonNo},
+						                {text:"World-Class School" , cost: 1, gain: 1, button: buttonNo},
+						            ),
 							        timeEvent: game.time.addEvent({
 							            delay:90000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true,
@@ -767,6 +825,52 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 						case 5:
 							buff.push(buffs(7));
 							buff[0] = new buff[0](game,{x:48, y: 209});
+							let modifyPopupEvent = popupEvent.createCategoriesEvent('1',
+					        	{text:"Cheap School" , cost: 1, gain: 1, button: buttonNo},
+				                {text:"Normal School" , cost: 1, gain: 1, button: buttonNo},
+				                {text:"Public School" , cost: 1, gain: 1, button: buttonNo},
+				                {text:"Private School" , cost: 1, gain: 1, button: buttonNo},
+				                {text:"Top-Class School" , cost: 1, gain: 1, button: buttonNo},
+				                {text:"World-Class School" , cost: 1, gain: 1, button: buttonNo},
+				            );
+				            modifyPopupEvent.nestedCategoriesEvent({
+				            		event: function (degree, schoolFinished) {
+				            			game.degree = degree;
+				            			game.schoolFinished = schoolFinished;
+				            		}
+				            	},
+				            	{text: 'a', args: [
+					            	{text:"Law School" , cost: 1, gain: 1, button: buttonNo},
+					            	{text:"Education" , cost: 1, gain: 1, button: buttonNo},
+					            ]},
+				            	{text: 'a', args: [
+					            	{text:"Education" , cost: 1, gain: 1, button: buttonNo},
+					            	{text:"Medical" , cost: 1, gain: 1, button: buttonNo},
+					            ]},
+				            	{text: 'a', args: [
+					            	{text:"Computer Science" , cost: 1, gain: 1, button: buttonNo},
+					            ]},
+				            	{text: 'a', args: [
+					            	{text:"Engineering" , cost: 1, gain: 1, button: buttonNo},
+					            	{text:"Law School" , cost: 1, gain: 1, button: buttonNo},
+					            	{text:"Computer Science" , cost: 1, gain: 1, button: buttonNo},
+					            	{text:"Medical School" , cost: 1, gain: 1, button: buttonNo},
+					            ]},
+				            	{text: 'a', args: [
+					            	{text:"Computer Science" , cost: 1, gain: 1, button: buttonNo},
+					            	{text:"Medical School" , cost: 1, gain: 1, button: buttonNo},
+					            	{text:"Avionics" , cost: 1, gain: 1, button: buttonNo},
+					            	{text:"Engineering" , cost: 1, gain: 1, button: buttonNo},
+					            ]},
+				            	{text: 'a', args: [
+					            	{text:"Computer Science" , cost: 1, gain: 1, button: buttonNo},
+					            	{text:"Medical School" , cost: 1, gain: 1, button: buttonNo},
+					            	{text:"Avionics" , cost: 1, gain: 1, button: buttonNo},
+					            	{text:"Engineering" , cost: 1, gain: 1, button: buttonNo},
+					            	{text:"Law School" , cost: 1, gain: 1, button: buttonNo},
+					            	{text:"Education" , cost: 1, gain: 1, button: buttonNo},
+					            ]},
+				            );
 							return {
 									default: getDefault(),
 							        description: 'COLLEGE',
@@ -780,6 +884,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        textDescription: '',
 							        itemRequired: false,
 							        itemEquipIndex: 4,
+							        popupEvent: modifyPopupEvent,
 							        timeEvent: game.time.addEvent({
 							            delay:90000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true,
@@ -787,6 +892,54 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							    };
 						default:
 							return true;
+					}
+				case 6:
+					switch(buttonNo){
+						case 1:
+							buff.push(buffs(0));
+							buff[0] = new buff[0](game,{x:48, y: 209});
+							return {
+									default: getDefault(),
+							        description: 'RECREATION',
+							        event: game.expGain.name,
+							        buff: buff,
+							        unlocked: true,
+							        gain: 0,
+							        requiredExpToUnlock: 0,
+							        requiredMoneyToUnlock: 0,
+							        requiredTurnsToUnlock: 0,
+							        textDescription: '',
+							        runOneWithLoop: true,
+							        cannotMidPause: true,
+							        timeEvent: game.time.addEvent({
+							            delay:90000, loop:true, callback: game.expGain,
+							            callbackScope: game, paused: true,
+							        })
+							    };
+						case 2:
+							buff.push(buffs(7));
+							buff[0] = new buff[0](game,{x:48, y: 209});
+							return {
+									default: getDefault(),
+							        description: 'WORK',
+							        event: game.gainMoney.name,
+							        buff: buff,
+							        unlocked: true,
+							        gain: 0,
+							        requiredExpToUnlock: 0,
+							        requiredMoneyToUnlock: 0,
+							        requiredTurnsToUnlock: 0,
+							        textDescription: '',
+							        runOneWithLoop: true,
+							        timeEvent: game.time.addEvent({
+							            delay:1000, loop:true, callback: game.gainMoney,
+							            callbackScope: game, paused: true,
+							        }),
+							        work: new game.workManager(game),
+							    };
+						default:
+							return true;
+
 					}
 			}
 	}

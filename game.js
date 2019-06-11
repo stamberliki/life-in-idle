@@ -6,6 +6,8 @@ import {buyMenuItems} from './buyMenuItems.js';
 import {buyMenuItemsData} from './buyMenuItemsData.js';
 import {popupEvent} from './popupEvent.js';
 import {workData} from './workData.js';
+import {recreation} from './recreation.js'
+import {ascend} from './ascend.js'
 import * as nineslice from './nineslice.js';
 
 var config = {
@@ -114,15 +116,17 @@ function preload (){
     this.load.spritesheet('teenager1','assets/characters/teenager1.png',{ frameWidth: 32, frameHeight: 64 });
     this.load.spritesheet('teenager2','assets/characters/teenager2.png',{ frameWidth: 32, frameHeight: 64 });
     this.load.spritesheet('adulthood','assets/characters/adulthood.png',{ frameWidth: 32, frameHeight: 64 });
-    this.load.spritesheet('button','assets/ui/button.png',{ frameWidth: 64, frameHeight: 14 });
+    this.load.spritesheet('button','assets/ui/button.png',{ frameWidth: 96, frameHeight: 16 });
     this.load.spritesheet('button32','assets/ui/button32.png',{ frameWidth: 32, frameHeight: 14 });
     this.load.spritesheet('activeButton','assets/ui/active_button.png',{ frameWidth: 64, frameHeight: 18 });
     this.load.spritesheet('activeButtonHoldAnim','assets/ui/active_button_hold_anim.png',{ frameWidth: 64, frameHeight: 20 });
-    this.load.spritesheet('lockedButton','assets/ui/locked_button.png',{ frameWidth: 64, frameHeight: 19 });
+    this.load.spritesheet('lockedButton','assets/ui/locked_button.png',{ frameWidth: 96, frameHeight: 21 });
     this.load.spritesheet('buyMenuIcons','assets/props/icons/buy_menu_icons.png',{ frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet('crib','assets/props/crib.png',{ frameWidth: 96, frameHeight: 64 });
     this.load.spritesheet('smallBed','assets/props/small_bed.png',{ frameWidth: 64, frameHeight: 96 });
     this.load.spritesheet('desk','assets/props/desk.png',{ frameWidth: 96, frameHeight: 64 });
+    this.load.spritesheet('computer','assets/props/computer.png',{ frameWidth: 96, frameHeight: 80 });
+    this.load.spritesheet('bedsideTable','assets/props/bedside_table.png',{ frameWidth: 32, frameHeight: 64 });
     this.load.spritesheet('home','assets/props/background_home.png',{ frameWidth: 400, frameHeight: 300 });
     this.load.spritesheet('props','assets/ui/props.png',{ frameWidth: 64, frameHeight: 16 });
     this.load.spritesheet('buyIcon','assets/ui/buy_icon.png',{ frameWidth: 16, frameHeight: 16 });
@@ -175,14 +179,18 @@ function preload (){
     this.motherPortrait;
     this.fatherPortrait;
     this.degree;
+    this.schoolFinished;
     this.workManager;
+    this.recreationManager;
+    this.buffManager;
     this.tier;
+    this.ascend;
 
     this.buttonLeftSelected = false;
     this.buttonRightSelected = false;
     this.buttonCharacterSelected = false;
     this.allButtonCharacterUnlock = false;
-    this.activeButtonNonCharacterCount = [2,1,1,1];
+    this.activeButtonNonCharacterCount = [2,1,1,1,1];
 
     this.currentBuffCharacter = [];
     this.currentBuffLeft = [];
@@ -210,6 +218,9 @@ function create (){
     this.popupEvent = popupEvent;
     this.isCareSelected = false;
     this.workManager = workData;
+    this.recreationManager = recreation;
+    this.buffManager = buffList;
+    this.ascend = new ascend(this);
 
     this.bg = this.add.image(400,300,'home',0);
     this.bg.setScale(scale);
@@ -221,12 +232,13 @@ function create (){
         repeat: -1
     });
 
-    player = this.add.sprite(400-32,300-44,'baby').setOrigin(0);
+    player = this.add.sprite(400,300-8,'baby').setOrigin(0.5);
     player.setScale(scale);
     player.anims.play('baby_idle',true);
     player.depth = 1;
 
     nextStage = this.add.image(400,600-(16*scale),'button',0);
+    nextStage.setData('text', this.add.bitmapText(400,600-(20*scale),'mainFont','Next Stage').setOrigin(0.5));
     nextStage.setScale(scale);
     nextStage.setInteractive();
     if (nextStageLocked){
@@ -235,155 +247,183 @@ function create (){
     nextStage.on('pointerover', function () {
         if (!nextStageLocked){
             nextStage.setFrame(1);
+            if ( currentStage >= 5 ){
+                nextStage.setFrame(4);
+            }
         }
-    });
+    }, this);
     nextStage.on('pointerout', function () {
         if (!nextStageLocked){
             nextStage.setFrame(0);
+            if ( currentStage >= 5 ){
+                nextStage.setFrame(3);
+            }
         }
-    });
+    }, this);
     nextStage.on('pointerdown', function () {
         if (!nextStageLocked){
             nextStage.setFrame(2);
+            if ( currentStage >= 5 ){
+                nextStage.setFrame(5);
+            }
         }
-    });
+    }, this);
     nextStage.on('pointerup', function () {
         if (!nextStageLocked){
             nextStage.setFrame(1);
             currentStage++;
-            player.anims.play(characterIdle[currentStage+this.currentStageCounter],true);
-            
-            this.isCareSelected = false;
-            if (currentStage+this.currentStageCounter == 2){
-                this.bg.setFrame(1);
-                this.buyMenuCategories[1].data.values.itemRender.destroy();
+            if (currentStage+1 >= 6){
+                nextStage.data.values.setText('ASCEND');
+                nextStage.setFrame(3);
             }
-            if (currentStage+this.currentStageCounter == 3){
-                player.setPosition(400-32,300-96);
-            }
-            if (currentStage+this.currentStageCounter >= 3){
-                this.isCareSelected = true;
-            }
-
-            let leftButton = {}, rightButton = {};
-            if (currentStage-1 <= 1){
-                leftButton['cycle'] = activeButtonLeft[1].data.values.gain+(activeButtonLeft[1].data.values.cycleCount*.75);
-                rightButton['cycle'] = activeButtonRight[1].data.values.gain+(activeButtonRight[1].data.values.cycleCount*.75);
-                leftButton['workData'] = activeButtonLeft[1].data.values.work.getData();
-                rightButton['workData'] = activeButtonRight[1].data.values.work.getData();
+            if ( currentStage >= 6){
+                this.ascend.run();
             }
             else {
-                leftButton['cycle'] = activeButtonLeft[0].data.values.gain+(activeButtonLeft[0].data.values.cycleCount*.75);
-                rightButton['cycle'] = activeButtonRight[0].data.values.gain+(activeButtonRight[0].data.values.cycleCount*.75);
-                leftButton['workData'] = activeButtonLeft[0].data.values.work.getData();
-                rightButton['workData'] = activeButtonRight[0].data.values.work.getData();
-            }
-
-            clearBuffs(this.currentBuffCharacter);
-            clearBuffs(this.currentBuffLeft);
-            clearBuffs(this.currentBuffRight);
-
-            for (let x = 0 ; x != activeButtonLeft.length ; x++){
-                activeButtonLeft[x].data.values.description.destroy();
-                activeButtonLeft[x].data.values.timeEvent.paused = true;
-                activeButtonLeft[x].data.values.descriptionPopup.destroy();
-                activeButtonLeft[x].destroy();
-            }
-            for (let x = 0 ; x != activeButtonRight.length ; x++){
-                activeButtonRight[x].data.values.description.destroy();
-                activeButtonRight[x].data.values.timeEvent.paused = true;
-                activeButtonRight[x].data.values.descriptionPopup.destroy();
-                activeButtonRight[x].destroy();
-            }
-            for (let x = 0 ; x != activeButtonCharacter.length ; x++){
-                activeButtonCharacter[x].data.values.description.destroy();
-                activeButtonCharacter[x].data.values.timeEvent.paused = true;
-                activeButtonCharacter[x].destroy();
-            }
-            activeButtonLeft.length = 0;
-            activeButtonRight.length = 0;
-            activeButtonCharacter.length = 0;
-            this.inputs.length = 0;
-
-            for (let x = 0 ; x != this.activeButtonNonCharacterCount[currentStage-1] ; x++){
-                activeButton(this,activeButtonLeft,
-                    'left',getActiveButtonStats(this,'left',currentStage+1,x+1,buffList));
-
-                activeButton(this,activeButtonRight,
-                    'right',getActiveButtonStats(this,'right',currentStage+1,x+1,buffList));
-            }
-            activeButton(this,activeButtonCharacter,
-                'character',getActiveButtonStats(this,'character',currentStage+1,1,buffList));
-            this.buttonLeftSelected = false;
-            this.buttonRightSelected = false;
-            this.buttonCharacterSelected = false;
-            putAllActiveButtonEvent(this);
-
-            let buyMenuCategorySelectHolder = this.buyMenuCategorySelect;
-            for (let x = 0 ; x != this.buyMenuCategories.length ; x++){
-                this.buyMenuCategorySelect = this.buyMenuCategories[x];
-                renderBuyMenuItem(this);
-            }
-            this.buyMenuCategorySelect = buyMenuCategorySelectHolder;
-
-            if (currentStage <= 1){
-                activeButtonLeft[1].data.values.cycleCount = leftButton.cycle;
-                activeButtonLeft[1].data.values.work.jobSelection.finished = leftButton.workData.jobSelectionFinished;
-                if (leftButton.workData.jobSelectionFinished){
-                    activeButtonLeft[1].data.values.work.acceptedWorkName = leftButton.workData.workName;
-                    activeButtonLeft[1].data.values.work.acceptJob();
+                player.anims.play(characterIdle[currentStage+this.currentStageCounter],true);
+                
+                this.isCareSelected = false;
+                if (currentStage+this.currentStageCounter == 2){
+                    this.bg.setFrame(1);
+                    this.buyMenuCategories[1].data.values.itemRender.destroy();
+                    player.setPosition(400,416);
                 }
-                activeButtonLeft[1].data.values.gain = leftButton.cycle;
-                activeButtonLeft[1].data.values.timeEvent.args = [activeButtonLeft[1].data.values.gain, activeButtonLeft[1]];
-
-                activeButtonRight[1].data.values.cycleCount = rightButton.cycle;
-                activeButtonRight[1].data.values.work.jobSelection.finished = rightButton.workData.jobSelectionFinished;
-                if (rightButton.workData.jobSelectionFinished){
-                    activeButtonRight[1].data.values.work.acceptedWorkName = leftButton.workData.workName;
-                    activeButtonRight[1].data.values.work.acceptJob();
+                if (currentStage+this.currentStageCounter == 3){
+                    player.setPosition(400,384);
                 }
-                activeButtonRight[1].data.values.gain = rightButton.cycle;
-                activeButtonRight[1].data.values.timeEvent.args = [activeButtonRight[1].data.values.gain, activeButtonRight[1]];
-                money.setData('promotionEventPopup', 
-                new popupEvent(this).createAcknowledgeEvent('Your mother now have '+activeButtonLeft[1].data.values.gain+
-                    '\ncash per cycle,'+
-                    '\nwhile you father \nhave '+
-                    activeButtonRight[1].data.values.gain+' cash per cycle \nas a promotion \nto their work'));
-                money.data.values.promotionEventPopup.approveButton.y += 24;
-                money.data.values.promotionEventPopup.approveButton.data.values.text.y += 24;
+                if (currentStage+this.currentStageCounter >= 3){
+                    this.isCareSelected = true;
+                }
+
+                //get work cycles
+                let leftButton = {}, rightButton = {};
+                if (currentStage-1 <= 1){
+                    leftButton['gain'] = activeButtonLeft[1].data.values.gain+(activeButtonLeft[1].data.values.cycleCount*.75);
+                    rightButton['gain'] = activeButtonRight[1].data.values.gain+(activeButtonRight[1].data.values.cycleCount*.75);
+                    leftButton['cycle'] = activeButtonLeft[1].data.values.cycleCount;
+                    rightButton['cycle'] = activeButtonRight[1].data.values.cycleCount;
+                    leftButton['workData'] = activeButtonLeft[1].data.values.work.getData();
+                    rightButton['workData'] = activeButtonRight[1].data.values.work.getData();
+                }
+                else {
+                    leftButton['gain'] = activeButtonLeft[0].data.values.gain+(activeButtonLeft[0].data.values.cycleCount*.75);
+                    rightButton['gain'] = activeButtonRight[0].data.values.gain+(activeButtonRight[0].data.values.cycleCount*.75);
+                    leftButton['cycle'] = activeButtonLeft[0].data.values.cycleCount;
+                    rightButton['cycle'] = activeButtonRight[0].data.values.cycleCount;
+                    leftButton['workData'] = activeButtonLeft[0].data.values.work.getData();
+                    rightButton['workData'] = activeButtonRight[0].data.values.work.getData();
+                }
+
+                clearBuffs(this.currentBuffCharacter);
+                clearBuffs(this.currentBuffLeft);
+                clearBuffs(this.currentBuffRight);
+
+                //remove all buttons
+                for (let x = 0 ; x != activeButtonLeft.length ; x++){
+                    activeButtonLeft[x].data.values.description.destroy();
+                    activeButtonLeft[x].data.values.timeEvent.paused = true;
+                    activeButtonLeft[x].data.values.descriptionPopup.destroy();
+                    activeButtonLeft[x].destroy();
+                }
+                for (let x = 0 ; x != activeButtonRight.length ; x++){
+                    activeButtonRight[x].data.values.description.destroy();
+                    activeButtonRight[x].data.values.timeEvent.paused = true;
+                    activeButtonRight[x].data.values.descriptionPopup.destroy();
+                    activeButtonRight[x].destroy();
+                }
+                for (let x = 0 ; x != activeButtonCharacter.length ; x++){
+                    activeButtonCharacter[x].data.values.description.destroy();
+                    activeButtonCharacter[x].data.values.timeEvent.paused = true;
+                    activeButtonCharacter[x].destroy();
+                }
+                activeButtonLeft.length = 0;
+                activeButtonRight.length = 0;
+                activeButtonCharacter.length = 0;
+                this.inputs.length = 0;
+
+                //re-add buttons
+                for (let x = 0 ; x != this.activeButtonNonCharacterCount[currentStage-1] ; x++){
+                    activeButton(this,activeButtonLeft,
+                        'left',getActiveButtonStats(this,'left',currentStage+1,x+1,buffList));
+
+                    activeButton(this,activeButtonRight,
+                        'right',getActiveButtonStats(this,'right',currentStage+1,x+1,buffList));
+                }
+                activeButton(this,activeButtonCharacter,
+                    'character',getActiveButtonStats(this,'character',currentStage+1,1,buffList));
+                this.buttonLeftSelected = false;
+                this.buttonRightSelected = false;
+                this.buttonCharacterSelected = false;
+                putAllActiveButtonEvent(this);
+
+                //recheck all items
+                let buyMenuCategorySelectHolder = this.buyMenuCategorySelect;
+                for (let x = 0 ; x != this.buyMenuCategories.length ; x++){
+                    this.buyMenuCategorySelect = this.buyMenuCategories[x];
+                    renderBuyMenuItem(this);
+                }
+                this.buyMenuCategorySelect = buyMenuCategorySelectHolder;
+
+                //apply work cycle promotion
+                if (currentStage <= 1){
+                    activeButtonLeft[1].data.values.cycleCount = leftButton.cycle;
+                    activeButtonLeft[1].data.values.work.jobSelection.finished = leftButton.workData.jobSelectionFinished;
+                    if (leftButton.workData.jobSelectionFinished){
+                        activeButtonLeft[1].data.values.work.acceptedWorkName = leftButton.workData.workName;
+                        activeButtonLeft[1].data.values.work.acceptJob();
+                    }
+                    activeButtonLeft[1].data.values.gain = leftButton.gain;
+                    activeButtonLeft[1].data.values.timeEvent.args = [activeButtonLeft[1].data.values.gain, activeButtonLeft[1]];
+
+                    activeButtonRight[1].data.values.cycleCount = rightButton.cycle;
+                    activeButtonRight[1].data.values.work.jobSelection.finished = rightButton.workData.jobSelectionFinished;
+                    if (rightButton.workData.jobSelectionFinished){
+                        activeButtonRight[1].data.values.work.acceptedWorkName = leftButton.workData.workName;
+                        activeButtonRight[1].data.values.work.acceptJob();
+                    }
+                    activeButtonRight[1].data.values.gain = rightButton.gain;
+                    activeButtonRight[1].data.values.timeEvent.args = [activeButtonRight[1].data.values.gain, activeButtonRight[1]];
+                    money.setData('promotionEventPopup', 
+                    new popupEvent(this).createAcknowledgeEvent('Your mother now have '+activeButtonLeft[1].data.values.gain+
+                        '\ncash per cycle,'+
+                        '\nwhile you father \nhave '+
+                        activeButtonRight[1].data.values.gain+' cash per cycle \nas a promotion \nto their work'));
+                    money.data.values.promotionEventPopup.approveButton.y += 24;
+                    money.data.values.promotionEventPopup.approveButton.data.values.text.y += 24;
+                }
+                else {
+                    activeButtonLeft[0].data.values.cycleCount = leftButton.cycle;
+                    activeButtonLeft[0].data.values.work.jobSelection.finished = leftButton.workData.jobSelectionFinished;
+                    if (leftButton.workData.jobSelectionFinished){
+                        activeButtonLeft[0].data.values.work.acceptedWorkName = leftButton.workData.workName;
+                        activeButtonLeft[0].data.values.work.acceptJob();
+                    }
+                    activeButtonLeft[0].data.values.gain = leftButton.gain;
+                    activeButtonLeft[0].data.values.timeEvent.args = [activeButtonLeft[0].data.values.gain, activeButtonLeft[0]];
+
+                    activeButtonRight[0].data.values.cycleCount = rightButton.cycle;
+                    activeButtonRight[0].data.values.work.jobSelection.finished = rightButton.workData.jobSelectionFinished;
+                    if (rightButton.workData.jobSelectionFinished){
+                        activeButtonRight[0].data.values.work.acceptedWorkName = leftButton.workData.workName;
+                        activeButtonRight[0].data.values.work.acceptJob();
+                    }
+                    activeButtonRight[0].data.values.gain = rightButton.gain;
+                    activeButtonRight[0].data.values.timeEvent.args = [activeButtonRight[0].data.values.gain, activeButtonRight[0]];
+                    money.setData('promotionEventPopup', 
+                    new popupEvent(this).createAcknowledgeEvent('Your mother gain '+activeButtonLeft[0].data.values.gain+
+                        '\ncash per cycle,'+
+                        '\nwhile you father \ngain '+
+                        activeButtonRight[0].data.values.gain+' cash per cycle \nas a promotion \nto their work'));
+                    money.data.values.promotionEventPopup.approveButton.y += 24;
+                    money.data.values.promotionEventPopup.approveButton.data.values.text.y += 24;
+                }
+
+                nextStageLocked = true;
+                nextStage.setTexture('lockedButton',0);
+                this.allButtonCharacterUnlock = false;
             }
-            else {
-                activeButtonLeft[0].data.values.cycleCount = leftButton.cycle;
-                activeButtonLeft[0].data.values.work.jobSelection.finished = leftButton.workData.jobSelectionFinished;
-                if (leftButton.workData.jobSelectionFinished){
-                    activeButtonLeft[0].data.values.work.acceptedWorkName = leftButton.workData.workName;
-                    activeButtonLeft[0].data.values.work.acceptJob();
-                }
-                activeButtonLeft[0].data.values.gain = leftButton.cycle;
-                activeButtonLeft[0].data.values.timeEvent.args = [activeButtonLeft[0].data.values.gain, activeButtonLeft[0]];
-
-                activeButtonRight[0].data.values.cycleCount = rightButton.cycle;
-                activeButtonRight[0].data.values.work.jobSelection.finished = rightButton.workData.jobSelectionFinished;
-                if (rightButton.workData.jobSelectionFinished){
-                    activeButtonRight[0].data.values.work.acceptedWorkName = leftButton.workData.workName;
-                    activeButtonRight[0].data.values.work.acceptJob();
-                }
-                activeButtonRight[0].data.values.gain = rightButton.cycle;
-                activeButtonRight[0].data.values.timeEvent.args = [activeButtonRight[0].data.values.gain, activeButtonRight[0]];
-                money.setData('promotionEventPopup', 
-                new popupEvent(this).createAcknowledgeEvent('Your mother gain '+activeButtonLeft[0].data.values.gain+
-                    '\ncash per cycle,'+
-                    '\nwhile you father \ngain '+
-                    activeButtonRight[0].data.values.gain+' cash per cycle \nas a promotion \nto their work'));
-                money.data.values.promotionEventPopup.approveButton.y += 24;
-                money.data.values.promotionEventPopup.approveButton.data.values.text.y += 24;
-            }
-
-            nextStageLocked = true;
-            nextStage.setTexture('lockedButton',0);
-            this.allButtonCharacterUnlock = false;
         }
-    },this);
+    }, this);
 
     ui = this.add.image(0,0,'uiBg').setOrigin(0);
     ui.setScale(scale);
@@ -466,6 +506,7 @@ function update(){
     graphics.fillStyle(0x874a1b, 1);
     if (nextStageWasLocked){
         nextStage.setTexture('button',0);
+        nextStage.data.values.text.y = 600-(17*scale);
         nextStageWasLocked = false;
         nextStageLocked = false;
     }
@@ -514,7 +555,6 @@ function putAllActiveButtonEvent(game){
 
 function disableActiveButtonEvent(game){
     for (var x = 0 ; x != game.inputs.length ; x++){
-        console.log('pass');
         game.inputs[x].disableInteractive();
         if (game.inputs[x].data){
             if (game.inputs[x].data.values.buff){   
@@ -532,7 +572,7 @@ function enableActiveButtonEvent(game){
         if (game.inputs[x].data){
             if (game.inputs[x].data.values.buff){   
                 for (let y = 0 ; y != game.inputs[x].data.values.buff.length ; y++){
-                    game.inputs[x].data.values.buff[y].icon.disableInteractive();
+                    game.inputs[x].data.values.buff[y].icon.setInteractive();
                 }
             }
         }
@@ -598,6 +638,10 @@ function expGain(gain, button=''){
     expAmount.setText(expAmount.data.values.amount += Math.trunc(gain*this.expMultiplier));
     let buttonData = button.data.values;
 
+    if (expAmount.data.values.amount >= 750 && this.currentStageCounter <= 0){
+        this.currentStageCounter = 1;
+        player.anims.play(characterIdle[currentStage+this.currentStageCounter],true);
+    }
     if (expAmount.data.values.amount >= 750 && this.currentStageCounter <= 0){
         this.currentStageCounter = 1;
         player.anims.play(characterIdle[currentStage+this.currentStageCounter],true);
@@ -741,12 +785,14 @@ function buyMenu(game){
         game.fakeBuyMenuBg.data.values.isClicked = false;
     });
 
-    createBuyMenuCategory(game,'SMALL BED', 0, true);
+    createBuyMenuCategory(game, 'SMALL BED', 0, true);
     createBuyMenuCategory(game, 'CRIB', 0);
     createBuyMenuCategory(game, 'DESK', 1, false, false);
-    createBuyMenuCategory(game, 'TOY', 1);
+    createBuyMenuCategory(game, 'BEDSIDE TABLE', 1, false, false);
+    createBuyMenuCategory(game, 'TOYS', 1);
     createBuyMenuCategory(game, 'SCHOOL SUPPLIES', 2, false, true,2);
-    createBuyMenuCategory(game, 'GADGETS', 3, false, true,2);
+    createBuyMenuCategory(game, 'GADGETS', 3, false, true,3);
+    createBuyMenuCategory(game, 'COMPUTERS', 3, false, true,2);
     
     buyMenuItems(game,game.buyMenuCategories,buyMenuItemsData);
 
@@ -853,12 +899,12 @@ function createBuyMenuCategory(game, name, stageAvailable, selected = false, nee
     });
     game.buyMenuCategories.push(button);
 }
-    
+
 function renderBuyMenuItem(game){
     if(game.buyMenuCategorySelect.data.values.itemSelect){
         let data = game.buyMenuCategorySelect.data.values.itemSelect.data.values;
         if (data.position-1 == 0){
-            game.buyMenuCategorySelect.data.values.itemRender = game.add.image(560,224, 'smallBed',data.itemNumber).setScale(2).setVisible(false);
+            game.buyMenuCategorySelect.data.values.itemRender = game.add.image(432,192, 'smallBed',data.itemNumber).setScale(2).setVisible(false).setOrigin(0);
             if (currentStage+game.currentStageCounter >= 2){
                 game.buyMenuCategorySelect.data.values.itemRender.setVisible(true);
             }
@@ -876,26 +922,27 @@ function renderBuyMenuItem(game){
             }
         }
         if (data.position-1 == 2){
-            game.buyMenuCategorySelect.data.values.itemRender = game.add.image(240,130,'desk',data.itemNumber).setOrigin(0).setScale(2);
+            game.buyMenuCategorySelect.data.values.itemRender = game.add.image(176,194,'desk',data.itemNumber).setOrigin(0).setScale(2);
         }
         if (data.position-1 == 3){
-            game.buyMenuCategorySelect.data.values.itemRender = game.add.image(200,400,'buyMenuIcons',data.iconItemNumber).setOrigin(0).setScale(2);
+            game.buyMenuCategorySelect.data.values.itemRender = game.add.image(400,226,'bedsideTable',data.itemNumber).setOrigin(0.5).setScale(2);
         }
         if (data.position-1 == 4){
-            if (currentStage == 2){
-                game.buyMenuCategorySelect.data.values.itemRender = game.add.image(306,144,'buyMenuIcons',data.iconItemNumber).setOrigin(0).setScale(2);
-            }
-            else if (currentStage == 3){
-                game.buyMenuCategorySelect.data.values.itemRender = game.add.image(346,144,'buyMenuIcons',data.iconItemNumber).setOrigin(0).setScale(2);
-            }
-        }  
+            game.buyMenuCategorySelect.data.values.itemRender = game.add.image(200,400,'buyMenuIcons',data.iconItemNumber).setOrigin(0).setScale(2);
+        }
         if (data.position-1 == 5){
             if (currentStage == 2){
-                game.buyMenuCategorySelect.data.values.itemRender = game.add.image(306,144,'buyMenuIcons',data.iconItemNumber).setOrigin(0).setScale(2);
+                game.buyMenuCategorySelect.data.values.itemRender = game.add.image(242,208,'buyMenuIcons',data.iconItemNumber).setOrigin(0).setScale(2);
             }
             else if (currentStage == 3){
-                game.buyMenuCategorySelect.data.values.itemRender = game.add.image(266,144,'buyMenuIcons',data.iconItemNumber).setOrigin(0).setScale(2);
+                game.buyMenuCategorySelect.data.values.itemRender = game.add.image(292,208,'buyMenuIcons',data.iconItemNumber).setOrigin(0).setScale(2);
             }
+        }  
+        if (data.position-1 == 6){
+            game.buyMenuCategorySelect.data.values.itemRender = game.add.image(400,222,'buyMenuIcons',data.iconItemNumber).setOrigin(0.5).setScale(2);
+        }
+        if (data.position-1 == 7){
+            game.buyMenuCategorySelect.data.values.itemRender = game.add.image(176,164,'computer',data.itemNumber).setOrigin(0).setScale(2);
         }    
     }
 }
@@ -928,10 +975,14 @@ function saveManager(game){
         game.saveGame.setItem('tier','veryLow');
         game.tier = 'veryLow';
         
-        game.buyMenuCategories[1].data.values.itemList[0].data.values.buyButton.setFrame(2);
-        game.buyMenuCategories[1].data.values.itemList[0].data.values.isBrought = true;
-        game.buyMenuCategories[1].data.values.itemList[0].data.values.canBeBrought = true;
-        game.buyMenuCategories[1].data.values.itemList[0].data.values.isUsed = true;
+        let defaultBuyItemData = game.buyMenuCategories[1].data.values.itemList[0].data.values;
+        defaultBuyItemData.buyButton.setFrame(2);
+        defaultBuyItemData.isBrought = true;
+        defaultBuyItemData.canBeBrought = true;
+        defaultBuyItemData.isUsed = true;
+        defaultBuyItemData.buyButtonText.setText('USED');
+        defaultBuyItemData.descriptionPopup.popupText.setText(defaultBuyItemData.desc);
+        defaultBuyItemData.descriptionPopup.popupBG.resize((defaultBuyItemData.descriptionPopup.popupText.getTextBounds().local.width/2)+8, (defaultBuyItemData.descriptionPopup.popupText.getTextBounds().local.height/2)+8);
         game.buyMenuCategorySelect = game.buyMenuCategories[1];
         game.buyMenuCategorySelect.data.values.itemSelect = game.buyMenuCategories[1].data.values.itemList[0];
         renderBuyMenuItem(game);
@@ -1162,9 +1213,15 @@ function saveManager(game){
                     data2.isBrought = buyItems[currentIndex].isBrought;
                     data2.canBeBrought = buyItems[currentIndex].canBeBrought;
                     data2.isUsed = buyItems[currentIndex].isUsed;
+                    if (data2.isBrought){
+                        data2.buyButtonText.setText('USE');
+                        data2.descriptionPopup.popupText.setText(data2.desc);
+                        data2.descriptionPopup.popupBG.resize((data2.descriptionPopup.popupText.getTextBounds().local.width/2)+8, (data2.descriptionPopup.popupText.getTextBounds().local.height/2)+8);
+                    }
                     if (data2.isUsed){
                         data2.buyButton.setFrame(2);
                         game.buyMenuCategories[x].data.values.itemSelect = data[y];
+                        data2.buyButtonText.setText('USED');
                     }
                     currentIndex++;
                 }
@@ -1176,16 +1233,17 @@ function saveManager(game){
 
         if (currentStage+game.currentStageCounter >= 2){
             game.bg.setFrame(1);
+            player.setPosition(400,416);
         }
         if (currentStage+game.currentStageCounter >= 3){
-            player.setPosition(400-32,300-96);
+            player.setPosition(400,384);
         }
 
         checkUnlockableActiveButton(game);
         putAllActiveButtonEvent(game);
+        repositionBuffs(game);
         if (game.saveGame.getItem('wasSaved')){
             let accumulateData = moneyAmount.data.values;
-            console.log(accumulateData);  
             moneyAmount.setData('offlineEvent', new popupEvent(game).createAcknowledgeEvent(
                 'While you\'re gone,\nYou gain '+Math.trunc(accumulate.money)+' cash \nand '+ Math.trunc(accumulate.exp)+' exp'));            
         }
@@ -1203,7 +1261,6 @@ function loadActiveButton(game,position,x,Button,elapseTime, accumulateList){
     }
     let buttonElapseTime = button.elapseTime;
     let delay = 1*button.delay;
-    console.log(button);
 
     if (!button.pause){
         if (delay < ((elapseTime)+(buttonElapseTime*delay))){
@@ -1232,23 +1289,23 @@ function loadActiveButton(game,position,x,Button,elapseTime, accumulateList){
     if (position == 'left'){
         activeButton(game,game.activeButtonLeft,'left',
             getActiveButtonStats(game,'left',button.stage,button.number,buffList));
-        loadButton(game, game.activeButtonLeft[x], button, buttonElapseTime);
+        loadButton(game, game.activeButtonLeft[x], button, buttonElapseTime, 'left');
     }
 
     else if (position == 'right'){
         activeButton(game,game.activeButtonRight,'right',
             getActiveButtonStats(game,'right',button.stage,button.number,buffList));
-        loadButton(game, game.activeButtonRight[x], button, buttonElapseTime);
+        loadButton(game, game.activeButtonRight[x], button, buttonElapseTime, 'right');
     }
 
     else if (position == 'character'){
         activeButton(game,game.activeButtonCharacter,'character',
             getActiveButtonStats(game,'character',button.stage,button.number,buffList));
-        loadButton(game, game.activeButtonCharacter[x], button, buttonElapseTime);
+        loadButton(game, game.activeButtonCharacter[x], button, buttonElapseTime, 'character');
     }
 }
 
-function loadButton(game,activeButtonPosition,button,buttonElapseTime){
+function loadButton(game,activeButtonPosition,button,buttonElapseTime, position){
     let buttonData = activeButtonPosition.data.values;
     if (buttonData.work){
         buttonData.work.jobSelection.finished = button.workJobSelectionFinished;
@@ -1270,14 +1327,32 @@ function loadButton(game,activeButtonPosition,button,buttonElapseTime){
     if (buttonData.popupEvent){
         buttonData.popupEvent.finished = button.popupEventFinished;
     }
+        console.log(button.buff);
     for (let y = 0 ; y != Object.keys(button.buff).length ; y++){
         if (button.buff[y].isActive){
             buttonData.buff[y].active();
-            game.currentBuffLeft.push(buttonData.buff[y]);
-            game.currentBuffLeft.numberOfTurns = button.buff[y].numberOfTurns;
-            if (game.currentBuffLeft.buffDuration){
-                game.currentBuffLeft.buffDuration.elapsed = button.buff[y].buffDuration;
+            if (position == 'left'){
+                game.currentBuffLeft.push(buttonData.buff[y]);
+                game.currentBuffLeft.numberOfTurns = button.buff[y].numberOfTurns;
+                if (game.currentBuffLeft.buffDuration){
+                    game.currentBuffLeft.buffDuration.elapsed = button.buff[y].buffDuration;
+                }
+            }   
+            else if (position == 'right'){
+                game.currentBuffRight.push(buttonData.buff[y]);
+                game.currentBuffRight.numberOfTurns = button.buff[y].numberOfTurns;
+                if (game.currentBuffRight.buffDuration){
+                    game.currentBuffRight.buffDuration.elapsed = button.buff[y].buffDuration;
+                }
             }
+            else if(position == 'character'){
+                game.currentBuffCharacter.push(buttonData.buff[y]);
+                game.currentBuffCharacter.numberOfTurns = button.buff[y].numberOfTurns;
+                if (game.currentBuffCharacter.buffDuration){
+                    game.currentBuffCharacter.buffDuration.elapsed = button.buff[y].buffDuration;
+                }
+            }
+            console.log(buttonData.buff[y]);
         }
     }
     if (button.unlocked){
@@ -1341,8 +1416,7 @@ function checkUnlockableActiveButton(game){
         turnsUnlocked = true;
     }
 
-    if (button.requiredExpToUnlock <= expAmount.data.values.amount && 
-    !game.allButtonCharacterUnlock && turnsUnlocked){
+    if (button.requiredExpToUnlock <= expAmount.data.values.amount && !game.allButtonCharacterUnlock && turnsUnlocked){
         game.activeButtonCharacter[x].setFrame(1);
         button.unlocked = true;
         if (getActiveButtonStats(game, 'character', button.default.stage, button.default.number+1, buffList) === true){
@@ -1391,7 +1465,6 @@ function updateBuffs(game, buttonData){
                     }
                 }
             }
-            buttonData.buff[x].active();
             
             if (buttonData.position == 'left'){
                 game.currentBuffLeft.push(buttonData.buff[x]);
@@ -1402,6 +1475,7 @@ function updateBuffs(game, buttonData){
             else if (buttonData.position == 'character'){
                 game.currentBuffCharacter.push(buttonData.buff[x]);
             }
+            buttonData.buff[x].active();
             repositionBuffs(game);
             break;
         }
@@ -1414,7 +1488,12 @@ function repositionBuffs(game){
             game.currentBuffLeft.splice(x--,1);
         }
         else{
-            game.currentBuffLeft[x].icon.x = game.currentBuffLeft[x].x+(32*x);
+            if(x == 0){
+                game.currentBuffLeft[x].icon.x = game.currentBuffLeft[x].x-(16*(game.currentBuffLeft.length-1));
+            }
+            else{
+                game.currentBuffLeft[x].icon.x = game.currentBuffLeft[0].x+16;
+            }
         }
     }
     for (let x = 0 ; x < game.currentBuffRight.length ; x++){
@@ -1422,7 +1501,12 @@ function repositionBuffs(game){
             game.currentBuffRight.splice(x--,1);
         }
         else{
-            game.currentBuffRight[x].icon.x = game.currentBuffRight[x].x+(32*x);
+            if(x == 0){
+                game.currentBuffRight[x].icon.x = game.currentBuffRight[x].x-(16*(game.currentBuffRight.length-1));
+            }
+            else{
+                game.currentBuffRight[x].icon.x = game.currentBuffRight[0].x+16;
+            }
         }
     }
     for (let x = 0 ; x < game.currentBuffCharacter.length ; x++){

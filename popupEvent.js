@@ -10,6 +10,7 @@ export class popupEvent{
 		this.text;
 		this.type;
 		this.requiredDelay;
+		this.selectedButtonText;
 		this.closeButton = this.game.add.image(746,32,'closeButton',0).setOrigin(0);
 		this.closeButton.setScale(2);
 	    this.closeButton.depth = 3;
@@ -135,11 +136,9 @@ export class popupEvent{
 			button.on('pointerup',function(){
 				this.game.moneyAmount.data.values.amount -= button.data.values.cost;
 				this.game.moneyAmount.setText(this.game.moneyAmount.data.values.amount);
-				this.game.activeButtonCharacter[args[x].button].data.values.gain = args[x].gain;
-				this.game.activeButtonCharacter[args[x].button].data.values.timeEvent.args[0] = args[x].gain;
-				this.destroy();
-				buttonData.descriptionPopup.destroy();
-				this.finished = true;
+				this.game.activeButtonCharacter[args[x].button-1].data.values.gain = args[x].gain;
+				this.game.activeButtonCharacter[args[x].button-1].data.values.timeEvent.args[0] = args[x].gain;
+				this.finish(buttonData);
 			},this);
 			this.buttons.push(button);
 		}
@@ -160,6 +159,28 @@ export class popupEvent{
 
 		this.hide();
 		return this;
+	}
+
+	nestedCategoriesEvent(event,...args ){
+		for (let x = 0 ; x != this.buttons.length ; x++){
+			this.buttons[x].off('pointerup');
+			this.buttons[x].data.values.secondButtons = new popupEvent(this.game).createCategoriesEvent(args[x].text, args[x].args[0]);
+			this.buttons[x].on('pointerup', function(){
+				this.selectedButtonText = this.buttons[x].data.values.text.text;
+				this.buttons[x].data.values.secondButtons.selectedButtonText = this.selectedButtonText;
+				this.buttons[x].data.values.secondButtons.show();
+				this.hide();
+			},this);
+
+			this.buttons[x].data.values.secondButtons.buttons[0].on('pointerup', function(){
+				if (event){
+					event.event(args[x].args[0].text, this.selectedButtonText);
+				}
+			},this);
+			for ( let y = 1; y != args[x].args.length ; y++){
+				this.buttons[x].data.values.secondButtons.addButton(event, args[x].args[y]);
+			}
+		}
 	}
 
 	popupManager(button, text, args){
@@ -204,6 +225,55 @@ export class popupEvent{
 		    	}
 		    }
 	    });
+	}
+
+	addButton(event,buttons){
+		let button = this.game.add.sprite(400,220+(32*(this.buttons.length)),'button',0).setInteractive().setScale(2);
+		button.depth = 2;
+		button.setData('text', this.game.add.bitmapText(400,220+(32*(this.buttons.length)),'mainFont',buttons.text).setFontSize(8).setOrigin(0.5));
+		button.data.values.text.depth = 2;
+		let buttonData = button.data.values;
+		buttonData.cost = buttons.cost;
+		this.popupManager(button, buttons.cost, this);
+
+		button.on('pointerout',function(){
+			button.setFrame(0);
+			buttonData.descriptionPopup.hide();
+		});
+		button.on('pointerover',function(){
+			button.setFrame(1);
+			buttonData.descriptionPopup.show();
+		});
+		button.on('pointerup',function(){
+			if(event){
+				event.event(buttons.text, this.selectedButtonText);
+			}
+			this.game.moneyAmount.data.values.amount -= button.data.values.cost;
+			this.game.moneyAmount.setText(this.game.moneyAmount.data.values.amount);
+			this.game.activeButtonCharacter[buttons.button-1].data.values.gain = buttons.gain;
+			this.game.activeButtonCharacter[buttons.button-1].data.values.timeEvent.args[0] = buttons.gain;
+			this.finish(buttonData);
+		},this);
+		this.buttons.push(button);
+
+		this.resize();
+		this.hide();
+	}
+
+	resize(){
+		this.popup.resize(496, ((this.buttons.length*32)/2)+316);
+		this.popup.setOrigin(0.5);
+		for (let x = 0 ; x != this.buttons.length ; x++){
+			if (x == 0){
+				this.buttons[x].y = (316-((32*this.buttons.length)/2));
+				this.buttons[x].data.values.text.y = this.buttons[x].y;
+			}
+			else{
+				this.buttons[x].y = this.buttons[x-1].y+36;
+				this.buttons[x].data.values.text.y = this.buttons[x].y;
+			}
+		}
+		this.text.y = this.buttons[0].y-26;
 	}
 
 	show (){
@@ -265,6 +335,14 @@ export class popupEvent{
 		if (this.buttons.length != 0){
 			this.buttons.length = 0;
 		}
+	}
+
+	finish(buttonData){
+		this.destroy();
+		if (buttonData.descriptionPopup){
+			buttonData.descriptionPopup.destroy();
+		}
+		this.finished = true;
 	}
 
 	setRequiredDelay(arg){

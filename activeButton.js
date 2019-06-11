@@ -27,6 +27,10 @@ export function activeButton(game,buttonArray,position,data){
         buttonData.work.setButton(button);
         buttonData.holdEvent = game.add.sprite(x,y).setOrigin(0.5).setScale(2);
     }
+    if(buttonData.recreation){
+        buttonData.recreation.setButton(button);
+        buttonData.popupEvent = buttonData.recreation.popupEvent;
+    }
     buttonData.buttonNumber = size;
     buttonData.position = position;
     buttonData.description = game.add.bitmapText(x,y-6,'mainFont', data.description).setOrigin(0.5);
@@ -53,7 +57,6 @@ export function activeButton(game,buttonArray,position,data){
             this.popupBG.destroy();
             this.popupText.destroy();
         }
-        
     };
     buttonData.descriptionPopup.hide();
     buttonData.timeEvent.args = [button.data.values.gain, button];
@@ -107,7 +110,8 @@ export function activeButton(game,buttonArray,position,data){
             }
         }
 
-        if(!buttonData.default.pause || buttonData.default.itemEquipPass && buttonData.unlocked && !(!buttonData.timeEvent.loop && buttonData.timeEvent.hasDispatched && !buttonData.runOneWithLoop) &&
+        if(!buttonData.default.pause || buttonData.default.itemEquipPass && buttonData.unlocked && !buttonData.cannotMidPause &&
+            !(!buttonData.timeEvent.loop && buttonData.timeEvent.hasDispatched && !buttonData.runOneWithLoop) &&
             ((!game.buttonLeftSelected && position == 'left' && !(buttonData.isCare && game.isCareSelected)) ||
             (!game.buttonRightSelected && position == 'right' && !(buttonData.isCare && game.isCareSelected)) || 
             (!game.buttonCharacterSelected && position == 'character' && game.isCareSelected) || buttonData.ignoreSingleButtonOnly)){
@@ -140,7 +144,7 @@ export function activeButton(game,buttonArray,position,data){
                 }
             }
 
-            if (buttonData.timeEvent.paused && buttonData.default.optionsPass && buttonData.default.itemEquipPass &&
+            if (buttonData.timeEvent.paused && buttonData.default.optionsPass && buttonData.default.itemEquipPass && !buttonData.cannotMidpause &&
             ((!game.buttonLeftSelected && position == 'left' && !(buttonData.isCare && game.isCareSelected)) ||
             (!game.buttonRightSelected && position == 'right' && !(buttonData.isCare && game.isCareSelected)) || 
             (!game.buttonCharacterSelected && position == 'character' && game.isCareSelected) || buttonData.ignoreSingleButtonOnly)){
@@ -196,9 +200,11 @@ export function activeButton(game,buttonArray,position,data){
                     game.buttonCharacterSelected = false;
 				}
             }
-            if (!buttonData.work.holdTimeEventDelay.paused){
-                buttonData.work.hideHoldAnim();
-                return;
+            if (buttonData.work){
+                if (!buttonData.work.holdTimeEventDelay.paused){
+                    buttonData.work.hideHoldAnim();
+                    return;
+            }
             }
         }
     });

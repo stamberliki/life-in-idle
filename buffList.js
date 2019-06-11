@@ -65,7 +65,7 @@ export function buffList(buffNumber){
 					this.icon.visible = false;
 					this.icon.setScale(2);
 					this.icon.setInteractive();
-					this.chance = 25;
+					this.chance = 100;
 					this.numberOfTurns = 0;
 					this.isActive = false;
 					this.buffNumber = buffNumber;
@@ -113,7 +113,7 @@ export function buffList(buffNumber){
 					this.icon.visible = false;
 					this.icon.setScale(2);
 					this.icon.setInteractive();
-					this.chance = 25;
+					this.chance = 100;
 					this.numberOfTurns = 0;
 					this.isActive = false;
 					this.buffNumber = buffNumber;
@@ -162,7 +162,7 @@ export function buffList(buffNumber){
 					this.icon.visible = false;
 					this.icon.setScale(2);
 					this.icon.setInteractive();
-					this.chance = 20;
+					this.chance = 100;
 					this.numberOfTurns = -1;
 					this.isActive = false;
 					this.buffNumber = buffNumber;
@@ -214,7 +214,7 @@ export function buffList(buffNumber){
 					this.icon.visible = false;
 					this.icon.setScale(2);
 					this.icon.setInteractive();
-					this.chance = 20;
+					this.chance = 100;
 					this.numberOfTurns = -1;
 					this.isActive = false;
 					this.buffNumber = buffNumber;
@@ -231,18 +231,21 @@ export function buffList(buffNumber){
 
 				active(){
 						for (var x = 0 ; x < this.game.currentBuffCharacter.length ; x++){
-							if (this.game.currentBuffCharacter[x].isActive && !this.game.currentBuffCharacter[x].immune){
+							if (this.game.currentBuffCharacter[x].isActive && !this.game.currentBuffCharacter[x].immune && this.game.currentBuffCharacter[x].buffType == 'debuff'){
 								this.game.currentBuffCharacter[x].deactivate();
+								x--;
 							}
 						}
 						for (var x = 0 ; x < this.game.currentBuffLeft.length ; x++){
-							if (this.game.currentBuffLeft[x].isActive && !this.game.currentBuffLeft[x].immune){
+							if (this.game.currentBuffLeft[x].isActive && !this.game.currentBuffLeft[x].immune && this.game.currentBuffLeft[x].buffType == 'debuff'){
 								this.game.currentBuffLeft[x].deactivate();
+								x--;
 							}
 						}
 						for (var x = 0 ; x < this.game.currentBuffRight.length ; x++){
-							if (this.game.currentBuffRight[x].isActive && !this.game.currentBuffRight[x].immune){
+							if (this.game.currentBuffRight[x].isActive && !this.game.currentBuffRight[x].immune && this.game.currentBuffRight[x].buffType == 'debuff'){
 								this.game.currentBuffRight[x].deactivate();
+								x--;
 							}
 						}
 					this.buffDuration = this.game.time.addEvent({
@@ -274,10 +277,11 @@ export function buffList(buffNumber){
 					this.icon.visible = false;
 					this.icon.setScale(2);
 					this.icon.setInteractive();
-					this.chance = 30;
+					this.chance = 100;
 					this.numberOfTurns = -1;
 					this.isActive = false;
 					this.buffNumber = buffNumber;
+					this.buffType = 'debuff';
 					this.button;
 					this.buffDuration;
 					popupManager(this,game,positions);
@@ -321,6 +325,7 @@ export function buffList(buffNumber){
 					this.chance = 100;
 					this.numberOfTurns = -1;
 					this.isActive = false;
+					this.buffType = 'debuff';
 					this.buffNumber = buffNumber;
 					this.button;
 					this.buffDuration;
@@ -456,15 +461,12 @@ export function buffList(buffNumber){
 				active(){
 					this.icon.visible = true;
 					this.isActive = true;
-					console.log(this.game.activeButtonCharacter[1].data.values.timeEvent.timeScale);
-					// console.log(this.);
 					this.game.activeButtonCharacter[1].data.values.timeEvent.timeScale += 
 						this.game.buyMenuCategories[this.button.data.values.itemEquipIndex-1]
 							.data.values.itemSelect.data.values.timeMultiplier / 100;
 					this.buffDuration = this.game.time.addEvent({
 			            delay:5000, callback: this.deactivate, callbackScope: this,
 					});
-					console.log(this.game.activeButtonCharacter[1].data.values.timeEvent.timeScale);
 				}
 
 				deactivate(){
@@ -477,6 +479,121 @@ export function buffList(buffNumber){
 					this.icon.x = this.x;
 					this.icon.y = this.y;
 					this.game.repositionBuffs(this.game);
+				}
+
+			}
+		case 9:
+			return class {
+				constructor(game, positions){
+					this.game = game;
+					this.x = positions.x;
+					this.y = positions.y;
+					this.name = 'Back from the Beach';
+					this.description = 'desc';
+					this.icon = game.add.image(this.x, this.y, 'buffIcons', 8).setOrigin(0);
+					this.buffTextDescription = '';
+					this.icon.visible = false;
+					this.icon.setScale(2);
+					this.icon.setInteractive();
+					this.chance = 100;
+					this.numberOfTurns = -1;
+					this.isActive = false;
+					this.buffNumber = buffNumber;
+					this.button;
+					this.buffDuration;
+					popupManager(this,game,positions);
+
+				}
+
+				setButton(button){
+					this.button = button;
+				}
+
+				active(){
+					for (var x = 0 ; x < this.game.currentBuffCharacter.length ; x++){
+						if (this.game.currentBuffCharacter[x].isActive && !this.game.currentBuffCharacter[x].immune){
+							this.game.currentBuffCharacter[x].deactivate();
+						}
+					}
+					for (var x = 0 ; x < this.game.currentBuffLeft.length ; x++){
+						if (this.game.currentBuffLeft[x].isActive && !this.game.currentBuffLeft[x].immune){
+							this.game.currentBuffLeft[x].deactivate();
+						}
+					}
+					for (var x = 0 ; x < this.game.currentBuffRight.length ; x++){
+						if (this.game.currentBuffRight[x].isActive && !this.game.currentBuffRight[x].immune){
+							this.game.currentBuffRight[x].deactivate();
+						}
+					}
+
+					this.game.activeButtonCharacter[1].data.values.timeEvent.timeScale += .1;
+
+					this.buffDuration = this.game.time.addEvent({
+			            delay:10000, callback: this.deactivate, callbackScope: this,
+					});
+
+					this.icon.visible = true;
+					this.isActive = true;
+				}
+
+				deactivate(){
+					this.game.activeButtonCharacter[1].data.values.timeEvent.timeScale -= .1;
+					this.icon.visible = false;
+					this.isActive = false;
+					this.icon.x = this.x;
+					this.icon.y = this.y;
+					this.game.repositionBuffs(this.game);
+				}
+			}
+		default:
+			return class {
+				constructor(game, positions){
+					this.game = game;
+					this.x;
+					this.y;
+					this.name;
+					this.description;
+					this.icon = game.add.image(this.x, this.y, 'buffIcons', 0).setOrigin(0);
+					this.icon.visible = false;
+					this.icon.setScale(2);
+					this.icon.setInteractive();
+					this.buffTextDescription;
+					this.chance = 0;
+					this.numberOfTurns = 0;
+					this.isActive = false;
+					this.buffNumber = buffNumber;
+					this.buffType;
+					this.button;
+					this.buffDuration;
+					this.immune;
+					popupManager(this,game);
+				}
+
+				setButton(button){
+					this.button = button;
+				}
+
+				active(){
+				}
+
+				deactivate(){
+				}
+
+				hide(){
+					if (this.icon){
+						this.icon.visible = false;
+					this.icon.x = this.x;
+					this.icon.y = this.y;
+					}
+					if (this.buffDuration){
+						this.buffDuration.destroy();
+					}
+					this.isActive = false;
+				}
+
+				config(config){
+					this.chance = config.chance;
+					this.button = config.button;
 				}
 
 			}
