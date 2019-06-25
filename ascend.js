@@ -5,12 +5,13 @@ export class ascend{
 		this.game = game;
 		this.basePoint;
 		this.totalPoints = 0;
-
+		this.requiredPoints;
 	}
 
 	run(){
 		this.evaluate();
 		console.log(this.totalPoints);
+		this.game.cutscene.show();
 	}
 
 	evaluate(){
@@ -45,15 +46,62 @@ export class ascend{
 		console.log(this.totalPoints);
 		this.totalPoints += this.game.expAmount.data.values.amount / 100;
 		console.log(this.totalPoints);
+		this.requiredPoints = ((30*(this.game.tier-1)*.75)/2)+(this.game.tier*30);
+		if (this.totalPoints*1.2 > this.requiredPoints) {
+			if (this.totalPoints*2.2 >= this.requiredPoints){
+
+			}
+		}
+		else if (this.totalPoints < this.requiredPoints){
+			if (this.totalPoints/2 >= this.requiredPoints){
+
+			}
+		}
+		else {
+
+		}
 	}
 
 	ascend(){
+		this.tier = this.tier+1 || 0;
+		this.bg.data.values.tierCounter = 0;
+		this.clearAllButton();
+        activeButton(game,activeButtonLeft,
+            'left',getActiveButtonStats(game,'left',1,1,buffList));
+
+        activeButton(game,activeButtonRight,
+            'right',getActiveButtonStats(game,'right',1,1,buffList));
+
+        activeButton(game,activeButtonLeft,
+            'left',getActiveButtonStats(game,'left',1,2,buffList));
+
+        activeButton(game,activeButtonRight,
+            'right',getActiveButtonStats(game,'right',1,2,buffList));
+
+        activeButton(game,activeButtonCharacter,
+            'character',getActiveButtonStats(game,'character',1,1,buffList));
 
 	}
 
 	descend(){
+		this.tier = this.tier-1 || 0;
+		this.bg.data.values.tierCounter = 0;
+		this.clearAllButton();
+        activeButton(game,activeButtonLeft,
+            'left',getActiveButtonStats(game,'left',1,1,buffList));
+
+        activeButton(game,activeButtonRight,
+            'right',getActiveButtonStats(game,'right',1,1,buffList));
+
+        activeButton(game,activeButtonLeft,
+            'left',getActiveButtonStats(game,'left',1,2,buffList));
+
+        activeButton(game,activeButtonRight,
+            'right',getActiveButtonStats(game,'right',1,2,buffList));
+
+        activeButton(game,activeButtonCharacter,
+            'character',getActiveButtonStats(game,'character',1,1,buffList));
 
 	}
-
 
 }

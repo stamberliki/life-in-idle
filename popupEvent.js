@@ -117,6 +117,7 @@ export class popupEvent{
 		this.popup = this.game.add.nineslice(400, 300, 400, 300, 'popupEvent', [143, 193, 158, 193]).setOrigin(0.5).setScale(2);
 		this.popup.depth = 2;
 		for (let x = 0 ; x != args.length ; x++){
+			console.log(x+'|'+args.length);
 			let button = this.game.add.sprite(400,220+(32*(x+1)),'button',0).setInteractive().setScale(2);
 			button.depth = 2;
 			button.setData('text', this.game.add.bitmapText(400,220+(32*(x+1)),'mainFont',args[x].text).setFontSize(8).setOrigin(0.5));
@@ -145,6 +146,7 @@ export class popupEvent{
 		this.popup.resize(496, ((this.buttons.length*32)/2)+316);
 		this.popup.setOrigin(0.5);
 		for (let x = 0 ; x != this.buttons.length ; x++){
+			console.log(x+'|'+this.buttons.length);
 			if (x == 0){
 				this.buttons[x].y = (316-((32*this.buttons.length)/2));
 				this.buttons[x].data.values.text.y = this.buttons[x].y;
@@ -163,6 +165,7 @@ export class popupEvent{
 
 	nestedCategoriesEvent(event,...args ){
 		for (let x = 0 ; x != this.buttons.length ; x++){
+			console.log(x+'|'+this.buttons.length);
 			this.buttons[x].off('pointerup');
 			this.buttons[x].data.values.secondButtons = new popupEvent(this.game).createCategoriesEvent(args[x].text, args[x].args[0]);
 			this.buttons[x].on('pointerup', function(){
@@ -178,6 +181,7 @@ export class popupEvent{
 				}
 			},this);
 			for ( let y = 1; y != args[x].args.length ; y++){
+			console.log(y+'|'+args[x].args.length);
 				this.buttons[x].data.values.secondButtons.addButton(event, args[x].args[y]);
 			}
 		}
@@ -264,6 +268,7 @@ export class popupEvent{
 		this.popup.resize(496, ((this.buttons.length*32)/2)+316);
 		this.popup.setOrigin(0.5);
 		for (let x = 0 ; x != this.buttons.length ; x++){
+			console.log(x+'|'+this.buttons.length);
 			if (x == 0){
 				this.buttons[x].y = (316-((32*this.buttons.length)/2));
 				this.buttons[x].data.values.text.y = this.buttons[x].y;
@@ -290,6 +295,7 @@ export class popupEvent{
 			this.disapproveButton.setVisible(true);
 		}
 		for (let x = 0 ; x != this.buttons.length ; x++){
+			console.log(x+'|'+this.buttons.length);
 			this.buttons[x].data.values.text.setVisible(true);
 			this.buttons[x].setVisible(true);
 		}
@@ -309,6 +315,7 @@ export class popupEvent{
 			this.disapproveButton.setVisible(false);
 		}
 		for (let x = 0 ; x != this.buttons.length ; x++){
+			console.log(x+'|'+this.buttons.length);
 			this.buttons[x].data.values.text.setVisible(false);
 			this.buttons[x].setVisible(false);
 		}
@@ -329,6 +336,7 @@ export class popupEvent{
 			this.disapproveButton.destroy();
 		}
 		for (let x = 0 ; x != this.buttons.length ; x++){
+			console.log(x+'|'+this.buttons.length);
 			this.buttons[x].data.values.text.destroy();
 			this.buttons[x].destroy();
 		}

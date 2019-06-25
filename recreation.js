@@ -20,6 +20,7 @@ export class recreation{
 		this.buffManager = this.game.buffManager(0);
 
 		for (let x = 0 ; x != this.popupEvent.buttons.length ; x++){
+			console.log(x+'|'+this.popupEvent.buttons.length);
 			this.popupEvent.buttons[x].off('pointerup');
 		}
 	}

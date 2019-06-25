@@ -148,19 +148,19 @@ export class workData{
 	}
 
 	generateJob(game){
-        if (game.tier == 'veryLow'){
-            this.workTier = game.tier;
+        if (game.tier == 1){
+            this.workTier = 'veryLow';
         }
-        else if (game.tier == 'low'){
+        else if (game.tier == 2){
             this.workTier = Phaser.Math.RND.pick(['veryLow','low']);
         }
-        else if (game.tier == 'average'){
+        else if (game.tier == 3){
             this.workTier = Phaser.Math.RND.pick(['veryLow','low','average']);
         }
-        else if (game.tier == 'high'){
+        else if (game.tier == 4){
             this.workTier = Phaser.Math.RND.pick(['veryLow','low','average','high']);
         }
-        else if (game.tier == 'veryHigh'){
+        else if (game.tier == 5){
             this.workTier = Phaser.Math.RND.pick(['veryLow','low','average','high','veryHigh']);
         }
         if (game.degree){
