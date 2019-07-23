@@ -1,17 +1,15 @@
 export function nextStageData(game, stage){
 	switch(stage){
 		case 1:
-			return game.expAmount.data.values.amount >= 1500 && game.buyMenuCategories[0].data.values.itemSelect;
+			return game.expAmount.data.values.amount >= 200+((200*.25)*(game.tier-1)) && game.buyMenuCategories[0].data.values.itemSelect;
 		case 2:
-			return game.expAmount.data.values.amount >= 2000;
+			return game.expAmount.data.values.amount >= 500+((500*.25)*(game.tier-1));
 		case 3:
-			return game.expAmount.data.values.amount >= 2000;
+			return game.expAmount.data.values.amount >= 800+((800*.25)*(game.tier-1));
 		case 4:
-			return game.expAmount.data.values.amount >= 2000;
+			return game.expAmount.data.values.amount >= 1250+((1250*.25)*(game.tier-1));
 		case 5:
-			return game.expAmount.data.values.amount >= 2000;
-		case 6:
-			return game.expAmount.data.values.amount >= 2000;
+			return game.expAmount.data.values.amount >= 1750+((1750*.25)*(game.tier-1));
 		default:
 			return true;
 	}

@@ -4,7 +4,7 @@ export function buyMenuItems(game, list,data){
 		let x = 6;
 		let y = 16;
 		x = (x+((array.length*138)-(Math.trunc(array.length/3)*416)))+(416*(position-1));
-		y = y+(600+(Math.trunc(array.length/3)*192));
+		y = 600+(Math.trunc(array.length/3)*192);
 		
 		let items = game.add.sprite(x,y,'buyMenuItems',0).setOrigin(0);
 		items.setData(data(game,game.buyMenuItemsCount,x+32,y+14));
@@ -15,6 +15,7 @@ export function buyMenuItems(game, list,data){
 		buttonData.position = position;
 		buttonData.itemNumber = array.length;
 		buttonData.array = list[categoryNumber];
+		buttonData.itemDefault = itemDefault;
 		buttonData.descriptionPopup = new function(){
 	    	this.popupBG = game.add.nineslice(0,0,16,16,'descriptionPopup',4,8);
 	    	this.popupBG.setScale(2);
@@ -23,6 +24,7 @@ export function buyMenuItems(game, list,data){
 			this.popupText = game.add.bitmapText(0,0,'mainFont2','Cost: '+buttonData.costMoney+'\n'+buttonData.desc);
 			this.popupText.depth = 4;
 			this.popupBG.resize((this.popupText.getTextBounds().local.width/2)+8, (this.popupText.getTextBounds().local.height/2)+8);
+
 	    	this.show = function(){
 	    		this.popupBG.setVisible(true);
 	    		this.popupText.setVisible(true);
@@ -35,8 +37,7 @@ export function buyMenuItems(game, list,data){
 	    		this.isPointed = false;
 	    	}
 	    };
-    	buttonData.descriptionPopup.hide();
-
+	    buttonData.descriptionPopup.hide();
 	    game.input.on('gameobjectmove',function(pointer,gameObject){
 	    	if (gameObject === buttonData.buyButton){
 		    	if (buttonData.descriptionPopup.isPointed){
@@ -74,7 +75,6 @@ export function buyMenuItems(game, list,data){
 						data.data.values.isUsed = false;
 						data.data.values.buyButtonText.setText('USE');
 						data.data.values.buyButton.setFrame(0);
-						game.buyMenuCategorySelect.data.values.itemRender.destroy();
 					}
 				}
 				game.buyMenuCategorySelect.data.values.itemSelect = items;
@@ -112,6 +112,19 @@ export function buyMenuItems(game, list,data){
 		return items;
 	}
 
+	function itemDefault(item){
+		item.buyButton.setFrame(0);
+		item.isBrought = false;
+		item.canBeBrought = false;
+		item.isUsed = false;
+		item.buyButtonText.setText('BUY');
+    	item.descriptionPopup.isPointed = false;
+		item.descriptionPopup.popupText.setText(item.costMoney+'\n'+item.desc);
+		item.descriptionPopup.popupBG.resize((item.descriptionPopup.popupText.getTextBounds().local.width/2)+8,
+			(item.descriptionPopup.popupText.getTextBounds().local.height/2)+8);
+
+	}
+
 	function getItemlist(index){
 		return list[index].data.values.itemList;
 	}
@@ -124,6 +137,7 @@ export function buyMenuItems(game, list,data){
 
 	getItemlist(3).push(createItems(4,getItemlist(3),2));
 
+	getItemlist(4).push(createItems(5,getItemlist(4)));
 	getItemlist(4).push(createItems(5,getItemlist(4)));
 	getItemlist(4).push(createItems(5,getItemlist(4)));
 	getItemlist(4).push(createItems(5,getItemlist(4)));

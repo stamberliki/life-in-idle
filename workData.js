@@ -66,9 +66,9 @@ export class workData{
 		this.acceptedWorkName;
 		this.acceptedWorkGain;
         this.timeEvent = game.time.addEvent({
-            delay:2000, loop:true, callback: game.gainMoney,
+            delay:1000, loop:true, callback: game.gainMoney,
             callbackScope: game, paused: true,
-        }),
+        });
         this.previousTimeEvent;
         this.workTier;
         this.points = 0;
@@ -82,8 +82,7 @@ export class workData{
         	text: 'No',
         	event: function(){
         	}
-        },
-        ).setRequiredDelay(true),
+        }).setRequiredDelay(true);
 
         this.holdEvent = new game.popupEvent(game).createTwoChoiceEvent('',{
         	text: 'Yes',
@@ -180,6 +179,36 @@ export class workData{
         }
 	}
 
+	generateJobByTier(isMaxGain){
+        let list = this.workData[this.workTier].nonDegree;
+        for (let x in this.workData[this.workTier].degree){
+        	list = list.concat(this.workData[this.workTier].degree[x]);
+        }
+        console.log(list);
+        this.acceptedWorkName = Phaser.Math.RND.pick(list);
+        if (isMaxGain){
+        	this.acceptedWorkGain = this.workData[this.workTier].maxGain;
+        }
+        else{
+        	this.acceptedWorkGain = Phaser.Math.Between(this.workData[this.workTier].minGain, this.workData[this.workTier].maxGain);
+        }
+        this.points = this.workData[this.workTier].degreePoint;
+	}
+
+	acceptJob(){
+		let buttonData = this.button.data.values;
+		this.previousTimeEvent = buttonData.timeEvent;
+		buttonData.timeEvent = this.timeEvent;
+		buttonData.gain = this.acceptedWorkGain;
+		buttonData.timeEvent.args = [this.acceptedWorkGain, this.button];
+		this.jobSelection.finished = true;
+		buttonData.runOneWithLoop = false;
+		this.holdEvent.text.setText('You are about to quit your job as a\n'+this.acceptedWorkName+'\nDo you want to quit your job?');
+		this.holdEvent.popup.resize(Math.max((this.holdEvent.text.getTextBounds().local.width/2)+400,496),
+                (this.holdEvent.text.getTextBounds().local.height/2)+322);
+        this.holdEvent.popup.setOrigin(0.5).setScale(2);
+	}
+
 	playHoldTimeEvent(){
 		this.holdTimeEventDelay.paused = true;
 		this.holdTimeEvent.paused = false;
@@ -199,20 +228,6 @@ export class workData{
         this.holdTimeEventDelay.elapsed = 0;
         this.holdTimeEvent.elapsed = 0;
         this.button.data.values.holdEvent.setVisible(false);
-	}
-
-	acceptJob(){
-		let buttonData = this.button.data.values;
-		this.previousTimeEvent = buttonData.timeEvent;
-		buttonData.timeEvent = this.timeEvent;
-		buttonData.gain = this.acceptedWorkGain;
-		buttonData.timeEvent.args = [this.acceptedWorkGain, this.button];
-		this.jobSelection.finished = true;
-		buttonData.runOneWithLoop = false;
-		this.holdEvent.text.setText('You are about to quit your job as a\n'+this.acceptedWorkName+'\nDo you want to quit your job?');
-		this.holdEvent.popup.resize(Math.max((this.holdEvent.text.getTextBounds().local.width/2)+400,496),
-                (this.holdEvent.text.getTextBounds().local.height/2)+322);
-        this.holdEvent.popup.setOrigin(0.5).setScale(2);
 	}
 
 	getData(){

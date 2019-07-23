@@ -7,9 +7,14 @@ export class cutscene{
 	    this.skip = false;
 	    this.play = true;
 
-	    this.textList = ['abcde f g h\nijk l m n','aaaa','bbbb'];
+	    this.textList = [
+		    'abcde f g h\nijk l m n',
+		    'you fail',
+		    'you succed',
+		    'stay the same',
+		    ];
 	    this.textQueue = '';
-	    this.textIndex = this.textIndex + 1 || 0;
+	    this.textIndex = 0;
 	    this.currentTextIndexQueue = this.currentTextIndexQueue + 1 || 0;
 	    this.textIndexQueue = [0,2];
 	    this.text = this.game.add.bitmapText(48,455,'mainFont','').setOrigin(0).setVisible(false);
@@ -54,6 +59,8 @@ export class cutscene{
 	        }
 	        else if (this.textQueue.length <= this.textIndex && this.textIndexQueue.length-1 <= this.currentTextIndexQueue){
 	        	this.hide();
+	        	this.textIndex = 0;
+	        	this.text.text = '';
 	        }
 	        else{
 	            this.textTimeEvent.paused = true;
@@ -63,12 +70,15 @@ export class cutscene{
 	    }, this);
 	}
 
-	show(){
+	show(fromAscend){
 		this.game.disableButtonsEvent(this.game);
 		this.finish = false;
 		this.game.cameras.main.once('camerafadeoutcomplete', function (camera) {
 		    this.bg.setVisible(true);
 		    this.eyes.setVisible(true);
+		    if (fromAscend){
+		    	this.game.ascend.evaluate();
+		    }
 
     		this.eyes.anims.play('eyesAnim2',true);
 
@@ -81,8 +91,8 @@ export class cutscene{
 		    this.text.setVisible(true);
 		    this.dialog.setVisible(true);
 			this.eyes.anims.play('eyesAnim', true);
-		    this.textIndex = this.textIndexQueue[0];
-		    this.textQueue = this.textList[this.textIndex];
+		    this.textIndex = 0;
+		    this.textQueue = this.textList[this.textIndexQueue[0]];
 		}, this);
 
 		this.game.cameras.main.fadeOut(1000, 255, 255, 255);
@@ -108,13 +118,13 @@ export class cutscene{
 	}
 	
 	hide(){
-		this.game.enableButtonsEvent(this.game);
 		this.finish = true;
 	    this.text.setVisible(false);
 	    this.dialog.setVisible(false);
 	    this.game.cameras.main.once('camerafadeoutcomplete', function (camera) {
 	        this.bg.setVisible(false);
 	        this.eyes.setVisible(false);
+			this.game.enableButtonsEvent(this.game);
 
 	        camera.fadeIn(1000, 255, 255, 255);
 
@@ -124,10 +134,9 @@ export class cutscene{
 	}
 
 	setText(){
-	    console.log('pass');
-	    this.text.setText(this.text.text + this.textQueue.charAt(this.textIndex));
+	    this.text.setText(this.text.text + this.textQueue.charAt(this.textIndex-1));
 	    this.textIndex = this.textIndex + 1 || 0;
-	    if (this.textIndex >= this.textQueue.length){
+	    if (this.textIndex >= this.textQueue.length+1){
 	        this.textTimeEvent.paused = true;
 		}
 	}

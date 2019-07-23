@@ -39,7 +39,7 @@ export function activeButton(game,buttonArray,position,data){
     	this.isPointed = false;
     	this.popupText = game.add.bitmapText(x+18,y+44,'mainFont2','0000000000\n000000000000');
     	this.popupBG.setScale(2);
-        this.popupBG.resize(this.popupText.getTextBounds().local.width,this.popupText.getTextBounds().local.height);
+        this.popupBG.resize((this.popupText.getTextBounds().local.width/2)+8,(this.popupText.getTextBounds().local.height/2)+8);
     	
     	this.show = function(){
     		this.popupBG.setVisible(true);
@@ -92,9 +92,7 @@ export function activeButton(game,buttonArray,position,data){
         	buttonData.descriptionPopup.hide();
         }
         if (buttonData.work){
-            if (!buttonData.work.holdTimeEvent.paused && buttonData.work.holdTimeEventDelay.paused){
-                buttonData.work.hideHoldAnim();
-            }
+            buttonData.work.hideHoldAnim();
         }
     });
     button.on('pointerover',function(){
@@ -110,11 +108,12 @@ export function activeButton(game,buttonArray,position,data){
             }
         }
 
-        if(!buttonData.default.pause || buttonData.default.itemEquipPass && buttonData.unlocked && !buttonData.cannotMidPause &&
-            !(!buttonData.timeEvent.loop && buttonData.timeEvent.hasDispatched && !buttonData.runOneWithLoop) &&
-            ((!game.buttonLeftSelected && position == 'left' && !(buttonData.isCare && game.isCareSelected)) ||
-            (!game.buttonRightSelected && position == 'right' && !(buttonData.isCare && game.isCareSelected)) || 
-            (!game.buttonCharacterSelected && position == 'character' && game.isCareSelected) || buttonData.ignoreSingleButtonOnly)){
+        if(buttonData.default.itemEquipPass && buttonData.unlocked && !(buttonData.cannotMidPause && !buttonData.default.pause) &&
+            !(!buttonData.timeEvent.loop && buttonData.timeEvent.hasDispatched && !buttonData.runOneWithLoop) && (
+            (!buttonData.default.pause || !game.buttonLeftSelected && position == 'left' && !(buttonData.isCare && game.isCareSelected)) ||
+            (!buttonData.default.pause || !game.buttonRightSelected && position == 'right' && !(buttonData.isCare && game.isCareSelected)) || 
+            (!buttonData.default.pause || !game.buttonCharacterSelected && position == 'character' && game.isCareSelected) || buttonData.ignoreSingleButtonOnly)
+            ){
             button.setFrame(0);
         }
         else if (!buttonData.unlocked){
@@ -194,6 +193,8 @@ export function activeButton(game,buttonArray,position,data){
                     game.buttonCharacterSelected.data.values.timeEvent.paused = true;
                     game.buttonCharacterSelected.data.values.default.pausedMidway = true;
                     game.buttonCharacterSelected.data.values.default.pause = true;
+                    game.buttonCharacterSelected.anims.remove('activeButtonStop');
+                    game.buttonCharacterSelected.setFrame(1);
                 }
                 if ((position == 'left' || position == 'right') && game.isCareSelected && buttonData.isCare){
                 	game.isCareSelected = false;

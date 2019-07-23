@@ -44,9 +44,6 @@ export function buffList(buffNumber){
 		    		a.descriptionPopup.popupText.y = pointer.y+32;
 		    		a.descriptionPopup.popupTextName.x = pointer.x+16;
 		    		a.descriptionPopup.popupTextName.y = pointer.y+16;
-		    		a.descriptionPopup.popupBG.setOrigin(0);
-		    		a.descriptionPopup.popupText.setOrigin(0);
-
 		    	}
 		    }
 	    });
@@ -84,7 +81,6 @@ export function buffList(buffNumber){
 					this.numberOfTurns = 1;
 					this.isActive = true;
 					for ( var x = 0 ; x != this.game.activeButtonCharacter.length ; x++ ){
-            console.log(x+'|'+this.game.activeButtonCharacter.length);
 						this.game.activeButtonCharacter[x].data.values.timeEvent.timeScale -= 0.5;
 					}
 				}
@@ -93,7 +89,6 @@ export function buffList(buffNumber){
 					this.icon.visible = false;
 					this.isActive = false;
 					for ( var x = 0 ; x != this.game.activeButtonCharacter.length ; x++ ){
-            console.log(x+'|'+this.game.activeButtonCharacter.length);
 						this.game.activeButtonCharacter[x].data.values.timeEvent.timeScale += 0.5;
 					}
 					this.icon.x = this.x;
@@ -135,7 +130,6 @@ export function buffList(buffNumber){
 					this.numberOfTurns = 1;
 					this.isActive = true;
 					for ( var x = 0 ; x != this.game.activeButtonCharacter.length ; x++ ){
-            console.log(x+'|'+this.game.activeButtonCharacter.length);
 						this.game.activeButtonCharacter[x].data.values.timeEvent.timeScale -= 0.5;
 					}
 				}
@@ -144,7 +138,6 @@ export function buffList(buffNumber){
 					this.icon.visible = false;
 					this.isActive = false;
 					for ( var x = 0 ; x != this.game.activeButtonCharacter.length ; x++ ){
-            console.log(x+'|'+this.game.activeButtonCharacter.length);
 						this.game.activeButtonCharacter[x].data.values.timeEvent.timeScale += 0.5;
 					}
 					this.icon.x = this.x;
@@ -185,7 +178,6 @@ export function buffList(buffNumber){
 					this.icon.visible = true;
 					this.isActive = true;
 					for ( var x = 0 ; x != this.game.activeButtonCharacter.length ; x++ ){
-            console.log(x+'|'+this.game.activeButtonCharacter.length);
 						this.game.activeButtonCharacter[x].data.values.timeEvent.timeScale -= 0.2;
 					}
 					this.buffDuration = this.game.time.addEvent({
@@ -198,7 +190,6 @@ export function buffList(buffNumber){
 					this.isActive = false;
 					this.buffDuration.destroy();
 					for ( var x = 0 ; x != this.game.activeButtonCharacter.length ; x++ ){
-            console.log(x+'|'+this.game.activeButtonCharacter.length);
 						this.game.activeButtonCharacter[x].data.values.timeEvent.timeScale += 0.2;
 					}
 					this.icon.x = this.x;
@@ -348,13 +339,11 @@ export function buffList(buffNumber){
 					this.isActive = true;
 					if (this.button.data.values.position == 'left'){
 						for ( var x = 0 ; x != this.game.activeButtonLeft.length ; x++ ){
-            console.log(x+'|'+this.game.activeButtonLeft.length);
 							this.game.activeButtonLeft[x].data.values.timeEvent.timeScale -= 0.3;
 						}
 					}
 					else if (this.button.data.values.position == 'right'){
 						for ( var x = 0 ; x != this.game.activeButtonRight.length ; x++ ){
-            console.log(x+'|'+this.game.activeButtonRight.length);
 							this.game.activeButtonRight[x].data.values.timeEvent.timeScale -= 0.3;
 						}
 					}
@@ -369,13 +358,11 @@ export function buffList(buffNumber){
 					this.isActive = false;
 					if (this.button.data.values.position == 'left'){
 						for ( var x = 0 ; x != this.game.activeButtonLeft.length ; x++ ){
-            console.log(x+'|'+this.game.activeButtonLeft.length);
 							this.game.activeButtonLeft[x].data.values.timeEvent.timeScale += 0.3;
 						}
 					}
 					else if (this.button.data.values.position == 'right'){
 						for ( var x = 0 ; x != this.game.activeButtonRight.length ; x++ ){
-            console.log(x+'|'+this.game.activeButtonRight.length);
 							this.game.activeButtonRight[x].data.values.timeEvent.timeScale += 0.3;
 						}
 					}
@@ -419,7 +406,6 @@ export function buffList(buffNumber){
 					this.icon.visible = true;
 					this.isActive = true;
 					for ( var x = 0 ; x != this.game.activeButtonCharacter.length ; x++ ){
-            console.log(x+'|'+this.game.activeButtonCharacter.length);
 						this.game.activeButtonCharacter[x].data.values.timeEvent.timeScale -= 0.2;
 					}
 					this.buffDuration = this.game.time.addEvent({
@@ -432,7 +418,6 @@ export function buffList(buffNumber){
 					this.isActive = false;
 					this.buffDuration.destroy();
 					for ( var x = 0 ; x != this.game.activeButtonCharacter.length ; x++ ){
-            console.log(x+'|'+this.game.activeButtonCharacter.length);
 						this.game.activeButtonCharacter[x].data.values.timeEvent.timeScale += 0.2;
 					}
 					this.icon.x = this.x;

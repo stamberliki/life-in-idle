@@ -403,7 +403,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        event: game.expGain.name,
 							        buff: buff,
 							        unlocked: true,
-							        gain: 10000,
+							        gain: 1000,
 							        requiredExpToUnlock: 0,
 							        requiredMoneyToUnlock: 0,
 							        textDescription: '',
@@ -422,12 +422,12 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        event: game.expGain.name,
 							        buff: buff,
 							        unlocked: false,
-							        gain: 3,
-							        requiredExpToUnlock: 50,
+							        gain: 2,
+							        requiredExpToUnlock: 15,
 							        requiredMoneyToUnlock: 0,
 							        textDescription: 'REQUIRED:\nEXP: 50',
 							        timeEvent: game.time.addEvent({
-							            delay:5000, loop:true, callback: game.expGain,
+							            delay:3500, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true,
 							        })
 							    };
@@ -441,11 +441,11 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        buff: buff,
 							        unlocked: false,
 							        gain: 0,
-							        requiredExpToUnlock: 250,
+							        requiredExpToUnlock: 35,
 							        requiredMoneyToUnlock: 0,
 							        textDescription: 'REQUIRED:\nEXP: 250',
 							        timeEvent: game.time.addEvent({
-							            delay:5000, loop:true, callback: game.expGain,
+							            delay:3000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true,
 							        })
 							    };
@@ -458,13 +458,13 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        event: game.expGain.name,
 							        buff: buff,
 							        unlocked: false,
-							        gain: 5,
-							        requiredExpToUnlock: 550,
+							        gain: 3,
+							        requiredExpToUnlock: 75,
 							        requiredMoneyToUnlock: 0,
 							        requiredTurnsToUnlock: 0,
 							        textDescription: 'REQUIRED:\nEXP: 550',
 							        timeEvent: game.time.addEvent({
-							            delay: 7000, loop:true, callback: game.expGain,
+							            delay: 5000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true,
 							        })
 							    };
@@ -477,13 +477,13 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        event: game.expGain.name,
 							        buff: buff,
 							        unlocked: false,
-							        gain: 11,
-							        requiredExpToUnlock: 800,
+							        gain: 6,
+							        requiredExpToUnlock: 120,
 							        requiredMoneyToUnlock: 0,
 							        requiredTurnsToUnlock: 0,
 							        textDescription: 'REQUIRED:\nEXP: 800\nCRAWL: 1',
 							        timeEvent: game.time.addEvent({
-							            delay:13000, loop:true, callback: game.expGain,
+							            delay:8300, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true,
 							        })
 							    };
@@ -542,7 +542,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        buff: buff,
 							        unlocked: true,
 							        gain: 37,
-							        requiredExpToUnlock: 2000,
+							        requiredExpToUnlock: 0,
 							        requiredMoneyToUnlock: 0,
 							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
@@ -911,6 +911,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        textDescription: '',
 							        runOneWithLoop: true,
 							        cannotMidPause: true,
+							        recreation: new game.recreationManager(game),
 							        timeEvent: game.time.addEvent({
 							            delay:90000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true,
