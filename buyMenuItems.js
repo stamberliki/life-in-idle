@@ -128,28 +128,56 @@ export function buyMenuItems(game, list,data){
 	function getItemlist(index){
 		return list[index].data.values.itemList;
 	}
+    //BST
+	getItemlist(0).push(createItems(1, getItemlist(0)));
+	getItemlist(0).push(createItems(1, getItemlist(0)));
+	getItemlist(0).push(createItems(1, getItemlist(0)));
 
-	getItemlist(0).push(createItems(1,getItemlist(0)));
+	//CMP
+	getItemlist(1).push(createItems(2, getItemlist(1), 1));
 
-	getItemlist(1).push(createItems(2,getItemlist(1)));
+	//CRB
+	getItemlist(2).push(createItems(3, getItemlist(2)));
 
-	getItemlist(2).push(createItems(3,getItemlist(2),2));
+	//DSK
+	getItemlist(3).push(createItems(4, getItemlist(3)));
+	getItemlist(3).push(createItems(4, getItemlist(3)));
+	getItemlist(3).push(createItems(4, getItemlist(3)));
 
-	getItemlist(3).push(createItems(4,getItemlist(3),2));
+	//GTS
+	getItemlist(4).push(createItems(5, getItemlist(4), 4));
+	getItemlist(4).push(createItems(5, getItemlist(4), 4));
 
-	getItemlist(4).push(createItems(5,getItemlist(4)));
-	getItemlist(4).push(createItems(5,getItemlist(4)));
-	getItemlist(4).push(createItems(5,getItemlist(4)));
-	getItemlist(4).push(createItems(5,getItemlist(4)));
-	getItemlist(4).push(createItems(5,getItemlist(4)));
+	//MB
+	getItemlist(5).push(createItems(6, getItemlist(5)));
+	getItemlist(5).push(createItems(6, getItemlist(5)));
+	getItemlist(5).push(createItems(6, getItemlist(5)));
+	getItemlist(5).push(createItems(6, getItemlist(5)));
+	getItemlist(5).push(createItems(6, getItemlist(5)));
 
-	getItemlist(5).push(createItems(6,getItemlist(5),5));
-	getItemlist(5).push(createItems(6,getItemlist(5),5));
-	getItemlist(5).push(createItems(6,getItemlist(5),5));
+	//QSB
+	getItemlist(6).push(createItems(7, getItemlist(6)));
+	getItemlist(6).push(createItems(7, getItemlist(6)));
+	getItemlist(6).push(createItems(7, getItemlist(6)));
+	getItemlist(6).push(createItems(7, getItemlist(6)));
+	getItemlist(6).push(createItems(7, getItemlist(6)));
 
-	getItemlist(6).push(createItems(7,getItemlist(6),6));
-	getItemlist(6).push(createItems(7,getItemlist(6),6));
+	//ScSu
+	getItemlist(7).push(createItems(8, getItemlist(7), 7));
+	getItemlist(7).push(createItems(8, getItemlist(7), 7));
+	getItemlist(7).push(createItems(8, getItemlist(7), 7));
 
-	getItemlist(7).push(createItems(8,getItemlist(7),7));
+	//sBed
+	getItemlist(8).push(createItems(9, getItemlist(8)));
+	getItemlist(8).push(createItems(9, getItemlist(8)));
+	getItemlist(8).push(createItems(9, getItemlist(8)));
+	getItemlist(8).push(createItems(9, getItemlist(8)));
+	getItemlist(8).push(createItems(9, getItemlist(8)));
+	getItemlist(8).push(createItems(9, getItemlist(8)));
 
+	//toys
+	getItemlist(9).push(createItems(10, getItemlist(9)));
+	getItemlist(9).push(createItems(10, getItemlist(9)));
+	getItemlist(9).push(createItems(10, getItemlist(9)));
+	getItemlist(9).push(createItems(10, getItemlist(9)));
 }

@@ -11,6 +11,7 @@ export class popupEvent{
 		this.type;
 		this.requiredDelay;
 		this.selectedButtonText;
+		this.origin;
 		this.closeButton = this.game.add.image(746,32,'closeButton',0).setOrigin(0);
 		this.closeButton.setScale(2);
 	    this.closeButton.depth = 3;
@@ -139,6 +140,9 @@ export class popupEvent{
 				this.game.activeButtonCharacter[args[x].button-1].data.values.gain = args[x].gain;
 				this.game.activeButtonCharacter[args[x].button-1].data.values.timeEvent.args[0] = args[x].gain;
 				this.finish(buttonData);
+				if (this.origin){
+					this.origin.finish(buttonData);
+				}
 			},this);
 			this.buttons.push(button);
 		}
@@ -165,6 +169,7 @@ export class popupEvent{
 		for (let x = 0 ; x != this.buttons.length ; x++){
 			this.buttons[x].off('pointerup');
 			this.buttons[x].data.values.secondButtons = new popupEvent(this.game).createCategoriesEvent(args[x].text, args[x].args[0]);
+			this.buttons[x].data.values.secondButtons.origin = this;
 			this.buttons[x].on('pointerup', function(){
 				this.selectedButtonText = this.buttons[x].data.values.text.text;
 				this.buttons[x].data.values.secondButtons.selectedButtonText = this.selectedButtonText;
@@ -176,8 +181,17 @@ export class popupEvent{
 				if (event){
 					event.event(args[x].args[0].text, this.selectedButtonText);
 				}
+				this.game.moneyAmount.data.values.amount -= args[x].args[0].cost;
+				this.game.moneyAmount.setText(this.game.moneyAmount.data.values.amount);
+				this.game.activeButtonCharacter[args[x].args[0].button-1].data.values.gain = args[x].args[0].gain;
+				this.game.activeButtonCharacter[args[x].args[0].button-1].data.values.timeEvent.args[0] = args[x].args[0].gain;
+				this.finish(this.buttons[x].data.values.secondButtons.buttons[0].data.values);
+				if (this.origin){
+					this.origin.finish(this.buttons[x].data.values.secondButtons.buttons[0].data.values);
+				}
 			},this);
-			for ( let y = 1; y != args[x].args.length ; y++){
+
+			for ( let y = 1 ; y != args[x].args.length ; y++){
 				this.buttons[x].data.values.secondButtons.addButton(event, args[x].args[y]);
 			}
 		}
@@ -253,6 +267,10 @@ export class popupEvent{
 			this.game.activeButtonCharacter[buttons.button-1].data.values.gain = buttons.gain;
 			this.game.activeButtonCharacter[buttons.button-1].data.values.timeEvent.args[0] = buttons.gain;
 			this.finish(buttonData);
+			if (this.origin){
+				console.log(this.origin.finished);
+				this.origin.finish(buttonData);
+			}
 		},this);
 		this.buttons.push(button);
 
@@ -276,7 +294,7 @@ export class popupEvent{
 		this.text.y = this.buttons[0].y-26;
 	}
 
-	show (){
+	show(){
 		this.game.disableButtonsEvent(this.game);
 		this.closeButton.setVisible(true);
 		this.popup.setVisible(true);

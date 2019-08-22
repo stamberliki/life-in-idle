@@ -58,7 +58,7 @@ export function buffList(buffNumber){
 					this.y = positions.y;
 					this.name = 'Disgust';
 					this.icon = game.add.image(this.x, this.y, 'buffIcons', 0).setOrigin(0);
-					this.buffTextDescription = '';
+					this.buffTextDescription = 'Guess they see something...\nwet';
 					this.icon.visible = false;
 					this.icon.setScale(2);
 					this.icon.setInteractive();
@@ -106,7 +106,7 @@ export function buffList(buffNumber){
 					this.name = 'Irritated';
 					this.description = 'desc';
 					this.icon = game.add.image(this.x, this.y, 'buffIcons', 1).setOrigin(0);
-					this.buffTextDescription = 'aaaaaaaa';
+					this.buffTextDescription = 'They can\'t take the noise';
 					this.icon.visible = false;
 					this.icon.setScale(2);
 					this.icon.setInteractive();
@@ -522,8 +522,15 @@ export function buffList(buffNumber){
 							this.game.currentBuffRight[x].deactivate();
 						}
 					}
-
-					this.game.activeButtonCharacter[1].data.values.timeEvent.timeScale += .1;
+					this.game.speedMultiplier += .1;
+					if (this.game.currentStage == 4){
+						for (let x = 0 ; x != this.game.activeButtonCharacter.length ; x++){
+							this.game.activeButtonCharacter[x].data.values.timeEvent.timeScale = this.game.speedMultiplier;
+						}
+					}
+					else if (this.game.currentStage == 5){
+						this.game.activeButtonCharacter[1].data.values.timeEvent.timeScale = this.game.speedMultiplier;
+					}
 
 					this.buffDuration = this.game.time.addEvent({
 			            delay:10000, callback: this.deactivate, callbackScope: this,
@@ -534,7 +541,16 @@ export function buffList(buffNumber){
 				}
 
 				deactivate(){
-					this.game.activeButtonCharacter[1].data.values.timeEvent.timeScale -= .1;
+					this.game.speedMultiplier -= .1;
+					if (this.game.currentStage == 4){
+						for (let x = 0 ; x != this.game.activeButtonCharacter.length ; x++){
+							this.game.activeButtonCharacter[x].data.values.timeEvent.timeScale = this.game.speedMultiplier;
+						}
+					}
+					else if (this.game.currentStage == 5){
+						this.game.activeButtonCharacter[1].data.values.timeEvent.timeScale = this.game.speedMultiplier;
+					}
+
 					this.icon.visible = false;
 					this.isActive = false;
 					this.icon.x = this.x;

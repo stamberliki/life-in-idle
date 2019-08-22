@@ -110,7 +110,7 @@ export class ascend{
 				this.game.tier = this.game.tier+1 || 0;
 			}
 			else{
-				this.game.achievement.unlock(5);
+				this.game.achievements.unlock(5);
 			}
 			if (this.totalPoints*2.2 > this.requiredPoints){
 				if (this.game.tier < 5){
@@ -127,12 +127,12 @@ export class ascend{
 				this.game.tier = this.game.tier-1 || 0;
 			}
 			else{
-				this.game.achievement.unlock(4);
+				this.game.achievements.unlock(4);
 			}
 			if (this.totalPoints/2 < this.requiredPoints){
 				if (this.game.tier > 1){
 					this.game.tier = this.game.tier-1;
-					this.game.achievement.unlock(0);
+					this.game.achievements.unlock(0);
 				}
 			}
 			this.game.cutscene.setTextIndexQueue([1]);
@@ -154,5 +154,6 @@ export class ascend{
 		this.buttonData.work.generateJob(this.game);
         this.buttonData.work.acceptJob();
         this.game.applySpeedMultiplier(this.game);
+        this.game.statistics.updateAll();
 	}
 }

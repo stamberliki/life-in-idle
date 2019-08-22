@@ -34,10 +34,13 @@ export function activeButton(game,buttonArray,position,data){
     buttonData.buttonNumber = size;
     buttonData.position = position;
     buttonData.description = game.add.bitmapText(x,y-6,'mainFont', data.description).setOrigin(0.5);
+    if (buttonData.description.width > 160){
+        buttonData.description.setFontSize(8).setOrigin(0.5);
+    }
     buttonData.descriptionPopup = new function(){
     	this.popupBG = game.add.nineslice(0,0,16,16,'descriptionPopup',4);
     	this.isPointed = false;
-    	this.popupText = game.add.bitmapText(x+18,y+44,'mainFont2','0000000000\n000000000000');
+    	this.popupText = game.add.bitmapText(x+18,y+44,'mainFont2',buttonData.textDescription);
     	this.popupBG.setScale(2);
         this.popupBG.resize((this.popupText.getTextBounds().local.width/2)+8,(this.popupText.getTextBounds().local.height/2)+8);
     	

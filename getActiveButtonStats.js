@@ -199,6 +199,50 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        }),
 							        work: new game.workManager(game),
 							    };
+						case 2:
+							buff.push(buffs(0));
+							buff[0] = new buff[0](game,{x:0, y: 0});
+							return {
+									default: getDefault(),
+							        description: 'Retired',
+							        event: game.gainMoney.name,
+							        buff: buff,
+							        unlocked: true,
+							        gain: 0,
+							        requiredExpToUnlock: 0,
+							        requiredMoneyToUnlock: 0,
+							        requiredTurnsToUnlock: 0,
+							        textDescription: '',
+							        popupEvent: popupEvent.createTwoChoiceEvent('Your father will retire and gain\n'+
+							        	(game.activeButtonLeft[0].data.values.cycleCount/100)*(game.activeButtonLeft[0].data.values.gain*.25)+
+							        	' cash per cycle.\nIt will never receive or generate buff \nor debuffs and it will run permamently',{
+								        	text: 'Yes',
+								        	event: function(){
+								        		let buttonData = game.activeButtonLeft[0].data.values;
+								        		buttonData.gain = (buttonData.cycleCount/100)*(buttonData.gain*.25);
+								        		buttonData.timeEvent.args[0] = buttonData.gain;
+								        		buttonData.timeEvent.paused = false;
+								        		buttonData.default.pause = false;
+								        		buttonData.default.pausedMidway = false;
+								        		buttonData.buffImmune = true;
+								        		buttonData.buff[0].chance = 0;
+								        		buttonData.retired = true;
+								        		game.activeButtonLeft[0].disableInteractive();
+								        		game.activeButtonLeft[1].disableInteractive();
+								        		game.activeButtonLeft[1].data.values.retired = true;
+								        		game.activeButtonLeft[0].setFrame(3);
+								        		console.log(buttonData);
+								        	}
+								        },{
+								        	text: 'No',
+								        	event: function(){
+								        	}
+								        }),
+							        timeEvent: game.time.addEvent({
+							            delay:1000, loop:false, callback: game.expGain,
+							            callbackScope: game, paused: true,
+							        })
+							    };
 					}
 			}
 
@@ -387,6 +431,49 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        }),
 							        work: new game.workManager(game),
 							    };
+					    case 2:
+							buff.push(buffs(0));
+							buff[0] = new buff[0](game,{x:0, y: 0});
+							return {
+									default: getDefault(),
+							        description: 'Retired',
+							        event: game.gainMoney.name,
+							        buff: buff,
+							        unlocked: true,
+							        gain: 0,
+							        requiredExpToUnlock: 0,
+							        requiredMoneyToUnlock: 0,
+							        requiredTurnsToUnlock: 0,
+							        textDescription: '',
+							        popupEvent: popupEvent.createTwoChoiceEvent('Your mother will retire and gain\n'+
+							        	(game.activeButtonRight[0].data.values.cycleCount/100)*(game.activeButtonRight[0].data.values.gain*.25)+
+							        	' cash per cycle.\nIt will never receive or generate buff or debuffs and it will run permamently',{
+								        	text: 'Yes',
+								        	event: function(){
+								        		let buttonData = game.activeButtonRight[0].data.values;
+								        		buttonData.gain = (buttonData.cycleCount/100)*(buttonData.gain*.25);
+								        		buttonData.timeEvent.args[0] = buttonData.gain;
+								        		buttonData.timeEvent.paused = false;
+								        		buttonData.default.pause = false;
+								        		buttonData.default.pausedMidway = false;
+								        		buttonData.buffImmune = true;
+								        		buttonData.buff[0].chance = 0;
+								        		buttonData.retired = true;
+								        		game.activeButtonRight[0].disableInteractive();
+								        		game.activeButtonRight[1].disableInteractive();
+								        		game.activeButtonRight[1].data.values.retired = true;
+								        		game.activeButtonRight[0].setFrame(3);
+								        	}
+								        },{
+								        	text: 'No',
+								        	event: function(){
+								        	}
+								        }),
+							        timeEvent: game.time.addEvent({
+							            delay:1000, loop:false, callback: game.expGain,
+							            callbackScope: game, paused: true,
+							        })
+							    };
 					}
 			}
 
@@ -409,7 +496,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        textDescription: '',
 							        holdEvent: true,
 							        timeEvent: game.time.addEvent({
-							            delay:2000, loop:true, callback: game.expGain,
+							            delay:1000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true,
 							        })
 							    };
@@ -422,12 +509,12 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        event: game.expGain.name,
 							        buff: buff,
 							        unlocked: false,
-							        gain: 2,
-							        requiredExpToUnlock: 15,
+							        gain: 3,
+							        requiredExpToUnlock: 20,
 							        requiredMoneyToUnlock: 0,
 							        textDescription: 'REQUIRED:\nEXP: 50',
 							        timeEvent: game.time.addEvent({
-							            delay:3500, loop:true, callback: game.expGain,
+							            delay:2000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true,
 							        })
 							    };
@@ -441,7 +528,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        buff: buff,
 							        unlocked: false,
 							        gain: 0,
-							        requiredExpToUnlock: 35,
+							        requiredExpToUnlock: 55,
 							        requiredMoneyToUnlock: 0,
 							        textDescription: 'REQUIRED:\nEXP: 250',
 							        timeEvent: game.time.addEvent({
@@ -458,8 +545,8 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        event: game.expGain.name,
 							        buff: buff,
 							        unlocked: false,
-							        gain: 3,
-							        requiredExpToUnlock: 75,
+							        gain: 8,
+							        requiredExpToUnlock: 80,
 							        requiredMoneyToUnlock: 0,
 							        requiredTurnsToUnlock: 0,
 							        textDescription: 'REQUIRED:\nEXP: 550',
@@ -477,13 +564,13 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        event: game.expGain.name,
 							        buff: buff,
 							        unlocked: false,
-							        gain: 6,
+							        gain: 10,
 							        requiredExpToUnlock: 120,
 							        requiredMoneyToUnlock: 0,
 							        requiredTurnsToUnlock: 0,
 							        textDescription: 'REQUIRED:\nEXP: 800\nCRAWL: 1',
 							        timeEvent: game.time.addEvent({
-							            delay:8300, loop:true, callback: game.expGain,
+							            delay:6000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true,
 							        })
 							    };
@@ -496,13 +583,13 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        event: game.expGain.name,
 							        buff: buff,
 							        unlocked: false,
-							        gain: 18,
+							        gain: 14,
 							        requiredExpToUnlock: -1,
 							        requiredMoneyToUnlock: 0,
 							        requiredTurnsToUnlock: 0,
 							        textDescription: 'REQUIRED:\nSTAND: 2',
 							        timeEvent: game.time.addEvent({
-							            delay:20000, loop:true, callback: game.expGain,
+							            delay:8000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true,
 							        })
 							    };
@@ -528,7 +615,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        itemRequired: true,
 							        itemEquipIndex: 4,
 							        timeEvent: game.time.addEvent({
-							            delay:60000, loop:true, callback: game.expGain,
+							            delay:15000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true,
 							        })
 							    };
@@ -547,7 +634,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
 							        timeEvent: game.time.addEvent({
-							            delay:35000, loop:true, callback: game.expGain,
+							            delay:8000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true,
 							        })
 							    };
@@ -566,7 +653,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
 							        timeEvent: game.time.addEvent({
-							            delay:50000, loop:true, callback: game.expGain,
+							            delay:9000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true,
 							        })
 							    };
@@ -590,9 +677,9 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
 							        itemRequired: true,
-							        itemEquipIndex: 4,
+							        itemEquipIndex: 9,
 							        timeEvent: game.time.addEvent({
-							            delay:60000, loop:true, callback: game.expGain,
+							            delay:15000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true,
 							        })
 							    };
@@ -611,7 +698,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
 							        itemRequired: false,
-							        itemEquipIndex: 5,
+							        itemEquipIndex: 7,
 							        ignoreSingleButtonOnly: true,
 							        popupEvent: popupEvent.createCategoriesEvent('1',
 							        	{text:"Cheap Daycare" , cost: '1', gain: 1,button: buttonNo},
@@ -622,7 +709,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 						                {text:"World-Class Daycare" , cost: '6', gain: 1,button: buttonNo},
 						            ),
 							        timeEvent: game.time.addEvent({
-							            delay:300000, loop:false, callback: game.expGain,
+							            delay:10000, loop:false, callback: game.expGain,
 							            callbackScope: game, paused: true,
 							        })
 							    };
@@ -641,9 +728,9 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
 							        itemRequired: true,
-							        itemEquipIndex: 5,
+							        itemEquipIndex: 7,
 							        timeEvent: game.time.addEvent({
-							            delay:60000, loop:true, callback: game.expGain,
+							            delay:15000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true,
 							        })
 							    };
@@ -667,9 +754,9 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
 							        itemRequired: true,
-							        itemEquipIndex: 4,
+							        itemEquipIndex: 9,
 							        timeEvent: game.time.addEvent({
-							            delay:60000, loop:true, callback: game.expGain,
+							            delay:15000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true,
 							        })
 							    };
@@ -688,7 +775,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
 							        itemRequired: false,
-							        itemEquipIndex: 5,
+							        itemEquipIndex: 7,
 							        ignoreSingleButtonOnly: true,
 							        popupEvent: popupEvent.createCategoriesEvent('1',
 							        	{text:"Cheap School" , cost: 1, gain: 1, button: buttonNo},
@@ -699,7 +786,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 						                {text:"World-Class School" , cost: 1, gain: 1, button: buttonNo},
 						            ),
 							        timeEvent: game.time.addEvent({
-							            delay:600000, loop:false, callback: game.expGain,
+							            delay:1000, loop:false, callback: game.expGain,
 							            callbackScope: game, paused: true,
 							        })
 							    };
@@ -718,9 +805,9 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
 							        itemRequired: true,
-							        itemEquipIndex: 5,
+							        itemEquipIndex: 7,
 							        timeEvent: game.time.addEvent({
-							            delay:60000, loop:true, callback: game.expGain,
+							            delay:15000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true,
 							        })
 							    };
@@ -766,9 +853,9 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
 							        itemRequired: true,
-							        itemEquipIndex: 4,
+							        itemEquipIndex: 7,
 							        timeEvent: game.time.addEvent({
-							            delay:90000, loop:true, callback: game.expGain,
+							            delay:15000, loop:true, callback: game.expGain,
 							            callbackScope: game, paused: true,
 							        })
 							    };
@@ -805,10 +892,11 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        gain: 0,
 							        requiredExpToUnlock: 0,
 							        requiredMoneyToUnlock: 0,
-							        requiredTurnsToUnlock: 0,
+							        requiredTurnsToUnlock: 1,
 							        textDescription: '',
 							        itemRequired: false,
 							        itemEquipIndex: 4,
+							        ignoreSingleButtonOnly: true,
 							        popupEvent: popupEvent.createCategoriesEvent('1',
 							        	{text:"Cheap School" , cost: 1, gain: 1, button: buttonNo},
 						                {text:"Normal School" , cost: 1, gain: 1, button: buttonNo},
@@ -818,7 +906,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 						                {text:"World-Class School" , cost: 1, gain: 1, button: buttonNo},
 						            ),
 							        timeEvent: game.time.addEvent({
-							            delay:90000, loop:true, callback: game.expGain,
+							            delay:1000, loop:false, callback: game.expGain,
 							            callbackScope: game, paused: true,
 							        })
 							    };
@@ -827,7 +915,6 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							buff[0] = new buff[0](game,{x:48, y: 209});
 							let modifyPopupEvent = popupEvent.createCategoriesEvent('1',
 					        	{text:"Cheap School" , cost: 1, gain: 1, button: buttonNo},
-				                {text:"Normal School" , cost: 1, gain: 1, button: buttonNo},
 				                {text:"Public School" , cost: 1, gain: 1, button: buttonNo},
 				                {text:"Private School" , cost: 1, gain: 1, button: buttonNo},
 				                {text:"Top-Class School" , cost: 1, gain: 1, button: buttonNo},
@@ -835,6 +922,7 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 				            );
 				            modifyPopupEvent.nestedCategoriesEvent({
 				            		event: function (degree, schoolFinished) {
+				            			console.log('pass');
 				            			game.degree = degree;
 				            			game.schoolFinished = schoolFinished;
 				            		}
@@ -846,8 +934,6 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 				            	{text: 'a', args: [
 					            	{text:"Education" , cost: 1, gain: 1, button: buttonNo},
 					            	{text:"Medical" , cost: 1, gain: 1, button: buttonNo},
-					            ]},
-				            	{text: 'a', args: [
 					            	{text:"Computer Science" , cost: 1, gain: 1, button: buttonNo},
 					            ]},
 				            	{text: 'a', args: [
@@ -883,10 +969,10 @@ export function getActiveButtonStats(game,location,stageNo,buttonNo,buffs){
 							        requiredTurnsToUnlock: 0,
 							        textDescription: '',
 							        itemRequired: false,
-							        itemEquipIndex: 4,
+							        itemEquipIndex: 7,
 							        popupEvent: modifyPopupEvent,
 							        timeEvent: game.time.addEvent({
-							            delay:90000, loop:true, callback: game.expGain,
+							            delay:10000, loop:false, callback: game.expGain,
 							            callbackScope: game, paused: true,
 							        })
 							    };

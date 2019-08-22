@@ -110,7 +110,7 @@ export class achievements{
 		this.achievementsList[index].setTint(0xffffff);
 		this.game.speedMultiplier += 0.1;
 		this.achievementsList[index].data.values.descriptionPopup.popupText.text = this.textDescription[index];
-    	this.achievementsList[x].data.values.descriptionPopup.resize();
+    	this.achievementsList[index].data.values.descriptionPopup.resize();
 	}
 
 	createAchievementList(){

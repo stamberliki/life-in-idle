@@ -72,15 +72,18 @@ export class workData{
         this.previousTimeEvent;
         this.workTier;
         this.points = 0;
+        this.rejectedJobs = [];
 
         this.jobSelection = new game.popupEvent(game).createTwoChoiceEvent('',{
         	text: 'Yes',
         	event: function(){
         		_this.acceptJob();
+        		_this.game.statistics.updateWork();
         	}
         },{
         	text: 'No',
         	event: function(){
+        		_this.rejectedJobs.push(_this.acceptedWorkName);
         	}
         }).setRequiredDelay(true);
 
@@ -97,7 +100,9 @@ export class workData{
         		buttonData.timeEvent.args[0] = [0];
         		_this.jobSelection.finished = false;
         		buttonData.runOneWithLoop = true;
-				this.points = 0;
+				_this.points = 0;
+				_this.acceptedWorkName = '';
+				_this.acceptedWorkGain = '';
         		if (buttonData.position == 'left'){
         			_this.game.buttonLeftSelected = false;
         		}
@@ -107,6 +112,7 @@ export class workData{
         		else if (buttonData.position == 'character'){
         			_this.game.buttonCharacterSelected = false;
         		}
+        		_this.game.statistics.updateWork();
         	}
         },{
         	text: 'No',
@@ -164,11 +170,31 @@ export class workData{
         }
         if (game.degree){
             let list = this.workData[this.workTier].nonDegree;
-            list = list.concat(this.workData[this.workTier].degree[game.degree]);
+            if (this.game.schoolFinished){
+            	if (this.game.schoolFinished == 'Cheap School'){
+            		list.concat(this.workData['veryLow'].degree[this.game.degree]);
+            	}
+            	else if (this.game.schoolFinished == 'Public School'){
+            		list.concat(this.workData['low'].degree[this.game.degree]);
+            	}
+            	else if (this.game.schoolFinished == 'Private School'){
+            		list.concat(this.workData['average'].degree[this.game.degree]);
+            	}
+            	else if (this.game.schoolFinished == 'Top-Class School'){
+            		list.concat(this.workData['high'].degree[this.game.degree]);
+            	}
+            	else if (this.game.schoolFinished == 'World-Class School'){
+            		list.concat(this.workData['veryHigh'].degree[this.game.degree]);
+            	}
+            }
+            list = list.filter(function(x){return x;});
+            console.log(list);
             this.acceptedWorkName = Phaser.Math.RND.pick(list);
             this.acceptedWorkGain = Phaser.Math.Between(this.workData[this.workTier].minGain, this.workData[this.workTier].maxGain);
-            if (!this.workData[this.workTier].degree[game.degree].includes(this.acceptedWorkName)){
-                this.acceptedWorkGain /= 2;
+            if (this.workData[this.workTier].degree[game.degree]){
+	            if (!this.workData[this.workTier].degree[game.degree].includes(this.acceptedWorkName)){
+	                this.acceptedWorkGain /= 2;
+	            }
             }
             this.points = this.workData[this.workTier].degreePoint;
         }
@@ -184,7 +210,6 @@ export class workData{
         for (let x in this.workData[this.workTier].degree){
         	list = list.concat(this.workData[this.workTier].degree[x]);
         }
-        console.log(list);
         this.acceptedWorkName = Phaser.Math.RND.pick(list);
         if (isMaxGain){
         	this.acceptedWorkGain = this.workData[this.workTier].maxGain;

@@ -45,6 +45,44 @@ export function buyMenuItemsData(game,itemNumber,x,y){
 			return getObject('0000000000\n000000000000',500,0,3,1,1,itemNumber);
 		case 13:
 			return getObject('0000000000\n000000000000',250,0,3,1,1,itemNumber);
+		case 14:
+			return getObject('0000000000\n000000000000',250,0,3,1,1,itemNumber);
+		case 15:
+			return getObject('0000000000\n000000000000',250,0,3,1,1,itemNumber);
+		case 16:
+			return getObject('0000000000\n000000000000',250,0,3,1,1,itemNumber);
+		case 17:
+			return getObject('0000000000\n000000000000',250,0,3,1,1,itemNumber);
+		case 18:
+			return getObject('0000000000\n000000000000',250,0,3,1,1,itemNumber);
+		case 19:
+			return getObject('0000000000\n000000000000',250,0,3,1,1,itemNumber);
+		case 20:
+			return getObject('0000000000\n000000000000',250,0,3,1,1,itemNumber);
+		case 21:
+			return getObject('0000000000\n000000000000',250,0,3,1,1,itemNumber);
+		case 22:
+			return getObject('0000000000\n000000000000',250,0,3,1,1,itemNumber);
+		case 23:
+			return getObject('0000000000\n000000000000',250,0,3,1,1,itemNumber);
+		case 24:
+			return getObject('0000000000\n000000000000',250,0,3,1,1,itemNumber);
+		case 25:
+			return getObject('0000000000\n000000000000',250,0,3,1,1,itemNumber);
+		case 26:
+			return getObject('0000000000\n000000000000',250,0,3,1,1,itemNumber);
+		case 27:
+			return getObject('0000000000\n000000000000',250,0,3,1,1,itemNumber);
+		case 28:
+			return getObject('0000000000\n000000000000',250,0,3,1,1,itemNumber);
+		case 29:
+			return getObject('0000000000\n000000000000',250,0,3,1,1,itemNumber);
+		case 30:
+			return getObject('0000000000\n000000000000',250,0,3,1,1,itemNumber);
+		case 31:
+			return getObject('0000000000\n000000000000',250,0,3,1,1,itemNumber);
+		case 32:
+			return getObject('0000000000\n000000000000',250,0,3,1,1,itemNumber);
 	}
 
 }
