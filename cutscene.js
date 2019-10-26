@@ -6,13 +6,62 @@ export class cutscene{
 		this.finish = true;
 	    this.skip = false;
 	    this.play = true;
+	    this.textList;
 
-	    this.textList = [
-		    'abcde f g h\nijk l m n',
-		    'you fail',
-		    'you succed',
-		    'stay the same',
-		    ];
+	    this.textListTrial = [
+			'Ah, Welcome back!',//0
+			'How is the simulation going?',//1
+			'Let me see what you have done so far',//2
+			'...',//3
+			'Congratulations you pass the simulation',//4
+			'Not only you pass, but also you get the highest points',//5
+			'But also you fail to promote you to a higher class',//6
+			'The person you simulated live in a stagnant life, but its \nbetter than nothing',//7
+			'The person you simulated have the best day of its entire life',//8
+			'The person you simulated is the new Elon of this generation',//9
+			'You are now promoted to a higher class',//10
+			'Sorry but you fail the simulation',//11
+			'You just not fail, but also you score the lowest',//12
+			'You are now demoted to lower class',//13
+			'You still retain your class',//14
+			'Poor human, it struggles about its life now. May it find \ntranquillity from the rest of its life',//15
+			'Are  you ready for you simulation?',//16
+			'You are now simulating a family of very-low class',//17
+			'You are now simulating a family of low class',//18
+			'You are now simulating a family of middle class',//19
+			'You are now simulating a family of high class',//20
+			'You are now simulating a family of very-high class',//21
+			'Good luck to your simulation and see you soon.',//22
+		];
+		this.textListFirstTime = [
+			'Ah, Welcome back!',
+			'I\'m A\'el, one of the guardians of this realm.',
+			'What do you mean you don\'t know me or this place?',
+			'Hmmm, seems you suffered memory loss from your last\nsimulation.',
+			'I\'m going to tell you the basics.',
+			'Ok...',
+			'You are controlling the faith of the person from the baby \nup to the adult stage with the help of the parents.',
+			'Use your simulation powers(buttons) to control them. But \nfor every action, there are either good or bad \nconsequences.',
+			'Gain experience from your powers to unlock more powers \nand level up to new stages.',
+			'There are powers that requires an item, or an item that \nenchance the powers.',
+			'You can select one power at a time. But you can select the \nschool and any powers at the same time.',
+			'From baby to toddler, it is require to use the \'Care\' power \nto use the main character\'s power',
+			'Gain money by working from the parent or from the person \nyou simulated in further stages',
+			'Buy items to magically gain more either money or \nexperience, or speed multiplier.',
+			'You can quit your job by holding it, and select a new one by \nrunning it again.',
+			'The jobs available depends on the class and the degree.',
+			'And in the adult stage, you have the option to face the trial \naccording to what you do in the simulation.',
+			'If you do good, you will be promoted to the higher class, \nif you do ok, you will retain to your previous class, if you do \nbad, you will be demoted to the lower class.',
+			'The criteria are confidential so we will not tell you about \nthat.',
+			'You will get a gift of the achiever when you finish a certain \nquest.',
+			'Any Question?',
+			'No, there are no breaks("offline progress") We dont want \nthis people doing nothing in the middle of something.',
+			'There will be some tooltip for the buffs/debuffs, how to \nunlock more powers, how to move to the next stage, and how \nto gain achevements',
+			'Are  you ready for you simulation?',
+			'You are now simulating a family of very-low class.',
+			'Good luck to your simulation and see you soon.',
+		];
+		
 	    this.textQueue = '';
 	    this.textIndex = 0;
 	    this.currentTextIndexQueue = this.currentTextIndexQueue + 1 || 0;
@@ -20,7 +69,7 @@ export class cutscene{
 	    this.text = this.game.add.bitmapText(48,455,'mainFont','').setOrigin(0).setVisible(false);
 	    this.text.depth = 3;
 	    this.textTimeEvent = this.game.time.addEvent({
-	        delay:100, loop:true, callback: this.setText,
+	        delay:10, loop:true, callback: this.setText,
 	        callbackScope: this, paused: true,
 	    });
 
@@ -143,6 +192,14 @@ export class cutscene{
 
 	setTextIndexQueue(textIndexQueue){
 		this.textIndexQueue = textIndexQueue;
+	}
+
+	getTextListFirstTimeQueueList(){
+		this.textListQueue = [];
+		for (let x = 0 ; x != this.textListFirstTime.length ; x++){
+			this.textListQueue.push(x);
+		}
+		return this.textListQueue;
 	}
 
 }

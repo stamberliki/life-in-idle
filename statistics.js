@@ -109,7 +109,7 @@ export class statistics{
 	updateCharacterWork(){
 		if (this.game.currentStage == 4 && this.game.activeButtonCharacter[2]){
 			if (this.game.activeButtonCharacter[2].data.values.work.acceptedWorkName){
-				this.workText.text = 'Work: '+this.game.activeButtonCharacter[2].data.values.work.acceptedWorkName;
+				this.workText.text = 'Work: '+this.game.activeButtonCharacter[2].data.values.work.acceptedWorkName.split('\n').join(' ');
 			}
 			else {
 				this.workText.text = 'Work: None';
@@ -117,7 +117,7 @@ export class statistics{
 		}
 		else if (this.game.currentStage == 5 && this.game.activeButtonCharacter[1]){
 			if (this.game.activeButtonCharacter[1].data.values.work.acceptedWorkName){
-				this.workText.text = 'Work: '+this.game.activeButtonCharacter[1].data.values.work.acceptedWorkName;
+				this.workText.text = 'Work: '+this.game.activeButtonCharacter[1].data.values.work.acceptedWorkName.split('\n').join(' ');
 			}
 			else {
 				this.workText.text = 'Work: None';
@@ -132,6 +132,9 @@ export class statistics{
 		if (this.game.degree){
 			this.degreeText.text = 'Degree: '+this.game.degree;
 		}
+		else{
+			this.degreeText.text = 'Degree: None';
+		}
 	}
 
 	updateWork(){
@@ -141,7 +144,7 @@ export class statistics{
 	}
 
 	updateMultipliers(){
-		this.speedMultiplierText.text = 'Speed Multiplier: '+this.game.speedMultiplier;
+		this.speedMultiplierText.text = 'Speed Multiplier: '+(((this.game.speedMultiplier/100))+1);
 		// this.moneyMultiplierText.text = 'Money Multiplier: '+this.game.moneyMultiplier;
 		// this.expMultiplierText.text = 'Experience Multiplier: '+this.game.expMultiplier;
 	}

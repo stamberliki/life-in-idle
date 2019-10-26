@@ -281,7 +281,7 @@ export class recreation{
 			this.buttonData.default.pause = false;
 			this.previousTimeEvent = this.buttonData.timeEvent;
 			this.timeEvent = this.game.time.addEvent({
-	            delay:1000, loop:true, callback: this.game.expGain,
+	            delay:60000, loop:true, callback: this.game.expGain,
 	            callbackScope: this.game, paused: false, args: [0, this.button],
 			});
 			this.buttonData.timeEvent = this.timeEvent;

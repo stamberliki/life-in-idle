@@ -6,8 +6,8 @@ export class workData{
 		this.game = game;
 		this.workData = {
 			veryLow: {
-				minGain: 15,
-				maxGain: 20,
+				minGain: 5,
+				maxGain: 10,
 				nonDegreePoint: 1,
 				degreePoint: 2, 
 				nonDegree:['Service Crew','Cashier','Dishwasher'],
@@ -17,29 +17,29 @@ export class workData{
 				}
 			},
 			low: {
-				minGain: 40,
-				maxGain: 60,
+				minGain: 20,
+				maxGain: 40,
 				nonDegreePoint: 2,
 				degreePoint: 4, 
 				nonDegree:['Delivery Driver'],
 				degree:{
 					'Medical School': ['Nurse'],
-					'Education': ['Primary Education Teacher'],
+					'Education': ['Primary Education\nTeacher'],
 				}
 			},
 			average: {
-				minGain: 100,
-				maxGain: 130,
+				minGain: 45,
+				maxGain: 160,
 				nonDegreePoint: 4,
 				degreePoint: 8, 
-				nonDegree: ['Customer Service'],
+				nonDegree: ['Customer\nService'],
 				degree:{
 					'Computer Science': ['Data Analyst', 'Graphic Artist']
 				}
 			},
 			high: {
-				minGain: 150,
-				maxGain: 175,
+				minGain: 140,
+				maxGain: 640,
 				nonDegreePoint: 16,
 				degreePoint: 32, 
 				nonDegree: [''],
@@ -50,8 +50,8 @@ export class workData{
 				}
 			},
 			veryHigh: {
-				minGain: 200,
-				maxGain: 250,
+				minGain: 415,
+				maxGain: 2560,
 				nonDegreePoint: 64,
 				degreePoint: 128, 
 				nonDegree:[''],
@@ -66,13 +66,28 @@ export class workData{
 		this.acceptedWorkName;
 		this.acceptedWorkGain;
         this.timeEvent = game.time.addEvent({
-            delay:1000, loop:true, callback: game.gainMoney,
+            delay:5000, loop:true, callback: game.gainMoney,
             callbackScope: game, paused: true,
         });
         this.previousTimeEvent;
         this.workTier;
         this.points = 0;
         this.rejectedJobs = [];
+        this.list;
+        this.workList = [];
+        this.degree;
+        this.degreeTier;
+        this.schoolFinished;
+		this.degreeList = ['Law School', 'Education', 'Medical School', 'Computer Science', 'Engineering', 'Avionics',];
+		this.schoolList = ['Normal','Public','Private','Top-Class','World-Class'];
+
+        for (var x in this.workData){
+        	this.workList = this.workList.concat(this.workData[x].nonDegree);
+        	for (var y in this.workData[x].degree){
+        		this.workList = this.workList.concat(this.workData[x].degree[y]);
+        	}
+        }
+        this.workList = this.workList.filter(function(x){return x;});
 
         this.jobSelection = new game.popupEvent(game).createTwoChoiceEvent('',{
         	text: 'Yes',
@@ -144,7 +159,7 @@ export class workData{
         if (!this.jobSelection.finished){
         	this.generateJob(game);
 
-            this.jobSelection.text.setText('You applying as a\n'+this.acceptedWorkName+'\nfor '+this.acceptedWorkGain+' per cycle\nDo you want to apply?');
+            this.jobSelection.text.setText('You applying as a\n'+this.acceptedWorkName.split('\n').join(' ')+'\nfor '+this.acceptedWorkGain+' per cycle\nDo you want to apply?');
             this.jobSelection.popup.resize(Math.max((this.jobSelection.text.getTextBounds().local.width/2)+400,496),
                 (this.jobSelection.text.getTextBounds().local.height/2)+322);
             this.jobSelection.popup.setOrigin(0.5).setScale(2);
@@ -168,33 +183,38 @@ export class workData{
         else if (game.tier == 5){
             this.workTier = Phaser.Math.RND.pick(['veryLow','low','average','high','veryHigh']);
         }
-        if (game.degree){
-            let list = this.workData[this.workTier].nonDegree;
-            if (this.game.schoolFinished){
-            	if (this.game.schoolFinished == 'Cheap School'){
-            		list.concat(this.workData['veryLow'].degree[this.game.degree]);
+        if (this.degree){
+           	this.list = this.workData[this.workTier].nonDegree;
+            if (this.schoolFinished){
+            	if (this.schoolFinished == 'Normal School'){
+            		this.list = this.list.concat(this.workData['veryLow'].degree[this.degree]);
+                    this.degreeTier = 'veryLow';
             	}
-            	else if (this.game.schoolFinished == 'Public School'){
-            		list.concat(this.workData['low'].degree[this.game.degree]);
+            	else if (this.schoolFinished == 'Public School'){
+            		this.list = this.list.concat(this.workData['low'].degree[this.degree]);
+                    this.degreeTier = 'low';
             	}
-            	else if (this.game.schoolFinished == 'Private School'){
-            		list.concat(this.workData['average'].degree[this.game.degree]);
+            	else if (this.schoolFinished == 'Private School'){
+            		this.list = this.list.concat(this.workData['average'].degree[this.degree]);
+                    this.degreeTier = 'average';
             	}
-            	else if (this.game.schoolFinished == 'Top-Class School'){
-            		list.concat(this.workData['high'].degree[this.game.degree]);
+            	else if (this.schoolFinished == 'Top-Class School'){
+            		this.list = this.list.concat(this.workData['high'].degree[this.degree]);
+                    this.degreeTier = 'high';
             	}
-            	else if (this.game.schoolFinished == 'World-Class School'){
-            		list.concat(this.workData['veryHigh'].degree[this.game.degree]);
+            	else if (this.schoolFinished == 'World-Class School'){
+            		this.list = this.list.concat(this.workData['veryHigh'].degree[this.degree]);
+                    this.degreeTier = 'veryHigh';
             	}
             }
-            list = list.filter(function(x){return x;});
-            console.log(list);
-            this.acceptedWorkName = Phaser.Math.RND.pick(list);
+            this.list = this.list.filter(function(x){return x;});
+            this.acceptedWorkName = Phaser.Math.RND.pick(this.list);
             this.acceptedWorkGain = Phaser.Math.Between(this.workData[this.workTier].minGain, this.workData[this.workTier].maxGain);
-            if (this.workData[this.workTier].degree[game.degree]){
-	            if (!this.workData[this.workTier].degree[game.degree].includes(this.acceptedWorkName)){
-	                this.acceptedWorkGain /= 2;
-	            }
+            if (this.workData[this.workTier].nonDegree.includes(this.acceptedWorkName)){
+                this.acceptedWorkGain /= 2;
+            }
+            else if (this.workData[this.degreeTier].degree[this.degree].includes(this.acceptedWorkName)){
+                this.acceptedWorkGain = Phaser.Math.Between(this.workData[this.degreeTier].minGain, this.workData[this.degreeTier].maxGain);
             }
             this.points = this.workData[this.workTier].degreePoint;
         }
@@ -206,11 +226,14 @@ export class workData{
 	}
 
 	generateJobByTier(isMaxGain){
-        let list = this.workData[this.workTier].nonDegree;
+        this.list = this.workData[this.workTier].nonDegree;
+        this.degreeListTier = [];
         for (let x in this.workData[this.workTier].degree){
-        	list = list.concat(this.workData[this.workTier].degree[x]);
+        	this.list = this.list.concat(this.workData[this.workTier].degree[x]);
+        	this.degreeListTier.push(x);
         }
-        this.acceptedWorkName = Phaser.Math.RND.pick(list);
+        this.degree = Phaser.Math.RND.pick(this.degreeListTier);
+        this.acceptedWorkName = Phaser.Math.RND.pick(this.list);
         if (isMaxGain){
         	this.acceptedWorkGain = this.workData[this.workTier].maxGain;
         }
@@ -218,6 +241,35 @@ export class workData{
         	this.acceptedWorkGain = Phaser.Math.Between(this.workData[this.workTier].minGain, this.workData[this.workTier].maxGain);
         }
         this.points = this.workData[this.workTier].degreePoint;
+	}
+
+	generateRandomJobData(){
+        this.list = [];
+        if (this.game.tier == 1){
+            this.degreeTier = 'veryLow';
+        }
+        else if (this.game.tier == 2){
+            this.degreeTier = Phaser.Math.RND.pick(['veryLow','low']);
+        }
+        else if (this.game.tier == 3){
+            this.degreeTier = Phaser.Math.RND.pick(['veryLow','low','average']);
+        }
+        else if (this.game.tier == 4){
+            this.degreeTier = Phaser.Math.RND.pick(['veryLow','low','average','high']);
+        }
+        else if (this.game.tier == 5){
+            this.degreeTier = Phaser.Math.RND.pick(['veryLow','low','average','high','veryHigh']);
+        }
+        for (let x in this.workData[this.degreeTier].degree){
+            this.list.push(x);
+        }
+        this.schoolFinished = Phaser.Math.RND.pick(this.list);
+        this.degree = Phaser.Math.RND.pick(this.workData[this.degreeTier].degree[this.schoolFinished]);
+	}
+
+	getJobData(){
+		this.degree = this.game.degree;
+		this.schoolFinished = this.game.schoolFinished;
 	}
 
 	acceptJob(){
@@ -228,10 +280,11 @@ export class workData{
 		buttonData.timeEvent.args = [this.acceptedWorkGain, this.button];
 		this.jobSelection.finished = true;
 		buttonData.runOneWithLoop = false;
-		this.holdEvent.text.setText('You are about to quit your job as a\n'+this.acceptedWorkName+'\nDo you want to quit your job?');
+		this.holdEvent.text.setText('You are about to quit your job as a\n'+this.acceptedWorkName.split('\n').join(' ')+'\nDo you want to quit your job?');
 		this.holdEvent.popup.resize(Math.max((this.holdEvent.text.getTextBounds().local.width/2)+400,496),
                 (this.holdEvent.text.getTextBounds().local.height/2)+322);
         this.holdEvent.popup.setOrigin(0.5).setScale(2);
+        this.game.applySpeedMultiplier(this.game);
 	}
 
 	playHoldTimeEvent(){
@@ -262,6 +315,8 @@ export class workData{
 			workGain: this.acceptedWorkGain,
     		jobSelectionFinished: this.jobSelection.finished,
     		runOneWithLoop: buttonData.runOneWithLoop,
+    		degree: this.degree,
+    		schoolFinished: this.schoolFinished,
 		};
 	}
 

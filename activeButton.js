@@ -34,13 +34,15 @@ export function activeButton(game,buttonArray,position,data){
     buttonData.buttonNumber = size;
     buttonData.position = position;
     buttonData.description = game.add.bitmapText(x,y-6,'mainFont', data.description).setOrigin(0.5);
-    if (buttonData.description.width > 160){
+    if (buttonData.description.width > 144){
         buttonData.description.setFontSize(8).setOrigin(0.5);
     }
     buttonData.descriptionPopup = new function(){
     	this.popupBG = game.add.nineslice(0,0,16,16,'descriptionPopup',4);
+        this.popupBG.depth = 1;
     	this.isPointed = false;
     	this.popupText = game.add.bitmapText(x+18,y+44,'mainFont2',buttonData.textDescription);
+        this.popupText.depth = 1;
     	this.popupBG.setScale(2);
         this.popupBG.resize((this.popupText.getTextBounds().local.width/2)+8,(this.popupText.getTextBounds().local.height/2)+8);
     	
@@ -80,37 +82,48 @@ export function activeButton(game,buttonArray,position,data){
 	    		buttonData.descriptionPopup.popupText.y = pointer.y+16;
 	    		buttonData.descriptionPopup.popupBG.setOrigin(0);
 	    		buttonData.descriptionPopup.popupText.setOrigin(0);
+                if (buttonData.descriptionPopup.popupBG.x+(buttonData.descriptionPopup.popupBG.width*2) > 800){
+                    buttonData.descriptionPopup.popupBG.x -= buttonData.descriptionPopup.popupBG.width*2;
+                    buttonData.descriptionPopup.popupText.x = buttonData.descriptionPopup.popupBG.x+8;
+                }
 	    	}
 	    	if (buttonData.unlocked){
-        		buttonData.descriptionPopup.hide();
+                if (buttonData.itemRequired){
+                    if (buttonData.itemEquipIndex){
+                        if (game.buyMenuCategories[buttonData.itemEquipIndex-1].data.values.itemSelect){
+                            buttonData.descriptionPopup.hide();
+                        }
+                    }  
+                }
+                else{
+            		buttonData.descriptionPopup.hide();
+                }
 	    	}
 	    }
     });
     button.on('pointerout',function(){
         if(button.frame.name == 0){
             button.setFrame(1);
-        	buttonData.descriptionPopup.hide();
         }
-        else{
-        	buttonData.descriptionPopup.hide();
-        }
+        buttonData.descriptionPopup.hide();
         if (buttonData.work){
             buttonData.work.hideHoldAnim();
         }
     });
     button.on('pointerover',function(){
+        console.log(game.activeButtonLeft[0].data.values.totalCycle);
         if (buttonData.itemRequired){
             if (buttonData.itemEquipIndex){
-                let data = game.buyMenuCategories[buttonData.itemEquipIndex-1].data.values.itemSelect;
-                if (!data){
+                if (!game.buyMenuCategories[buttonData.itemEquipIndex-1].data.values.itemSelect){
                     buttonData.default.itemEquipPass = false;
+                    buttonData.descriptionPopup.show();
                 }
                 else{
                     buttonData.default.itemEquipPass = true;
                 }
             }
         }
-
+        
         if(buttonData.default.itemEquipPass && buttonData.unlocked && !(buttonData.cannotMidPause && !buttonData.default.pause) &&
             !(!buttonData.timeEvent.loop && buttonData.timeEvent.hasDispatched && !buttonData.runOneWithLoop) && (
             (!buttonData.default.pause || !game.buttonLeftSelected && position == 'left' && !(buttonData.isCare && game.isCareSelected)) ||
@@ -122,6 +135,7 @@ export function activeButton(game,buttonArray,position,data){
         else if (!buttonData.unlocked){
         	buttonData.descriptionPopup.show();
         }
+
     });
     button.on('pointerup',function(){
     	game.checkItemEquip(game);
@@ -135,7 +149,6 @@ export function activeButton(game,buttonArray,position,data){
             }
         }
     	if (buttonData.unlocked && !(!buttonData.timeEvent.loop && buttonData.timeEvent.hasDispatched && !buttonData.runOneWithLoop)){
-
             if (buttonData.popupEvent){
                 if (!buttonData.popupEvent.finished && !buttonData.popupEvent.requiredDelay){
                     buttonData.popupEvent.show();
@@ -198,6 +211,7 @@ export function activeButton(game,buttonArray,position,data){
                     game.buttonCharacterSelected.data.values.default.pause = true;
                     game.buttonCharacterSelected.anims.remove('activeButtonStop');
                     game.buttonCharacterSelected.setFrame(1);
+                    game.buttonCharacterSelected = false;
                 }
                 if ((position == 'left' || position == 'right') && game.isCareSelected && buttonData.isCare){
                 	game.isCareSelected = false;

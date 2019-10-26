@@ -108,10 +108,10 @@ var onResume = function onResume(){
         }
     }
 
-    if (expAmount.data.values.amount >= 120+((120*.25)*(game.tier-1)) && _game.currentStageCounter == 0){
+    if (expAmount.data.values.amount >= 600+((600*.25)*(game.tier-1)) && _game.currentStageCounter == 0){
         _game.currentStageCounter = 1;
     }
-    if (expAmount.data.values.amount >= 1500+((1500*.25)*(game.tier-1)) && _game.currentStage == 4){
+    if (expAmount.data.values.amount >= 4500+((4500*.25)*(game.tier-1)) && _game.currentStage == 4){
         _game.currentStageCounter = 2;
     }
     _game.player.anims.play(characterIdle[_game.currentStage+_game.currentStageCounter],true);
@@ -149,8 +149,8 @@ function preload (){
     this.load.spritesheet('buyMenuCategories','assets/ui/buy_menu_categories.png',{ frameWidth: 72, frameHeight: 16 });
     this.load.spritesheet('loading','assets/ui/loading.png',{ frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet('achievementIcons','assets/ui/achievement_icons.png',{ frameWidth: 32, frameHeight: 32 });
-    this.load.spritesheet('fatherPortraitBase','assets/characters/father portraits/base.png',{ frameWidth: 32, frameHeight: 32 });
-    this.load.spritesheet('motherPortraitBase','assets/characters/mother portraits/base.png',{ frameWidth: 32, frameHeight: 32 });
+    this.load.spritesheet('fatherPortraitHair','assets/characters/father portraits/hair.png',{ frameWidth: 32, frameHeight: 32 });
+    this.load.spritesheet('motherPortraitHair','assets/characters/mother portraits/hair.png',{ frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet('eyes','assets/characters/a_el/A_el eyes.png',{ frameWidth: 153, frameHeight: 58 });
     this.load.spritesheet('eyes2','assets/characters/a_el/A_el eyes2.png',{ frameWidth: 153, frameHeight: 58 });
     this.load.image('a_el','assets/characters/a_el/A_el.png');
@@ -161,6 +161,8 @@ function preload (){
     this.load.image('descriptionPopup','assets/ui/description_popup.png');
     this.load.image('popupEventCategories','assets/ui/popup_event_categories.png');
     this.load.image('dialog','assets/ui/dialog.png');
+    this.load.image('fatherPortraitBase','assets/characters/father portraits/base.png');
+    this.load.image('motherPortraitBase','assets/characters/mother portraits/base.png');
     this.load.bitmapFont('mainFont', 'assets/ui/font.png','assets/ui/font.fnt');
     this.load.bitmapFont('mainFont2', 'assets/ui/font2.png','assets/ui/font2.fnt');
     this.load.bitmapFont('mainFont3', 'assets/ui/font3.png','assets/ui/font3.fnt');
@@ -185,7 +187,7 @@ function preload (){
     this.expAmount;
     this.moneyMultiplier = 1;
     this.expMultiplier = 1;
-    this.speedMultiplier = 1;
+    this.speedMultiplier = 0;
     this.isCareSelected = false;
     this.nextStageLocked = true;
     this.buyMenuCamera;
@@ -215,6 +217,7 @@ function preload (){
     this.graphics;
     this.achievements;
     this.statistics;
+    this.kongregate;
 
     this.buttonLeftSelected = false;
     this.buttonRightSelected = false;
@@ -278,6 +281,13 @@ function create (){
         this.isPointed = false;
         this.popupText = _this.add.bitmapText(0,0,'mainFont2','');
         this.popupBG.setScale(2);
+        this.required = {
+                1: ['', '\n1 Small Bed', '\n5 Walks'],
+                2: ['', '\n1 Bedside Table', '\n1 Desk', '\n5 Runs'],
+                3: ['', ],
+                4: ['', '\n1 Medium Bed'],
+                5: ['', '\n1 Queen-Size Bed'],
+            };
         
         this.show = function(){
             this.popupBG.setVisible(true);
@@ -302,19 +312,47 @@ function create (){
 
         this.reinitialize = function(){
             if (_this.currentStage == 0){
-                this.popupText.text = 'Required: \nExp: '+(200+((_this.tier-1)*(200*.25)))+'\nA Bed';
+                if (_this.expAmount.data.values.amount >= 400+((400*.25)*(_this.tier-1))){
+                    this.required['1'][0] = '';
+                }
+                else {
+                    this.required['1'][0] = '\nExp: '+(400+((400*.25)*(_this.tier-1)));
+                }
             }
             else if (_this.currentStage == 1){
-                this.popupText.text = 'Required: \nExp: '+(500+((500*.25)*(_this.tier-1)));
+                if (_this.expAmount.data.values.amount >= 750+((750*.25)*(_this.tier-1))){
+                    this.required['2'][0] = '';
+                }
+                else {
+                    this.required['2'][0] = '\nExp: '+(750+((750*.25)*(_this.tier-1)));
+                }
             }
             else if (_this.currentStage == 2){
-                this.popupText.text = 'Required: \nExp: '+(800+((800*.25)*(_this.tier-1)));
+                if (_this.expAmount.data.values.amount >= 1500+((1500*.25)*(_this.tier-1))){
+                    this.required['3'][0] = '';
+                }
+                else {
+                    this.required['3'][0] = '\nExp: '+(1500+((1500*.25)*(_this.tier-1)));
+                }
             }
             else if (_this.currentStage == 3){
-                this.popupText.text = 'Required: \nExp: '+(1250+((1250*.25)*(_this.tier-1)));
+                if (_this.expAmount.data.values.amount >= 2750+((2750*.25)*(_this.tier-1))){
+                    this.required['4'][0] = '';
+                }
+                else {
+                    this.required['4'][0] = '\nExp: '+(2750+((2750*.25)*(_this.tier-1)));
+                }
             }
             else if (_this.currentStage == 4){
-                this.popupText.text = 'Required: \nExp: '+(1750+((1750*.25)*(_this.tier-1)));
+                if (_this.expAmount.data.values.amount >= 4500+((4500*.25)*(_this.tier-1))){
+                    this.required['5'][0] = '';
+                }
+                else {
+                    this.required['5'][0] = '\nExp: '+(4500+((4500*.25)*(_this.tier-1)));
+                }
+            }
+            if (typeof _this.currentStage !== 'undefined' && _this.currentStage < 5){
+                this.popupText.text = 'Required:'+this.required[(_this.currentStage+1).toString()].join('');
             }
             this.resize();
         }
@@ -385,6 +423,7 @@ function create (){
                 this.nextStage.data.values.text.setText('TRIAL');
                 this.nextStage.setFrame(3);
             }
+
             if ( this.currentStage >= 6){
                 this.nextStage.data.values.popupEvent.show();
             }
@@ -404,30 +443,34 @@ function create (){
                     this.isCareSelected = true;
                 }
 
-                //get work cycles and time
+                //get work data
                 let leftButton = {}, rightButton = {}, characterButton = {};
                 if (this.currentStage-1 <= 1){
-                    leftButton['gain'] = activeButtonLeft[1].data.values.gain+(activeButtonLeft[1].data.values.cycleCount*.75);
-                    leftButton['cycle'] = activeButtonLeft[1].data.values.cycleCount;
+                    leftButton['gain'] = activeButtonLeft[1].data.values.gain+(activeButtonLeft[1].data.values.cycleCount*.15);
+                    leftButton['totalCycle'] = activeButtonLeft[1].data.values.totalCycle+activeButtonLeft[1].data.values.cycleCount;
                     leftButton['workData'] = activeButtonLeft[1].data.values.work.getData();
                     leftButton['elapseTime'] = activeButtonLeft[1].data.values.timeEvent.elapsed;
                     leftButton['paused'] = activeButtonLeft[1].data.values.timeEvent.paused;
+                    leftButton['elapseTimeCare'] = activeButtonLeft[0].data.values.timeEvent.elapsed;
+                    leftButton['pausedCare'] = activeButtonLeft[0].data.values.timeEvent.paused;
 
-                    rightButton['gain'] = activeButtonRight[1].data.values.gain+(activeButtonRight[1].data.values.cycleCount*.75);
-                    rightButton['cycle'] = activeButtonRight[1].data.values.cycleCount;
+                    rightButton['gain'] = activeButtonRight[1].data.values.gain+(activeButtonRight[1].data.values.cycleCount*.15);
+                    rightButton['totalCycle'] = activeButtonRight[1].data.values.totalCycle+activeButtonRight[1].data.values.cycleCount;
                     rightButton['workData'] = activeButtonRight[1].data.values.work.getData();
                     rightButton['elapseTime'] = activeButtonRight[1].data.values.timeEvent.elapsed;
                     rightButton['paused'] = activeButtonRight[1].data.values.timeEvent.paused;
+                    rightButton['elapseTimeCare'] = activeButtonRight[0].data.values.timeEvent.elapsed;
+                    rightButton['pausedCare'] = activeButtonRight[0].data.values.timeEvent.paused;
                 }
                 else {
-                    leftButton['gain'] = activeButtonLeft[0].data.values.gain+(activeButtonLeft[0].data.values.cycleCount*.75);
-                    leftButton['cycle'] = activeButtonLeft[0].data.values.cycleCount;
+                    leftButton['gain'] = activeButtonLeft[0].data.values.gain+(activeButtonLeft[0].data.values.cycleCount*.15);
+                    leftButton['totalCycle'] = activeButtonLeft[0].data.values.totalCycle+activeButtonLeft[0].data.values.cycleCount;
                     leftButton['workData'] = activeButtonLeft[0].data.values.work.getData();
                     leftButton['elapseTime'] = activeButtonLeft[0].data.values.timeEvent.elapsed;
                     leftButton['paused'] = activeButtonLeft[0].data.values.timeEvent.paused;
 
-                    rightButton['gain'] = activeButtonRight[0].data.values.gain+(activeButtonRight[0].data.values.cycleCount*.75);
-                    rightButton['cycle'] = activeButtonRight[0].data.values.cycleCount;
+                    rightButton['gain'] = activeButtonRight[0].data.values.gain+(activeButtonRight[0].data.values.cycleCount*.15);
+                    rightButton['totalCycle'] = activeButtonRight[0].data.values.totalCycle+activeButtonRight[0].data.values.cycleCount;
                     rightButton['workData'] = activeButtonRight[0].data.values.work.getData();
                     rightButton['elapseTime'] = activeButtonRight[0].data.values.timeEvent.elapsed;
                     rightButton['paused'] = activeButtonRight[0].data.values.timeEvent.paused;
@@ -488,14 +531,27 @@ function create (){
                 let buyMenuCategorySelectHolder = this.buyMenuCategorySelect;
                 for (let x = 0 ; x != this.buyMenuCategories.length ; x++){
                     this.buyMenuCategorySelect = this.buyMenuCategories[x];
-                    renderBuyMenuItem(this);
+                    renderBuyMenuItem(this, true);
                 }
                 this.buyMenuCategorySelect = buyMenuCategorySelectHolder;
+                if (this.currentStage == 1){
+                    this.buyMenuCamera.scrollX = 416*0;
+                    this.buyMenuCamera.scrollY = 600;
+                    if (this.buyMenuCategorySelect){
+                        this.buyMenuCategorySelect.data.values.isSelected = false;
+                        this.buyMenuCategorySelect.setFrame(0);
+                    }
+                    this.buyMenuCategorySelect = this.buyMenuCategories[0];
+                    this.buyMenuCategorySelect.setFrame(1);
+                    this.buyMenuCategorySelect.data.values.isSelected = true;
+                }
 
                 //apply work cycle promotion
                 if (this.currentStage <= 1){
-                    activeButtonLeft[1].data.values.cycleCount = leftButton.cycle;
+                    activeButtonLeft[1].data.values.totalCycle = leftButton.totalCycle;
                     activeButtonLeft[1].data.values.work.jobSelection.finished = leftButton.workData.jobSelectionFinished;
+                    activeButtonLeft[1].data.values.work.degree = leftButton.workData.degree;
+                    activeButtonLeft[1].data.values.work.schoolFinished = leftButton.workData.schoolFinished;
                     if (leftButton.workData.jobSelectionFinished){
                         activeButtonLeft[1].data.values.work.acceptedWorkName = leftButton.workData.workName;
                         activeButtonLeft[1].data.values.work.acceptJob();
@@ -503,25 +559,45 @@ function create (){
                     activeButtonLeft[1].data.values.gain = leftButton.gain;
                     activeButtonLeft[1].data.values.timeEvent.args = [activeButtonLeft[1].data.values.gain, activeButtonLeft[1]];
                     activeButtonLeft[1].data.values.timeEvent.elapsed = leftButton.elapseTime;
+                    activeButtonLeft[0].data.values.timeEvent.elapsed = leftButton.elapseTimeCare;
                     if (!leftButton.paused){
                         activeButtonLeft[1].data.values.timeEvent.paused = false;
                         activeButtonLeft[1].data.values.default.pause = false;
                         activeButtonLeft[1].data.values.default.pausedMidway = false;
+                        this.buttonLeftSelected = true;
+                    }
+                    if (!leftButton.pausedCare){
+                        activeButtonLeft[0].data.values.timeEvent.paused = false;
+                        activeButtonLeft[0].data.values.default.pause = false;
+                        activeButtonLeft[0].data.values.default.pausedMidway = false;
+                        this.isCareSelected = true;
+                        this.buttonLeftSelected = true;
                     }
 
-                    activeButtonRight[1].data.values.cycleCount = rightButton.cycle;
+                    activeButtonRight[1].data.values.totalCycle = rightButton.totalCycle;
                     activeButtonRight[1].data.values.work.jobSelection.finished = rightButton.workData.jobSelectionFinished;
+                    activeButtonRight[1].data.values.work.degree = rightButton.workData.degree;
+                    activeButtonRight[1].data.values.work.schoolFinished = rightButton.workData.schoolFinished;
                     if (rightButton.workData.jobSelectionFinished){
-                        activeButtonRight[1].data.values.work.acceptedWorkName = leftButton.workData.workName;
+                        activeButtonRight[1].data.values.work.acceptedWorkName = rightButton.workData.workName;
                         activeButtonRight[1].data.values.work.acceptJob();
                     }
                     activeButtonRight[1].data.values.gain = rightButton.gain;
                     activeButtonRight[1].data.values.timeEvent.args = [activeButtonRight[1].data.values.gain, activeButtonRight[1]];
                     activeButtonRight[1].data.values.timeEvent.elapsed = rightButton.elapseTime;
+                    activeButtonRight[0].data.values.timeEvent.elapsed = rightButton.elapseTimeCare;
                     if (!rightButton.paused){
                         activeButtonRight[1].data.values.timeEvent.paused = false;
                         activeButtonRight[1].data.values.default.pause = false;
                         activeButtonRight[1].data.values.default.pausedMidway = false;
+                        this.buttonRightSelected = true;
+                    }
+                    if (!rightButton.pausedCare){
+                        activeButtonRight[0].data.values.timeEvent.paused = false;
+                        activeButtonRight[0].data.values.default.pause = false;
+                        activeButtonRight[0].data.values.default.pausedMidway = false;
+                        this.isCareSelected = true;
+                        this.buttonRightSelected = true;
                     }
 
                     money.setData('promotionEventPopup', 
@@ -533,8 +609,10 @@ function create (){
                     money.data.values.promotionEventPopup.approveButton.data.values.text.y += 24;
                 }
                 else {
-                    activeButtonLeft[0].data.values.cycleCount = leftButton.cycle;
+                    activeButtonLeft[0].data.values.totalCycle = leftButton.totalCycle;
                     activeButtonLeft[0].data.values.work.jobSelection.finished = leftButton.workData.jobSelectionFinished;
+                    activeButtonLeft[0].data.values.work.degree = leftButton.workData.degree;
+                    activeButtonLeft[0].data.values.work.schoolFinished = leftButton.workData.schoolFinished;
                     if (leftButton.workData.jobSelectionFinished){
                         activeButtonLeft[0].data.values.work.acceptedWorkName = leftButton.workData.workName;
                         activeButtonLeft[0].data.values.work.acceptJob();
@@ -548,31 +626,35 @@ function create (){
                         activeButtonLeft[0].data.values.default.pausedMidway = false;
                     }
 
-                    activeButtonRight[0].data.values.cycleCount = rightButton.cycle;
+                    activeButtonRight[0].data.values.totalCycle = rightButton.totalCycle;
                     activeButtonRight[0].data.values.work.jobSelection.finished = rightButton.workData.jobSelectionFinished;
+                    activeButtonRight[0].data.values.work.degree = rightButton.workData.degree;
+                    activeButtonRight[0].data.values.work.schoolFinished = rightButton.workData.schoolFinished;
                     if (rightButton.workData.jobSelectionFinished){
-                        activeButtonRight[0].data.values.work.acceptedWorkName = leftButton.workData.workName;
+                        activeButtonRight[0].data.values.work.acceptedWorkName = rightButton.workData.workName;
                         activeButtonRight[0].data.values.work.acceptJob();
                     }
                     activeButtonRight[0].data.values.gain = rightButton.gain;
                     activeButtonRight[0].data.values.timeEvent.args = [activeButtonRight[0].data.values.gain, activeButtonRight[0]];
-
                     activeButtonRight[0].data.values.timeEvent.elapsed = rightButton.elapseTime;
                     if (!rightButton.paused){
                         activeButtonRight[0].data.values.timeEvent.paused = false;
                         activeButtonRight[0].data.values.default.pause = false;
                         activeButtonRight[0].data.values.default.pausedMidway = false;
                     }
+
                     money.setData('promotionEventPopup', 
-                    new popupEvent(this).createAcknowledgeEvent('Your mother gain '+activeButtonLeft[0].data.values.gain+
+                    new popupEvent(this).createAcknowledgeEvent('Your father now have '+activeButtonLeft[0].data.values.gain+
                         '\ncash per cycle,'+
-                        '\nwhile you father \ngain '+
+                        '\nwhile you mother \now have '+
                         activeButtonRight[0].data.values.gain+' cash per cycle \nas a promotion \nto their work'));
                     money.data.values.promotionEventPopup.approveButton.y += 24;
                     money.data.values.promotionEventPopup.approveButton.data.values.text.y += 24;
                 }
                 if (this.currentStage == 5){
                     this.activeButtonCharacter[1].data.values.work.jobSelection.finished = characterButton.workData.jobSelectionFinished;
+                    this.activeButtonCharacter[1].data.values.work.degree = characterButton.workData.degree;
+                    this.activeButtonCharacter[1].data.values.work.schoolFinished = characterButton.workData.schoolFinished;
                     if (characterButton.workData.jobSelectionFinished){
                         this.activeButtonCharacter[1].data.values.work.acceptedWorkName = characterButton.workData.workName;
                         this.activeButtonCharacter[1].data.values.work.acceptedWorkGain = characterButton.workData.workGain;
@@ -589,7 +671,11 @@ function create (){
                 this.statistics.updateAll();
                 this.nextStageLocked = true;
                 this.nextStage.setTexture('lockedButton',0);
+                this.nextStage.data.values.text.y = 600-(19*scale);
+                this.nextStage.data.values.descriptionPopup.reinitialize();
                 this.allButtonCharacterUnlock = false;
+                checkItemEquip(this);
+                applySpeedMultiplier(this);
             }
         }
     }, this);
@@ -661,15 +747,21 @@ function create (){
 
     this.fatherPortrait = this.add.image(62,148,'fatherPortraitBase').setOrigin(0.5).setScale(2);
     this.fatherPortrait.depth = 1;
+    this.fatherPortrait.setData('hair','');
 
     this.motherPortrait = this.add.image(742,148,'motherPortraitBase').setOrigin(0.5).setScale(2);
     this.motherPortrait.depth = 1;
+    this.motherPortrait.setData('hair','');
 
     this.buyMenu = new buyMenu(this);
     this.buyMenu.close();
 
     this.saveManager = new saveManager(this);
     this.saveManager.load(this);
+
+    kongregateAPI.loadAPI(function(){
+        _this.kongregate = kongregateAPI.getAPI();
+    });
 }
 
 function update(){
@@ -813,6 +905,10 @@ function gainGold(gain, button=''){
         if (!buttonData.work.jobSelection.finished){
             buttonData.work.showJobSelection(this);
         }
+        if (buttonData.position == 'character'){
+            expAmount.data.values.amount += Math.trunc((gain*this.expMultiplier)*.35);
+            expAmount.setText(expAmount.data.values.amount);
+        }
     }
 
     if (buttonData.default.pause){
@@ -855,15 +951,17 @@ function gainGold(gain, button=''){
 }
 
 function expGain(gain, button=''){
-    expAmount.data.values.amount += Math.trunc(gain*this.expMultiplier);
-    expAmount.setText(expAmount.data.values.amount);
+    if (this.nextStage.data.values.descriptionPopup.required[this.currentStage+1][0] != ''){
+        expAmount.data.values.amount += Math.trunc(gain*this.expMultiplier);
+        expAmount.setText(expAmount.data.values.amount);   
+    }
     let buttonData = button.data.values;
 
-    if (expAmount.data.values.amount >= 120+((120*.25)*(this.tier-1)) && this.currentStageCounter == 0){
+    if (expAmount.data.values.amount >= (600+((600*.25)*(this.tier-1)))/2 && this.currentStageCounter == 0){
         this.currentStageCounter = 1;
         this.player.anims.play(characterIdle[this.currentStage+this.currentStageCounter],true);
     }
-    if (expAmount.data.values.amount >= 1500+((1500*.25)*(this.tier-1)) && this.currentStage == 4){
+    if (expAmount.data.values.amount >= (4500+((4500*.25)*(this.tier-1)))/2 && this.currentStage == 4){
         this.currentStageCounter += 1;
         this.player.anims.play(characterIdle[this.currentStage+this.currentStageCounter],true);
     }
@@ -875,6 +973,8 @@ function expGain(gain, button=''){
             buttonData.requiredTurnsToUnlock -= 1;
         }
     }
+
+    this.nextStage.data.values.descriptionPopup.reinitialize();
 
     updateBuffs(this, buttonData);
 
@@ -1009,16 +1109,16 @@ function buyMenu(game){
         game.fakeBuyMenuBg.data.values.isClicked = false;
     });
 
-    createBuyMenuCategory(game, 'BEDSIDE TABLE', 1);
-    createBuyMenuCategory(game, 'COMPUTERS', 3, false, true, 3);
-    createBuyMenuCategory(game, 'CRIB', 0, true);
-    createBuyMenuCategory(game, 'DESK', 1, false, false);
-    createBuyMenuCategory(game, 'GADGETS', 3, false, true, 0);
-    createBuyMenuCategory(game, 'MEDIUM BED', 3);
-    createBuyMenuCategory(game, 'QUEEN-SIZE BED', 4);
-    createBuyMenuCategory(game, 'SCHOOL SUPPLIES', 2, false, true, 3);
-    createBuyMenuCategory(game, 'SMALL BED', 0);
-    createBuyMenuCategory(game, 'TOYS', 1);
+    createBuyMenuCategory(game, 'BEDSIDE TABLE', 1, -1); //0
+    createBuyMenuCategory(game, 'COMPUTERS', 3, -1,false, true, 3); //1
+    createBuyMenuCategory(game, 'CRIB', 0, 1, true); //2
+    createBuyMenuCategory(game, 'DESK', 1, -1, false, false); //3
+    createBuyMenuCategory(game, 'GADGETS', 3, -1, false, true, 0); //4
+    createBuyMenuCategory(game, 'MEDIUM BED', 3, 5); //5
+    createBuyMenuCategory(game, 'QUEEN-SIZE BED', 4, -1); //6
+    createBuyMenuCategory(game, 'SCHOOL SUPPLIES', 2, -1, false, true, 3); //7
+    createBuyMenuCategory(game, 'SMALL BED', 0, 4); //8
+    createBuyMenuCategory(game, 'TOYS', 1, 4); //9
     
     buyMenuItems(game,game.buyMenuCategories,buyMenuItemsData);
 
@@ -1075,12 +1175,13 @@ function buyMenu(game){
     }
 }
 
-function createBuyMenuCategory(game, name, stageAvailable, selected = false, needPrimaryItem=false, primaryItemPointer = ''){
+function createBuyMenuCategory(game, name, stageAvailable, stageMax, selected = false, needPrimaryItem=false, primaryItemPointer = ''){
     let button = game.add.image(66,130+(32*(game.buyMenuCategories.length+1)),'buyMenuCategories',0).setOrigin(0);
     button.setInteractive();
     button.setData({
         isSelected: selected,
         stageAvailable: stageAvailable,
+        stageMax: stageMax,
         number: game.buyMenuCategories.length,
         name: name,
         text: game.add.bitmapText(74,146+(32*(game.buyMenuCategories.length+1)), 'mainFont', name).setFontSize(16).setOrigin(0,.5),
@@ -1102,18 +1203,19 @@ function createBuyMenuCategory(game, name, stageAvailable, selected = false, nee
         game.buyMenuCamera.scrollX = 416*button.data.values.number;
     }
     button.on('pointerout',function() {
-        if (!button.data.values.isSelected && button.data.values.stageAvailable <= game.currentStage){
+        if (!button.data.values.isSelected){
             button.setFrame(0);
         }
     });
     button.on('pointerover',function() {
-        if (!button.data.values.isSelected && button.data.values.stageAvailable <= game.currentStage){
+        if (!button.data.values.isSelected && button.data.values.stageAvailable <= game.currentStage && (game.currentStage < button.data.values.stageMax || button.data.values.stageMax == -1)){
             button.setFrame(2);
         }
     });
     button.on('pointerup',function(){
-        if (!button.isSelected && button.data.values.stageAvailable <= game.currentStage){
+        if (!button.data.values.isSelected && button.data.values.stageAvailable <= game.currentStage && (game.currentStage < button.data.values.stageMax || button.data.values.stageMax == -1)){
             game.buyMenuCamera.scrollX = 416*button.data.values.number;
+            game.buyMenuCamera.scrollY = 600;
             if (game.buyMenuCategorySelect){
                 game.buyMenuCategorySelect.data.values.isSelected = false;
                 game.buyMenuCategorySelect.setFrame(0);
@@ -1127,22 +1229,28 @@ function createBuyMenuCategory(game, name, stageAvailable, selected = false, nee
     game.buyMenuCategories.push(button);
 }
 
-function renderBuyMenuItem(game){
+function renderBuyMenuItem(game, ignoreAddMultiplier){
     if(game.buyMenuCategorySelect.data.values.itemSelect){
         let data = game.buyMenuCategorySelect.data.values.itemSelect.data.values;
+        //bst
         if (data.position-1 == 0){
             if (!game.buyMenuCategorySelect.data.values.itemRender){
-                game.buyMenuCategorySelect.data.values.itemRender = game.add.image(400,250,'bedsideTable',data.itemNumber).setOrigin(0.5).setScale(2);
+                if (game.currentStage == 1){
+                    game.nextStage.data.values.descriptionPopup.required['2'][1] = '';
+                }
+                game.buyMenuCategorySelect.data.values.itemRender = game.add.image(400,256,'bedsideTable',data.itemNumber).setOrigin(0.5).setScale(2);
             }
             game.buyMenuCategorySelect.data.values.itemRender.setFrame(data.itemNumber);
         }
+        //cmp
         if (data.position-1 == 1){
             if (!game.buyMenuCategorySelect.data.values.itemRender){
-                game.buyMenuCategorySelect.data.values.itemRender = game.add.image(176,164,'computer',data.itemNumber).setOrigin(0).setScale(2);
+                game.buyMenuCategorySelect.data.values.itemRender = game.add.image(176,156,'computer',data.itemNumber).setOrigin(0).setScale(2);
             }
             game.buyMenuCategorySelect.data.values.itemRender.setFrame(data.itemNumber);
             game.buyMenuCategorySelect.data.values.itemRender.depth = 1;
         }
+        //crb
         if (data.position-1 == 2){
             if (!game.buyMenuCategorySelect.data.values.itemRender){
                 game.buyMenuCategorySelect.data.values.itemRender = game.add.image(400,310,'crib',data.itemNumber).setScale(2);
@@ -1155,23 +1263,32 @@ function renderBuyMenuItem(game){
                 game.buyMenuCategorySelect.data.values.itemRender.setVisible(false);
             }
         }
+        //dsk
         if (data.position-1 == 3){
             if (!game.buyMenuCategorySelect.data.values.itemRender){
+                if (game.currentStage == 1){
+                    game.nextStage.data.values.descriptionPopup.required['2'][2] = '';
+                }
                 game.buyMenuCategorySelect.data.values.itemRender = game.add.image(176,194,'desk',data.itemNumber).setOrigin(0).setScale(2);
             }
             game.buyMenuCategorySelect.data.values.itemRender.setFrame(data.itemNumber);
         }
+        //gts
         if (data.position-1 == 4){
             if (!game.buyMenuCategorySelect.data.values.itemRender){
-                game.buyMenuCategorySelect.data.values.itemRender = game.add.image(400,236,'buyMenuIcons',data.iconItemNumber).setOrigin(0.5).setScale(2);
+                game.buyMenuCategorySelect.data.values.itemRender = game.add.image(400,248,'buyMenuIcons',data.iconItemNumber).setOrigin(0.5).setScale(2);
             }
             game.buyMenuCategorySelect.data.values.itemRender.setFrame(data.iconItemNumber);
         }
+        //MB
         if (data.position-1 == 5){
             if (!game.buyMenuCategorySelect.data.values.itemRender){
+                if (game.currentStage == 3){
+                    game.nextStage.data.values.descriptionPopup.required['4'][1] = '';
+                }
                 game.buyMenuCategorySelect.data.values.itemRender = game.add.image(432,192,'bed').setOrigin(0).setScale(2);
             }
-            game.buyMenuCategorySelect.data.values.itemRender.setFrame(data.itemNumber+3);
+            game.buyMenuCategorySelect.data.values.itemRender.setFrame(data.itemNumber+9);
             if (game.currentStage+game.currentStageCounter >= 5 && game.currentStage+game.currentStageCounter < 7){
                 game.buyMenuCategorySelect.data.values.itemRender.setVisible(true);
             }
@@ -1179,11 +1296,15 @@ function renderBuyMenuItem(game){
                 game.buyMenuCategorySelect.data.values.itemRender.setVisible(false);
             }
         }  
+        //qsb
         if (data.position-1 == 6){
             if (!game.buyMenuCategorySelect.data.values.itemRender){
+                if (game.currentStage == 4){
+                    game.nextStage.data.values.descriptionPopup.required['5'][1] = '';
+                }
                 game.buyMenuCategorySelect.data.values.itemRender = game.add.image(432,192,'bed').setOrigin(0).setVisible(false).setScale(2);
             }
-            game.buyMenuCategorySelect.data.values.itemRender.setFrame(data.itemNumber+6);
+            game.buyMenuCategorySelect.data.values.itemRender.setFrame(data.itemNumber+18);
             if (game.currentStage+game.currentStageCounter >= 7){
                 game.buyMenuCategorySelect.data.values.itemRender.setVisible(true);
             }
@@ -1191,9 +1312,10 @@ function renderBuyMenuItem(game){
                 game.buyMenuCategorySelect.data.values.itemRender.setVisible(false);
             }
         }
+        //scsu
         if (data.position-1 == 7){
             if (!game.buyMenuCategorySelect.data.values.itemRender){
-                game.buyMenuCategorySelect.data.values.itemRender = game.add.image(242,208,'buyMenuIcons',data.iconItemNumber).setOrigin(0).setScale(2);
+                game.buyMenuCategorySelect.data.values.itemRender = game.add.image(242,200,'buyMenuIcons',data.iconItemNumber).setOrigin(0).setScale(2);
             }
             game.buyMenuCategorySelect.data.values.itemRender.setFrame(data.iconItemNumber);
             if (game.currentStage <= 2){
@@ -1203,8 +1325,12 @@ function renderBuyMenuItem(game){
                 game.buyMenuCategorySelect.data.values.itemRender.x = 292;
             }
         } 
+        //sbed
         if (data.position-1 == 8){
             if (!game.buyMenuCategorySelect.data.values.itemRender){
+                if (game.currentStage == 0){
+                    game.nextStage.data.values.descriptionPopup.required['1'][1] = '';
+                }
                 game.buyMenuCategorySelect.data.values.itemRender = game.add.image(432,192, 'bed').setScale(2).setVisible(false).setOrigin(0);
             }
             game.buyMenuCategorySelect.data.values.itemRender.setFrame(data.itemNumber);
@@ -1215,19 +1341,24 @@ function renderBuyMenuItem(game){
                 game.buyMenuCategorySelect.data.values.itemRender.setVisible(false);
             }
         } 
+        //toys
         if (data.position-1 == 9){
             if (!game.buyMenuCategorySelect.data.values.itemRender){
                 game.buyMenuCategorySelect.data.values.itemRender = game.add.image(240,448,'buyMenuIcons',data.iconItemNumber).setOrigin(0).setScale(2);
             }
             game.buyMenuCategorySelect.data.values.itemRender.setFrame(data.iconItemNumber);
-        }   
+        }
+        if (!ignoreAddMultiplier){
+            addSpeedMultiplier(game);
+        }
+        game.nextStage.data.values.descriptionPopup.reinitialize();
     }
 }
 
 function saveManager(game){
     game.saveGame = window.localStorage;
     game.time.addEvent({
-            delay:60000, loop:true, callback: save,
+            delay:300000, loop:true, callback: save,
             callbackScope: this, args:[game],
         });
     // game.saveGame.clear();
@@ -1249,16 +1380,17 @@ function saveManager(game){
         game.saveGame.setItem('expMultiplier', game.expMultiplier);
         game.saveGame.setItem('moneyMultiplier', game.moneyMultiplier);
         game.saveGame.setItem('speedMultiplier', game.speedMultiplier);
-        game.saveGame.setItem('buttonSelected',JSON.stringify({
-            buttonLeftSelected: game.buttonLeftSelected,
-            buttonRightSelected: game.buttonRightSelected,
-            buttonCharacterSelected: game.buttonCharacterSelected,
-        }));
         game.saveGame.setItem('tier', 1);
         game.saveGame.setItem('tierCounter', 0);
         game.saveGame.setItem('degree', '');
         game.saveGame.setItem('schoolFinished', '');
         game.tier = 1;
+        game.saveGame.setItem('motherHairFrame', Phaser.Math.Between(0,2));
+        game.saveGame.setItem('fatherHairFrame', Phaser.Math.Between(0,4));
+        game.fatherPortrait.hair = game.add.image(62,148,'fatherPortraitHair', game.saveGame.getItem('fatherHairFrame')).setOrigin(0.5).setScale(2);
+        game.fatherPortrait.hair.depth = 1;
+        game.motherPortrait.hair = game.add.image(742,148,'motherPortraitHair', game.saveGame.getItem('motherHairFrame')).setOrigin(0.5).setScale(2);
+        game.fatherPortrait.hair.depth = 1;
         
         let defaultBuyItemData = game.buyMenuCategories[2].data.values.itemList[0].data.values;
         defaultBuyItemData.buyButton.setFrame(2);
@@ -1271,6 +1403,7 @@ function saveManager(game){
         game.buyMenuCategorySelect = game.buyMenuCategories[2];
         game.buyMenuCategorySelect.data.values.itemSelect = game.buyMenuCategories[2].data.values.itemList[0];
         renderBuyMenuItem(game);
+        game.buyMenuCategorySelect = game.buyMenuCategories[2];
 
         activeButton(game,activeButtonLeft,
             'left',getActiveButtonStats(game,'left',1,1,buffList));
@@ -1290,17 +1423,18 @@ function saveManager(game){
         let buttonData = game.activeButtonLeft[1].data.values;
         buttonData.work.generateJob(game);
         buttonData.work.acceptJob();
-        buttonData.gain = 15;
-        buttonData.timeEvent.args[0] = 15;
+        buttonData.gain = 10;
+        buttonData.timeEvent.args[0] = 10;
 
         buttonData = game.activeButtonRight[1].data.values;
         buttonData.work.generateJob(game);
         buttonData.work.acceptJob();
-        buttonData.gain = 15;
-        buttonData.timeEvent.args[0] = 15;
+        buttonData.gain = 10;
+        buttonData.timeEvent.args[0] = 10;
         putAllActiveButtonEvent(game);
 
-        game.cutscene.setTextIndexQueue([0,1]);
+        game.cutscene.textList = game.cutscene.textListFirstTime;
+        game.cutscene.setTextIndexQueue(game.cutscene.getTextListFirstTimeQueueList());
         game.cutscene.showFadeIn();
     }
 
@@ -1314,11 +1448,6 @@ function saveManager(game){
         game.saveGame.setItem('money',moneyAmount.data.values.amount);
         game.saveGame.setItem('exp',expAmount.data.values.amount);
         game.saveGame.setItem('time',Date.now());
-        game.saveGame.setItem('buttonSelected',JSON.stringify({
-            buttonLeftSelected: game.buttonLeftSelected,
-            buttonRightSelected: game.buttonRightSelected,
-            buttonCharacterSelected: game.buttonCharacterSelected,
-        }));
         game.saveGame.setItem('stage', game.currentStage);
         game.saveGame.setItem('stageCounter', game.currentStageCounter);
         game.saveGame.setItem('isCareSelected',game.isCareSelected);
@@ -1326,7 +1455,6 @@ function saveManager(game){
         game.saveGame.setItem('tierCounter', game.bg.data.values.tierCounter);
         game.saveGame.setItem('expMultiplier', game.expMultiplier);
         game.saveGame.setItem('moneyMultiplier', game.moneyMultiplier);
-        game.saveGame.setItem('speedMultiplier', game.speedMultiplier);
         game.saveGame.setItem('degree', game.degree);
         game.saveGame.setItem('schoolFinished', game.schoolFinished);
 
@@ -1352,6 +1480,7 @@ function saveManager(game){
                 gain: buttons.gain,
                 hasDispatched: buttons.timeEvent.hasDispatched,
                 buff: {},
+                turns: buttons.requiredTurnsToUnlock,
             };
             if(typeof buttons.runOneWithLoop !== 'undefined'){
                 activeLeft[x].runOneWithLoop = buttons.runOneWithLoop;
@@ -1359,9 +1488,15 @@ function saveManager(game){
             if (buttons.popupEvent){
                 activeLeft[x].popupEventFinished = buttons.popupEvent.finished;
             }
+            if (buttons.cycleCount || buttons.totalCycle){
+                activeLeft[x].cycle = buttons.cycleCount;
+                activeLeft[x].totalCycle = buttons.totalCycle;
+            }
             if (buttons.work){
                 activeLeft[x].workJobSelectionFinished = buttons.work.jobSelection.finished;
                 activeLeft[x].workName = buttons.work.acceptedWorkName;
+                activeLeft[x].workDegree = buttons.work.degree;
+                activeLeft[x].workSchoolFinished = buttons.work.schoolFinished;
             }
             for (let y = 0 ; y != buttons.buff.length ; y++){
                 activeLeft[x].buff[y] = {
@@ -1388,6 +1523,7 @@ function saveManager(game){
                 gain: buttons.gain,
                 hasDispatched: buttons.timeEvent.hasDispatched,
                 buff: {},
+                turns: buttons.requiredTurnsToUnlock,
             };
             if(typeof buttons.runOneWithLoop !== 'undefined'){
                 activeRight[x].runOneWithLoop = buttons.runOneWithLoop;
@@ -1395,9 +1531,15 @@ function saveManager(game){
             if (buttons.popupEvent){
                 activeRight[x].popupEventFinished = buttons.popupEvent.finished;
             }
+            if (buttons.cycleCount || buttons.totalCycle){
+                activeRight[x].cycle = buttons.cycleCount;
+                activeRight[x].totalCycle = buttons.totalCycle;
+            }
             if (buttons.work){
                 activeRight[x].workJobSelectionFinished = buttons.work.jobSelection.finished;
                 activeRight[x].workName = buttons.work.acceptedWorkName;
+                activeRight[x].workDegree = buttons.work.degree;
+                activeRight[x].workSchoolFinished = buttons.work.schoolFinished;
             }
             for (let y = 0 ; y != buttons.buff.length ; y++){
                 activeRight[x].buff[y] = {
@@ -1423,6 +1565,7 @@ function saveManager(game){
                 gain: buttons.gain,
                 hasDispatched: buttons.timeEvent.hasDispatched,
                 buff: {},
+                turns: buttons.requiredTurnsToUnlock,
             };
             if(typeof buttons.runOneWithLoop !== 'undefined'){
                 activeCharacter[x].runOneWithLoop = buttons.runOneWithLoop;
@@ -1433,6 +1576,8 @@ function saveManager(game){
             if (buttons.work){
                 activeCharacter[x].workJobSelectionFinished = buttons.work.jobSelection.finished;
                 activeCharacter[x].workName = buttons.work.acceptedWorkName;
+                activeCharacter[x].workDegree = buttons.work.degree;
+                activeCharacter[x].workSchoolFinished = buttons.work.schoolFinished;
             }
             for (let y = 0 ; y != buttons.buff.length ; y++){
                 activeCharacter[x].buff[y] = {
@@ -1452,6 +1597,7 @@ function saveManager(game){
                     isBrought: data[y].data.values.isBrought,
                     canBeBrought: data[y].data.values.canBeBrought,
                     isUsed: data[y].data.values.isUsed,
+                    id: data[y].data.values.id,
                 }
             }
         }
@@ -1473,10 +1619,6 @@ function saveManager(game){
         moneyAmount.data.values.amount = parseInt(loadGame.getItem('money'));
         expAmount.data.values.amount = parseInt(loadGame.getItem('exp'));
         game.isCareSelected = loadGame.getItem('isCareSelected') === 'true';
-        let buttonSelected = JSON.parse(loadGame.getItem('buttonSelected'));
-        game.buttonLeftSelected = buttonSelected.buttonLeftSelected;
-        game.buttonRightSelected = buttonSelected.buttonRightSelected;
-        game.buttonCharacterSelected = buttonSelected.buttonCharacterSelected;
         game.currentStage = parseInt(loadGame.getItem('stage'));
         game.currentStageCounter = parseInt(loadGame.getItem('stageCounter'));
         game.tier = parseInt(loadGame.getItem('tier'));
@@ -1484,10 +1626,13 @@ function saveManager(game){
         game.bg.setFrame(game.tier-1 + game.bg.data.values.tierCounter);
         game.expMultiplier = parseInt(loadGame.getItem('expMultiplier'));
         game.moneyMultiplier = parseInt(loadGame.getItem('moneyMultiplier'));
-        game.speedMultiplier = parseInt(loadGame.getItem('speedMultiplier'));
         game.degree = loadGame.getItem('degree');
         game.schoolFinished = loadGame.getItem('schoolFinished');
         var accumulate = {money: 0 , exp: 0};
+        game.fatherPortrait.hair = game.add.image(62,148,'fatherPortraitHair', loadGame.getItem('fatherHairFrame')).setOrigin(0.5).setScale(2);
+        game.fatherPortrait.hair.depth = 1;
+        game.motherPortrait.hair = game.add.image(742,148,'motherPortraitHair', loadGame.getItem('motherHairFrame')).setOrigin(0.5).setScale(2);
+        game.motherPortrait.hair.depth = 1;
 
         for (let x in JSON.parse(loadGame.getItem('achievements'))){
             game.achievements.unlock(x);
@@ -1496,6 +1641,9 @@ function saveManager(game){
         let elapseTime = loadGame.getItem('time');
         if (elapseTime){
             elapseTime = Date.now() - elapseTime;
+            if (elapseTime > 3600000){
+                elapseTime = 3600000;
+            }
         }
 
         let activeLeft = JSON.parse(loadGame.getItem('activeLeft'));
@@ -1521,31 +1669,50 @@ function saveManager(game){
 
         let buyItems = JSON.parse(loadGame.getItem('buyItems'));
         if (buyItems != null){
-            let currentIndex = 0;
-            for (let x = 0 ; x != game.buyMenuCategories.length ; x++){
-                let data = game.buyMenuCategories[x].data.values.itemList;
-                game.buyMenuCategorySelect = game.buyMenuCategories[x];
-                for (let y = 0 ; y != data.length ; y++){
-                    let data2 = data[y].data.values;
-                    data2.isBrought = buyItems[currentIndex].isBrought;
-                    data2.canBeBrought = buyItems[currentIndex].canBeBrought;
-                    data2.isUsed = buyItems[currentIndex].isUsed;
-                    if (data2.isBrought){
-                        data2.buyButtonText.setText('USE');
-                        data2.descriptionPopup.popupText.setText(data2.desc);
-                        data2.descriptionPopup.popupBG.resize((data2.descriptionPopup.popupText.getTextBounds().local.width/2)+8, (data2.descriptionPopup.popupText.getTextBounds().local.height/2)+8);
+            for (let x = 0 ; x != buyItems.length ; x++){
+                let itemSave = buyItems[x];
+                for (let a = 0 ; a != game.buyMenuCategories.length ; a++){
+                    let dataCategories = game.buyMenuCategories[a].data.values.itemList;
+                    game.buyMenuCategorySelect = game.buyMenuCategories[a];
+                    for (let b = 0 ; b != dataCategories.length ; b++ ){
+                        let dataItems = dataCategories[b].data.values;
+                        if (itemSave.id == dataItems.id){
+                            dataItems.isBrought = itemSave.isBrought;
+                            dataItems.canBeBrought = itemSave.canBeBrought;
+                            dataItems.isUsed = itemSave.isUsed;
+                            if (dataItems.isBrought){
+                                dataItems.buyButtonText.setText('USE');
+                                dataItems.descriptionPopup.popupText.setText(dataItems.desc);
+                                dataItems.descriptionPopup.popupBG.resize((dataItems.descriptionPopup.popupText.getTextBounds().local.width/2)+8, (dataItems.descriptionPopup.popupText.getTextBounds().local.height/2)+8);
+                            }
+                            if (dataItems.isUsed){
+                                dataItems.buyButton.setFrame(2);
+                                game.buyMenuCategories[a].data.values.itemSelect = dataCategories[b];
+                                dataItems.buyButtonText.setText('USED');
+                            }
+                        }
                     }
-                    if (data2.isUsed){
-                        data2.buyButton.setFrame(2);
-                        game.buyMenuCategories[x].data.values.itemSelect = data[y];
-                        data2.buyButtonText.setText('USED');
-                    }
-                    currentIndex++;
+
                 }
+            }
+            for (let x = 0 ; x != game.buyMenuCategories.length ; x++){
+                game.buyMenuCategorySelect = game.buyMenuCategories[x];
                 renderBuyMenuItem(game);
             }
             checkItemEquip(game);
+        }
+        applySpeedMultiplier(game);
+        if (game.currentStage == 0){
+            game.buyMenuCategorySelect = game.buyMenuCategories[2];
+        }
+        else {
+            game.buyMenuCategorySelect = game.buyMenuCategories[2];
+            game.buyMenuCategorySelect.setFrame(0);
+            game.buyMenuCategorySelect.data.values.isSelected = false;
             game.buyMenuCategorySelect = game.buyMenuCategories[0];
+            game.buyMenuCategorySelect.setFrame(1);
+            game.buyMenuCamera.scrollX = 416*game.buyMenuCategorySelect.data.values.number;
+            game.buyMenuCategorySelect.data.values.isSelected = true;
         }
 
         if (expAmount.data.values.amount >= 120 && game.currentStageCounter >= 0){
@@ -1584,10 +1751,10 @@ function saveManager(game){
         repositionBuffs(game);
         game.nextStage.data.values.descriptionPopup.reinitialize();
         game.statistics.updateAll();
-        if (game.saveGame.getItem('wasSaved')){
-            moneyAmount.setData('offlineEvent', new popupEvent(game).createAcknowledgeEvent(
-                'While you\'re gone,\nYou gain '+Math.trunc(accumulate.money)+' cash \nand '+ Math.trunc(accumulate.exp)+' exp'));            
-        }
+        // if (game.saveGame.getItem('wasSaved')){
+        //     moneyAmount.setData('offlineEvent', new popupEvent(game).createAcknowledgeEvent(
+        //         'While you\'re gone,\nYou gain '+Math.trunc(accumulate.money)+' cash \nand '+ Math.trunc(accumulate.exp)+' exp'));            
+        // }
     }
 }
 
@@ -1629,6 +1796,8 @@ function loadButton(game,activeButtonPosition,button,buttonElapseTime, position)
 
     if (buttonData.work){
         buttonData.work.jobSelection.finished = button.workJobSelectionFinished;
+        buttonData.work.degree = button.workDegree;
+        buttonData.work.schoolFinished = button.workSchoolFinished;
         if (buttonData.work.jobSelection.finished){
             buttonData.work.acceptedWorkGain = button.gain;
             buttonData.work.acceptedWorkName = button.workName;
@@ -1641,6 +1810,7 @@ function loadButton(game,activeButtonPosition,button,buttonElapseTime, position)
     buttonData.gain = button.gain;
     buttonData.timeEvent.args[0] = button.gain;
     buttonData.timeEvent.paused = button.pause;
+    buttonData.requiredTurnsToUnlock = button.turns;
     if (!buttonData.timeEvent.hasDispatched){
         buttonData.timeEvent.hasDispatched = button.hasDispatched;
     }
@@ -1655,37 +1825,51 @@ function loadButton(game,activeButtonPosition,button,buttonElapseTime, position)
         activeButtonPosition.setFrame(1);
     }
 
+    if (button.cycle || button.totalCycle){
+        buttonData.cycleCount = button.cycle;
+        buttonData.totalCycle = button.totalCycle;
+    }
+
     if (!button.pause){
-        if (delay < ((button.elapseTime)+(buttonElapseTime*delay))){
-            if ((!buttonData.timeEvent.loop && !buttonData.timeEvent.hasDispatched) || buttonData.runOneWithLoop){
-                buttonData.timeEvent.hasDispatched = true;
-                buttonData.timeEvent.callbackScope[buttonData.timeEvent.callback.name](parseInt(buttonData.timeEvent.args[0]), buttonData.timeEvent.args[1]);
-                if (!buttonData.runOneWithLoop){
-                    activeButtonPosition.setFrame(3);
-                }
-            }
-            else{
-                buttonElapseTime = ((button.elapseTime)+(buttonElapseTime*delay));
-                let accumulate = Math.trunc(buttonElapseTime/delay);
-                if (button.event == 'gainGold'){
-                    moneyAmount.data.values.amount += Math.trunc((button.gain*accumulate)*.50);
-                    moneyAmount.setText(moneyAmount.data.values.amount);
-                    button.accumulateList.money += (button.gain*accumulate)*.50;
-                }
-                else if (button.event == 'expGain'){
-                    expAmount.data.values.amount += Math.trunc((button.gain*accumulate)*.50);
-                    expAmount.setText(expAmount.data.values.amount);
-                    button.accumulateList.exp += (button.gain*accumulate)*.50;
-                }
-                buttonElapseTime = buttonElapseTime-(delay*accumulate);}
+        // if (delay < ((button.elapseTime)+(buttonElapseTime*delay))){
+            // if ((!buttonData.timeEvent.loop && !buttonData.timeEvent.hasDispatched) || buttonData.runOneWithLoop){
+            //     buttonData.timeEvent.hasDispatched = true;
+            //     buttonData.timeEvent.callbackScope[buttonData.timeEvent.callback.name](parseInt(buttonData.timeEvent.args[0]), buttonData.timeEvent.args[1]);
+            //     if (!buttonData.runOneWithLoop){
+            //         activeButtonPosition.setFrame(3);
+            //     }
+            // }
+            // else{
+            //     buttonElapseTime = ((button.elapseTime)+(buttonElapseTime*delay));
+            //     let accumulate = Math.trunc(buttonElapseTime/delay);
+            //     if (button.event == 'gainGold'){
+            //         moneyAmount.data.values.amount += Math.trunc((button.gain*accumulate)*.50);
+            //         moneyAmount.setText(moneyAmount.data.values.amount);
+            //         button.accumulateList.money += (button.gain*accumulate)*.50;
+            //     }
+            //     else if (button.event == 'expGain'){
+            //         expAmount.data.values.amount += Math.trunc((button.gain*accumulate)*.50);
+            //         expAmount.setText(expAmount.data.values.amount);
+            //         button.accumulateList.exp += (button.gain*accumulate)*.50;
+            //     }
+            //     buttonElapseTime = buttonElapseTime-(delay*accumulate);}
+        //     }
+        // else {
+            // buttonElapseTime = (button.elapseTime)+(buttonElapseTime*delay);
+        // }
+        if (position == 'left'){
+            game.buttonLeftSelected = activeButtonPosition;
         }
-        else {
-            buttonElapseTime = ((button.elapseTime)+(buttonElapseTime*delay));
+        else if (position == 'right'){
+            game.buttonRightSelected = activeButtonPosition;
+        }
+        else if (position == 'character' && !buttonData.ignoreSingleButtonOnly){
+            game.buttonCharacterSelected = activeButtonPosition;
         }
     }
-    else{
+    // else{
         buttonElapseTime = buttonElapseTime*delay;
-    }
+    // }
 
     buttonData.timeEvent.elapsed = buttonElapseTime;
     for (let y = 0 ; y != Object.keys(button.buff).length ; y++){
@@ -1743,18 +1927,18 @@ function reloadActiveButton(button,elapseTime){
                 buttonElapseTime = ((elapseTime)+(buttonElapseTime*delay));
                 let accumulate = Math.trunc(buttonElapseTime/delay);
                 if (button.data.values.timeEvent.callback == gainGold){
-                    moneyAmount.data.values.amount += button.data.values.timeEvent.args[0]*accumulate;
+                    moneyAmount.data.values.amount += Math.trunc(button.data.values.timeEvent.args[0]*accumulate);
                     moneyAmount.setText(moneyAmount.data.values.amount);
                 }
                 else if (button.data.values.timeEvent.callback == expGain){
-                    expAmount.data.values.amount += button.data.values.timeEvent.args[0]*accumulate;
+                    expAmount.data.values.amount += Math.trunc(button.data.values.timeEvent.args[0]*accumulate);
                     expAmount.setText(expAmount.data.values.amount);
                 }
                 buttonElapseTime = buttonElapseTime-(delay*accumulate);
             }
         }
         else {
-            buttonElapseTime = ((elapseTime)+(buttonElapseTime*delay));
+            buttonElapseTime = (elapseTime)+(buttonElapseTime*delay);
         }
     }
     if (button.data.values.pausedMidway){
@@ -1792,10 +1976,18 @@ function checkUnlockableActiveButton(game){
     }
 
     if (button.requiredExpToUnlock+((button.requiredExpToUnlock*.25)*(game.tier-1)) <= expAmount.data.values.amount && !game.allButtonCharacterUnlock && turnsUnlocked){
-        game.activeButtonCharacter[x].setFrame(1);
-        button.unlocked = true;
+        if (!button.unlocked){
+            button.unlocked = true;
+            game.activeButtonCharacter[x].setFrame(1);
+        }
         if (getActiveButtonStats(game, 'character', button.default.stage, button.default.number+1, buffList) === true){
             if (button.requiredTurnsToUnlock == 0){
+                if (game.currentStage == 0){
+                    game.nextStage.data.values.descriptionPopup.required['1'][2] = '';
+                }
+                else if (game.currentStage == 1){
+                    game.nextStage.data.values.descriptionPopup.required['2'][3] = '';
+                }
                 game.allButtonCharacterUnlock = true;
             }
         }
@@ -1803,6 +1995,7 @@ function checkUnlockableActiveButton(game){
             activeButton(game,activeButtonCharacter,'character',
                 getActiveButtonStats(game, 'character', button.default.stage, button.default.number+1, buffList));
             game.inputs.push(activeButtonCharacter[x+1]);
+            activeButtonCharacter[x+1].data.values.timeEvent.timeScale = 1+(game.speedMultiplier/100);
         }
     }
 }
@@ -1832,6 +2025,11 @@ function updateBuffs(game, buttonData){
 
     for (var x = 0 ; x != buttonData.buff.length ; x++){
         if (Phaser.Math.Between(1,100) <= buttonData.buff[x].chance && !buttonData.buff[x].isActive){
+            if (buttonData.work){
+                if (!buttonData.work.jobSelection.finished){
+                    break;
+                }
+            }
             if (currentBuff){
                 for (var y = 0 ; y < currentBuff.length ; y++){
                     if (currentBuff[y].buffNumber == buttonData.buff[x].buffNumber && !currentBuff[y].immune){
@@ -1919,10 +2117,20 @@ function checkItemEquip(game){
             if (game.buyMenuCategories[data.itemEquipIndex-1].data.values.itemSelect){
                 let itemData = game.buyMenuCategories[data.itemEquipIndex-1].data.values.itemSelect.data.values;
                 if (data.event == 'gainGold'){
-                    data.gain = itemData.gainMoney;
+                    if (data.itemRequired){
+                        data.gain = itemData.gainMoney;
+                    }
+                    else {
+                        data.gain *= (itemData.point/100)+1;
+                    }
                 }
                 else if (data.event == 'expGain'){
-                    data.gain = itemData.gainExp;
+                    if (data.itemRequired){
+                        data.gain = itemData.gainExp;
+                    }
+                    else {
+                        data.gain *= (itemData.point/100)+1;
+                    }
                 }
                 data.timeEvent.args[0] = data.gain;
             }
@@ -1930,16 +2138,40 @@ function checkItemEquip(game){
     }
 }
 
-function applySpeedMultiplier(game){
+function addSpeedMultiplier(game, checkAll){
+    if (checkAll){
+        for (let x = 0 ; x != game.buyMenuCategories.length ; x++){
+            game.buyMenuCategorySelect = game.buyMenuCategories[x];
+            if (game.buyMenuCategorySelect.data.values.itemSelect){
+                game.speedMultiplier += game.buyMenuCategorySelect.data.values.itemSelect.data.values.point;
+            }
+        }
+    }
+    else {
+        if (game.buyMenuCategorySelect.data.values.prevItem){
+            game.speedMultiplier -= game.buyMenuCategorySelect.data.values.prevItem.data.values.point;
+        }
+        if (game.buyMenuCategorySelect.data.values.itemSelect){
+            game.speedMultiplier += game.buyMenuCategorySelect.data.values.itemSelect.data.values.point;
+        }
+    }
+    applySpeedMultiplier(game);
+}
+
+function applySpeedMultiplier(game, checkAll){
+    if (checkAll){
+        addSpeedMultiplier(game, true);
+    }
     for (let x = 0 ; x != game.activeButtonLeft.length ; x++){
-        game.activeButtonLeft[x].data.values.timeEvent.timeScale += game.speedMultiplier/10;
+        game.activeButtonLeft[x].data.values.timeEvent.timeScale = 1+(game.speedMultiplier/100);
     }
     for (let x = 0 ; x != game.activeButtonRight.length ; x++){
-        game.activeButtonRight[x].data.values.timeEvent.timeScale += game.speedMultiplier/10;
+        game.activeButtonRight[x].data.values.timeEvent.timeScale = 1+(game.speedMultiplier/100);
     }
     for (let x = 0 ; x != game.activeButtonCharacter.length ; x++){
-        game.activeButtonCharacter[x].data.values.timeEvent.timeScale += game.speedMultiplier/10;
+        game.activeButtonCharacter[x].data.values.timeEvent.timeScale = 1+(game.speedMultiplier/100);
     }
+    game.statistics.updateMultipliers();
 }
 
 function save(game){

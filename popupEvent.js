@@ -135,13 +135,15 @@ export class popupEvent{
 				buttonData.descriptionPopup.show();
 			});
 			button.on('pointerup',function(){
-				this.game.moneyAmount.data.values.amount -= button.data.values.cost;
-				this.game.moneyAmount.setText(this.game.moneyAmount.data.values.amount);
-				this.game.activeButtonCharacter[args[x].button-1].data.values.gain = args[x].gain;
-				this.game.activeButtonCharacter[args[x].button-1].data.values.timeEvent.args[0] = args[x].gain;
-				this.finish(buttonData);
-				if (this.origin){
-					this.origin.finish(buttonData);
+				if (this.game.moneyAmount.data.values.amount >= button.data.values.cost){
+					this.game.moneyAmount.data.values.amount -= button.data.values.cost;
+					this.game.moneyAmount.setText(this.game.moneyAmount.data.values.amount);
+					this.game.activeButtonCharacter[args[x].button-1].data.values.gain = args[x].gain;
+					this.game.activeButtonCharacter[args[x].button-1].data.values.timeEvent.args[0] = args[x].gain;
+					this.finish(buttonData);
+					if (this.origin){
+						this.origin.finish(buttonData);
+					}	
 				}
 			},this);
 			this.buttons.push(button);
@@ -169,26 +171,29 @@ export class popupEvent{
 		for (let x = 0 ; x != this.buttons.length ; x++){
 			this.buttons[x].off('pointerup');
 			this.buttons[x].data.values.secondButtons = new popupEvent(this.game).createCategoriesEvent(args[x].text, args[x].args[0]);
+			this.buttons[x].data.values.secondButtons.buttons[0].origin = this;
 			this.buttons[x].data.values.secondButtons.origin = this;
 			this.buttons[x].on('pointerup', function(){
 				this.selectedButtonText = this.buttons[x].data.values.text.text;
 				this.buttons[x].data.values.secondButtons.selectedButtonText = this.selectedButtonText;
 				this.buttons[x].data.values.secondButtons.show();
 				this.hide();
+				this.game.disableButtonsEvent(this.game);
 			},this);
 
 			this.buttons[x].data.values.secondButtons.buttons[0].on('pointerup', function(){
 				if (event){
 					event.event(args[x].args[0].text, this.selectedButtonText);
 				}
-				this.game.moneyAmount.data.values.amount -= args[x].args[0].cost;
-				this.game.moneyAmount.setText(this.game.moneyAmount.data.values.amount);
-				this.game.activeButtonCharacter[args[x].args[0].button-1].data.values.gain = args[x].args[0].gain;
-				this.game.activeButtonCharacter[args[x].args[0].button-1].data.values.timeEvent.args[0] = args[x].args[0].gain;
-				this.finish(this.buttons[x].data.values.secondButtons.buttons[0].data.values);
-				if (this.origin){
-					this.origin.finish(this.buttons[x].data.values.secondButtons.buttons[0].data.values);
-				}
+				// console.log(this);
+				// this.game.moneyAmount.data.values.amount -= args[x].args[0].cost;
+				// this.game.moneyAmount.setText(this.game.moneyAmount.data.values.amount);
+				// this.game.activeButtonCharacter[args[x].args[0].button-1].data.values.gain = args[x].args[0].gain;
+				// this.game.activeButtonCharacter[args[x].args[0].button-1].data.values.timeEvent.args[0] = args[x].args[0].gain;
+				// this.finish(this.buttons[x].data.values.secondButtons.buttons[0].data.values);
+				// if (this.origin){
+				// 	this.origin.finish(this.buttons[x].data.values.secondButtons.buttons[0].data.values);
+				// }
 			},this);
 
 			for ( let y = 1 ; y != args[x].args.length ; y++){
@@ -203,15 +208,17 @@ export class popupEvent{
 			this.popupBG = args.game.add.nineslice(0,0,36,19,'descriptionPopup',4);
 			this.popupBG.depth = 3;
 	    	this.popupBG.setScale(2);
-	    	this.popupText = args.game.add.bitmapText(0,0,'mainFont2',text+' Cash');
+	    	this.popupText = args.game.add.bitmapText(0,0,'mainFont2',text+' Money');
 	    	this.popupText.depth = 3;
-			this.popupBG.resize(this.popupText.getTextBounds().local.width,this.popupText.getTextBounds().local.height+4);
+			this.popupBG.resize((this.popupText.getTextBounds().local.width/2)+8,(this.popupText.getTextBounds().local.height/2)+6);
 	    	this.isPointed = false;
 	    	
 	    	this.show = function(){
-	    		this.popupBG.setVisible(true);
-	    		this.popupText.setVisible(true);
-	    		this.isPointed = true;
+	    		if (text != ''){
+	    			this.popupBG.setVisible(true);
+		    		this.popupText.setVisible(true);
+		    		this.isPointed = true;
+	    		}
 	    	}
 
 	    	this.hide = function(){
@@ -259,17 +266,18 @@ export class popupEvent{
 			buttonData.descriptionPopup.show();
 		});
 		button.on('pointerup',function(){
-			if(event){
-				event.event(buttons.text, this.selectedButtonText);
-			}
-			this.game.moneyAmount.data.values.amount -= button.data.values.cost;
-			this.game.moneyAmount.setText(this.game.moneyAmount.data.values.amount);
-			this.game.activeButtonCharacter[buttons.button-1].data.values.gain = buttons.gain;
-			this.game.activeButtonCharacter[buttons.button-1].data.values.timeEvent.args[0] = buttons.gain;
-			this.finish(buttonData);
-			if (this.origin){
-				console.log(this.origin.finished);
-				this.origin.finish(buttonData);
+			if (this.game.moneyAmount.data.values.amount >= button.data.values.cost){
+				if(event){
+					event.event(buttons.text, this.selectedButtonText);
+				}
+				this.game.moneyAmount.data.values.amount -= button.data.values.cost;
+				this.game.moneyAmount.setText(this.game.moneyAmount.data.values.amount);
+				this.game.activeButtonCharacter[buttons.button-1].data.values.gain = buttons.gain;
+				this.game.activeButtonCharacter[buttons.button-1].data.values.timeEvent.args[0] = buttons.gain;
+				this.finish(buttonData);
+				if (this.origin){
+					this.origin.finish(buttonData);
+				}
 			}
 		},this);
 		this.buttons.push(button);
